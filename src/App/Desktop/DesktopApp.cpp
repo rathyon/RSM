@@ -1,7 +1,7 @@
 /*
 	This is where GLUT/GLEW is initialized and the Windows section of the project connects to the core
 */
-#include "WindowsApp.h"
+#include "DesktopApp.h"
 
 #include <iostream>
 #include <sstream>
@@ -9,14 +9,14 @@
 #define WND_W 800
 #define WND_H 640
 
-using namespace gir;
+using namespace rsm;
 
-void gir::init(int argc, char* argv[]) {
+void rsm::init(int argc, char* argv[]) {
 	glApp = new OpenGLApplication();
 
 	width = WND_W;
 	height = WND_H;
-	title = "Global Illumination Rendering";
+	title = "Mobile Reflective Shadow Maps";
 
 	// Setup glut
 	glutInit(&argc, argv);
@@ -57,10 +57,11 @@ void gir::init(int argc, char* argv[]) {
 	glApp->init();
 	RM.init();
 
-	Shader vShader = Shader(VERTEX_SHADER, "../../shaders/vertex.vs");
+	/** /
+	Shader vShader = Shader(VERTEX_SHADER, "../../Shaders/vertex.vs");
 	vShader.inject("#version 330 core\n");
 
-	Shader fShader = Shader(FRAGMENT_SHADER, "../../shaders/frag.fs");
+	Shader fShader = Shader(FRAGMENT_SHADER, "../../Shaders/frag.fs");
 	fShader.inject("#version 330 core\n");
 
 	sref<Shader> program = make_sref<Shader>("ShaderProgram");
@@ -72,11 +73,12 @@ void gir::init(int argc, char* argv[]) {
 	program->attach(fShader);
 
 	RM.addShader("program", program);
+	/**/
 
 	glApp->prepare();
 }
 
-void gir::update() {
+void rsm::update() {
 	int timeSinceStart = glutGet(GLUT_ELAPSED_TIME);
 	int deltaTime = timeSinceStart - oldTimeSinceStart;
 	oldTimeSinceStart = timeSinceStart;
@@ -89,7 +91,7 @@ void gir::update() {
 	glApp->update(dt);
 }
 
-void gir::updateFPS(int value) {
+void rsm::updateFPS(int value) {
 	std::ostringstream oss;
 	oss << title << ": " << frameCount << " FPS @ (" << width << "x" << height << ")";
 	std::string s = oss.str();
@@ -98,11 +100,11 @@ void gir::updateFPS(int value) {
 	frameCount = 0;
 }
 
-void gir::setTitle(const std::string& new_title) {
+void rsm::setTitle(const std::string& new_title) {
 	title = new_title;
 }
 
-void gir::render() {
+void rsm::render() {
 	update();
 	glApp->render();
 	frameCount++;
@@ -110,15 +112,15 @@ void gir::render() {
 	glutSwapBuffers();
 }
 
-void gir::reshape(int w, int h) {
+void rsm::reshape(int w, int h) {
 	glApp->reshape(w, h);
 }
 
-void gir::idle() {
+void rsm::idle() {
 	glutPostRedisplay();
 }
 
-void gir::setupCallbacks() {
+void rsm::setupCallbacks() {
 	glutDisplayFunc(render);
 	glutReshapeFunc(reshape);
 	glutIdleFunc(idle);
@@ -126,20 +128,20 @@ void gir::setupCallbacks() {
 	glutTimerFunc(1000, updateFPS, 0);
 }
 
-void gir::loop() {
+void rsm::loop() {
 	glutMainLoop();
 }
 
-void gir::cleanup() {
+void rsm::cleanup() {
 	glApp->cleanup();
 	delete glApp;
 }
 
 int main(int argc, char* argv[]) {
-	gir::init(argc, argv);
-	gir::setupCallbacks();
+	rsm::init(argc, argv);
+	rsm::setupCallbacks();
 
-	gir::loop();
+	rsm::loop();
 
 	exit(EXIT_SUCCESS);
 }

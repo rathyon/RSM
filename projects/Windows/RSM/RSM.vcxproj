@@ -18,6 +18,27 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\App\Desktop\DesktopApp.cpp" />
+    <ClCompile Include="..\..\..\src\Core\OpenGL.cpp" />
+    <ClCompile Include="..\..\..\src\Core\OpenGLApplication.cpp" />
+    <ClCompile Include="..\..\..\src\Core\Resources.cpp" />
+    <ClCompile Include="..\..\..\src\Graphics\Shader.cpp" />
+    <ClCompile Include="..\..\..\src\Utils\Utils.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\App\Desktop\DesktopApp.h" />
+    <ClInclude Include="..\..\..\src\Core\OpenGL.h" />
+    <ClInclude Include="..\..\..\src\Core\OpenGLApplication.h" />
+    <ClInclude Include="..\..\..\src\Core\Resources.h" />
+    <ClInclude Include="..\..\..\src\Graphics\Shader.h" />
+    <ClInclude Include="..\..\..\src\RSM.h" />
+    <ClInclude Include="..\..\..\src\Utils\Utils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\src\Shaders\frag.fs" />
+    <None Include="..\..\..\src\Shaders\vertex.vs" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{68D267FE-5796-40AC-9B14-5CB59F184C54}</ProjectGuid>
@@ -73,13 +94,13 @@
     <OutDir>$(SolutionDir)..\..\bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>intermediate\$(Configuration)\$(Platform)\</IntDir>
     <IncludePath>$(SolutionDir)..\..\src;$(SolutionDir)..\..\src\App;$(SolutionDir)..\..\src\Core;$(SolutionDir)..\..\src\Graphics;$(SolutionDir)..\..\src\GUI;$(SolutionDir)..\..\src\Materials;$(SolutionDir)..\..\src\Math;$(SolutionDir)..\..\src\Lights;$(SolutionDir)..\..\src\Utils;$(SolutionDir)..\..\ext\freeglut\include;$(SolutionDir)..\..\ext\glew\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(LibraryPath);$(SolutionDir)..\..\ext\freeglut\lib\$(Platform);$(SolutionDir)..\..\ext\glew\lib\$(Platform)</LibraryPath>
+    <LibraryPath>$(LibraryPath);$(SolutionDir)..\..\ext\freeglut\lib\$(Platform);$(SolutionDir)..\..\ext\glew\lib\Release\$(Platform)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\..\bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>intermediate\$(Configuration)\$(Platform)\</IntDir>
     <IncludePath>$(SolutionDir)..\..\src;$(SolutionDir)..\..\src\App;$(SolutionDir)..\..\src\Core;$(SolutionDir)..\..\src\Graphics;$(SolutionDir)..\..\src\GUI;$(SolutionDir)..\..\src\Materials;$(SolutionDir)..\..\src\Math;$(SolutionDir)..\..\src\Lights;$(SolutionDir)..\..\src\Utils;$(SolutionDir)..\..\ext\freeglut\include;$(SolutionDir)..\..\ext\glew\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(LibraryPath);$(SolutionDir)..\..\ext\freeglut\lib\$(Platform);$(SolutionDir)..\..\ext\glew\lib\$(Platform)</LibraryPath>
+    <LibraryPath>$(LibraryPath);$(SolutionDir)..\..\ext\freeglut\lib\$(Platform);$(SolutionDir)..\..\ext\glew\lib\Release\$(Platform)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -88,6 +109,14 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>glew32.lib;freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>COPY /Y "$(SolutionDir)..\..\ext\glew\bin\Release\$(Platform)\glew32.dll" "$(SolutionDir)..\..\bin\$(Configuration)\$(Platform)\."
+COPY /Y "$(SolutionDir)..\..\ext\freeglut\bin\$(Platform)\freeglut.dll" "$(SolutionDir)..\..\bin\$(Configuration)\$(Platform)\."
+XCOPY  "$(SolutionDir)..\..\src\Shaders" "$(SolutionDir)..\..\bin\$(Configuration)\$(Platform)\Shaders" /s /e /y /i</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -100,8 +129,8 @@
       <AdditionalDependencies>glew32.lib;freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>COPY /Y "$(SolutionDir)..\ext\glew\bin\Release\$(Platform)\glew32.dll" "$(SolutionDir)..\..\bin\$(Configuration)\$(Platform)\."
-COPY /Y "$(SolutionDir)..\ext\freeglut\bin\$(Platform)\freeglut.dll" "$(SolutionDir)..\..\bin\$(Configuration)\$(Platform)\."
+      <Command>COPY /Y "$(SolutionDir)..\..\ext\glew\bin\Release\$(Platform)\glew32.dll" "$(SolutionDir)..\..\bin\$(Configuration)\$(Platform)\."
+COPY /Y "$(SolutionDir)..\..\ext\freeglut\bin\$(Platform)\freeglut.dll" "$(SolutionDir)..\..\bin\$(Configuration)\$(Platform)\."
 XCOPY  "$(SolutionDir)..\..\src\Shaders" "$(SolutionDir)..\..\bin\$(Configuration)\$(Platform)\Shaders" /s /e /y /i</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -117,7 +146,13 @@ XCOPY  "$(SolutionDir)..\..\src\Shaders" "$(SolutionDir)..\..\bin\$(Configuratio
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>glew32.lib;freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>COPY /Y "$(SolutionDir)..\..\ext\glew\bin\Release\$(Platform)\glew32.dll" "$(SolutionDir)..\..\bin\$(Configuration)\$(Platform)\."
+COPY /Y "$(SolutionDir)..\..\ext\freeglut\bin\$(Platform)\freeglut.dll" "$(SolutionDir)..\..\bin\$(Configuration)\$(Platform)\."
+XCOPY  "$(SolutionDir)..\..\src\Shaders" "$(SolutionDir)..\..\bin\$(Configuration)\$(Platform)\Shaders" /s /e /y /i</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -134,17 +169,11 @@ XCOPY  "$(SolutionDir)..\..\src\Shaders" "$(SolutionDir)..\..\bin\$(Configuratio
       <AdditionalDependencies>glew32.lib;freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>COPY /Y "$(SolutionDir)..\ext\glew\bin\Release\$(Platform)\glew32.dll" "$(SolutionDir)..\..\bin\$(Configuration)\$(Platform)\."
-COPY /Y "$(SolutionDir)..\ext\freeglut\bin\$(Platform)\freeglut.dll" "$(SolutionDir)..\..\bin\$(Configuration)\$(Platform)\."
+      <Command>COPY /Y "$(SolutionDir)..\..\ext\glew\bin\Release\$(Platform)\glew32.dll" "$(SolutionDir)..\..\bin\$(Configuration)\$(Platform)\."
+COPY /Y "$(SolutionDir)..\..\ext\freeglut\bin\$(Platform)\freeglut.dll" "$(SolutionDir)..\..\bin\$(Configuration)\$(Platform)\."
 XCOPY  "$(SolutionDir)..\..\src\Shaders" "$(SolutionDir)..\..\bin\$(Configuration)\$(Platform)\Shaders" /s /e /y /i</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\..\src\App\Desktop\WindowsApp.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\src\App\Desktop\WindowsApp.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

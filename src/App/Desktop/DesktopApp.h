@@ -1,8 +1,8 @@
-#include "Core/OpenGLApplication.h"
+#include <OpenGLApplication.h>
 
 #include <string>
 
-namespace gir {
+namespace rsm {
 
 	void init(int argc, char* argv[]);
 	void loop(); // glutMainLoop
