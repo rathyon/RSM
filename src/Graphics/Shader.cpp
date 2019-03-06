@@ -6,7 +6,7 @@
 
 namespace rsm {
 
-	Shader::Shader(ShaderType type, const std::string& filepath) {
+	ShaderSource::ShaderSource(ShaderType type, const std::string& filepath) {
 		_name = filepath;
 		_id = glCreateShader(OpenGLShaderType[type]);
 		if (_id == 0)
@@ -14,14 +14,31 @@ namespace rsm {
 
 		// Read shader source code into attribute
 		Utils::readFile(filepath, std::ios_base::in, _source);
+
+		compile();
 	}
 
-	Shader::Shader(const std::string& name) {
-		_name = name;
-		_id = glCreateProgram();
+	ShaderSource::~ShaderSource() {
+		glDeleteShader(_id);
 	}
 
-	void Shader::compile() {
+	GLuint ShaderSource::id() const {
+		return _id;
+	}
+
+	ShaderType ShaderSource::type() const {
+		return _type;
+	}
+
+	const std::string ShaderSource::name() const {
+		return _name;
+	}
+
+	const std::string ShaderSource::source() const {
+		return _source;
+	}
+
+	void ShaderSource::compile() {
 		const char* c_str = _source.c_str();
 		glShaderSource(_id, 1, &c_str, 0);
 		glCompileShader(_id);
@@ -46,20 +63,44 @@ namespace rsm {
 	}
 
 	// Injects a string on the first line of the shader source
-	void Shader::inject(const std::string& str) {
+	void ShaderSource::inject(const std::string& str) {
 		_source.insert(0, str);
 	}
 
-	void Shader::attach(Shader shader) {
-		glAttachShader(_id, shader.id());
-		// Check attachment error
-		checkOpenGLError("Could not attach shader (" + std::to_string(shader.id()) +
-			") to program (" + std::to_string(_id) + ") " + shader.name() + ".");
 
-		_shaders.push_back(shader.id());
+
+	Shader::Shader(const std::string& name) {
+		_name = name;
 	}
 
-	void Shader::link() {
+	GLuint Shader::id() const {
+		return _id;
+	}
+
+	const std::string& Shader::name() const{
+		return _name;
+	}
+
+	const std::vector<ShaderSource>& Shader::shaders() const {
+		return _shaders;
+	}
+
+	void Shader::addShader(const ShaderSource& src) {
+		_shaders.push_back(src);
+	}
+
+	bool Shader::link() {
+		_id = glCreateProgram();
+		if (_id == 0)
+			std::cerr << "Could not create shader: " + _name << std::endl;
+
+		for (ShaderSource src : _shaders) {
+			glAttachShader(_id, src.id());
+			// Check attachment error
+			checkOpenGLError("Could not attach shader (" + std::to_string(src.id()) +
+				") to program (" + std::to_string(_id) + ") " + src.name() + ".");
+		}
+
 		glLinkProgram(_id);
 
 		// Check linkage for errors and print them
@@ -75,31 +116,23 @@ namespace rsm {
 			std::string strLog(log);
 			std::cerr << "Shader " << _name << " linkage log:\n" << strLog;
 			delete[] log;
+
+			// Detach shaders
+			for (ShaderSource src : _shaders) {
+				glDetachShader(_id, src.id());
+			}
+
+			// Delete the program
+			glDeleteProgram(_id);
+
+			return false;
 		}
 
-		for (int i = 0; i < _shaders.size(); i++) {
-			glDeleteShader(_shaders[i]);
+		// Detach shaders after successful linking
+		for (ShaderSource src : _shaders) {
+			glDetachShader(_id, src.id());
 		}
-	}
 
-	Shader::~Shader() {
-		glDeleteShader(_id);
+		return true;
 	}
-
-	GLuint Shader::id(){
-		return _id;
-	}
-
-	ShaderType Shader::type() {
-		return _type;
-	}
-
-	std::string Shader::name() {
-		return _name;
-	}
-
-	std::string Shader::source() {
-		return _source;
-	}
-
 }
