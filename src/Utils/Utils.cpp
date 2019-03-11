@@ -7,7 +7,8 @@ using namespace rsm;
 bool Utils::readFile(const std::string& filepath, std::ios_base::openmode mode, std::string& str) {
 	std::ifstream file(filepath, mode);
 	if (file.fail()) {
-		perror(filepath.c_str());
+		//perror(filepath.c_str());
+		LOGE(filepath.c_str());
 		return false;
 	}
 
@@ -20,7 +21,7 @@ bool Utils::readFile(const std::string& filepath, std::ios_base::openmode mode, 
 }
 
 void Utils::throwError(const std::string& error) {
-	std::cerr << error << std::endl;
-	std::cin.get();
+	LOGE(error);
+	//std::cin.get();
 	exit(EXIT_FAILURE);
 }

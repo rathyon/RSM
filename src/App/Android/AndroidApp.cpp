@@ -1,15 +1,16 @@
 #include "Core/OpenGLApplication.h"
 
-using namespace gir;
+using namespace rsm;
 
 // MOBILE IMPORTING
 
-gir::OpenGLApplication* glApp;
+rsm::OpenGLApplication* glApp;
 
 void init() {
     glApp = new OpenGLApplication();
     glApp->init();
 
+    /** /
     RM.init();
 
     Shader vShader = Shader(VERTEX_SHADER, "vertex.vs");
@@ -27,6 +28,7 @@ void init() {
     program->attach(fShader);
 
     RM.addShader("program", program);
+    /**/
 
     // Read files, etc... input stuff
     // ...
@@ -45,20 +47,20 @@ void render() {
 
 extern "C"
 {
-    JNIEXPORT void JNICALL Java_com_rbenjamim_gir_MobileApp_init(JNIEnv *env, jclass type);
-    JNIEXPORT void JNICALL Java_com_rbenjamim_gir_MobileApp_resize(JNIEnv *env, jclass type, jint width, jint height);
-    JNIEXPORT void JNICALL Java_com_rbenjamim_gir_MobileApp_render(JNIEnv *env, jclass type);
+    JNIEXPORT void JNICALL Java_com_rbenjamim_rsm_AndroidApp_init(JNIEnv *env, jclass type);
+    JNIEXPORT void JNICALL Java_com_rbenjamim_rsm_AndroidApp_resize(JNIEnv *env, jclass type, jint width, jint height);
+    JNIEXPORT void JNICALL Java_com_rbenjamim_rsm_AndroidApp_render(JNIEnv *env, jclass type);
 };
 
-JNIEXPORT void JNICALL Java_com_rbenjamim_gir_MobileApp_init(JNIEnv *env, jclass type) {
+JNIEXPORT void JNICALL Java_com_rbenjamim_rsm_AndroidApp_init(JNIEnv *env, jclass type) {
     init();
 }
 
-JNIEXPORT void JNICALL Java_com_rbenjamim_gir_MobileApp_resize(JNIEnv *env, jclass type, jint width, jint height) {
+JNIEXPORT void JNICALL Java_com_rbenjamim_rsm_AndroidApp_resize(JNIEnv *env, jclass type, jint width, jint height) {
     reshape(width, height);
 }
 
-JNIEXPORT void JNICALL Java_com_rbenjamim_gir_MobileApp_render(JNIEnv *env, jclass type) {
+JNIEXPORT void JNICALL Java_com_rbenjamim_rsm_AndroidApp_render(JNIEnv *env, jclass type) {
     render();
 }
 

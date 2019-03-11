@@ -1,8 +1,5 @@
 #include "OpenGL.h"
 
-#include <string>
-#include <iostream>
-
 const char *getGLErrorString(GLenum err)
 {
     switch (err) {
@@ -27,8 +24,9 @@ const char *getGLErrorString(GLenum err)
 
 void checkOpenGLError(const std::string& error) {
 	if (isOpenGLError()) {
-		std::cerr << error << std::endl;
-		std::cin.get();
+		//std::cerr << error << std::endl;
+		LOGE(error);
+		//std::cin.get();
 		exit(EXIT_FAILURE);
 	}
 }
@@ -40,7 +38,8 @@ bool isOpenGLError() {
 	while ((errCode = glGetError()) != GL_NO_ERROR) {
 		isError = true;
 		errString = getGLErrorString(errCode);
-		std::cerr << "OpenGL ERROR [" << errString << "]." << std::endl;
+		//std::cerr << "OpenGL ERROR [" << errString << "]." << std::endl;
+		LOGE("OpenGL ERROR [" << errString << "].");
 	}
 	return isError;
 }

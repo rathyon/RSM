@@ -14,9 +14,24 @@
 
 #define make_sref std::make_shared
 
+#define LOG_TAG "RSM"
+
+#ifdef __ANDROID__
+#include <android/log.h>
+
+#define LOG(str) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, str)
+#define LOGE(str) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, str)
+
+#else
+
+#define LOG(str) std::cout << str << std::endl
+#define LOGE(str) std::cerr << str << std::endl
+
+#endif
+
 namespace rsm {
 
-	// This is a relic from a previous project, ignore it for the most part for now
+	// These are relics from the PBR project, ignore it for the most part for now
 
 	// Integer types
 	typedef std::uint8_t  uint8;

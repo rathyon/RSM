@@ -48,9 +48,6 @@
     <ClCompile Include="..\..\..\src\Core\OpenGLApplication.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\App\Desktop\DesktopApp.cpp">
-      <Filter>Source Files\App</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\Core\Resources.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
@@ -59,6 +56,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\Utils\Utils.cpp">
       <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\App\Windows\WindowsApp.cpp">
+      <Filter>Source Files\App</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -71,9 +71,6 @@
     <ClInclude Include="..\..\..\src\RSM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\App\Desktop\DesktopApp.h">
-      <Filter>Header Files\App</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\Core\Resources.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
@@ -82,6 +79,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Utils\Utils.h">
       <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\App\Windows\WindowsApp.h">
+      <Filter>Header Files\App</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

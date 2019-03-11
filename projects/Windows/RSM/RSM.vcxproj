@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\App\Desktop\DesktopApp.cpp" />
+    <ClCompile Include="..\..\..\src\App\Windows\WindowsApp.cpp" />
     <ClCompile Include="..\..\..\src\Core\OpenGL.cpp" />
     <ClCompile Include="..\..\..\src\Core\OpenGLApplication.cpp" />
     <ClCompile Include="..\..\..\src\Core\Resources.cpp" />
@@ -27,7 +27,7 @@
     <ClCompile Include="..\..\..\src\Utils\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\App\Desktop\DesktopApp.h" />
+    <ClInclude Include="..\..\..\src\App\Windows\WindowsApp.h" />
     <ClInclude Include="..\..\..\src\Core\OpenGL.h" />
     <ClInclude Include="..\..\..\src\Core\OpenGLApplication.h" />
     <ClInclude Include="..\..\..\src\Core\Resources.h" />

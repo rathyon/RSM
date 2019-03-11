@@ -3,9 +3,6 @@
 
 #include "Core/OpenGL.h"
 
-#include <string>
-#include <vector>
-
 namespace rsm {
 
 	const GLenum OpenGLShaderType[] {

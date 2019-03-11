@@ -9,9 +9,11 @@ namespace rsm {
 	ShaderSource::ShaderSource(ShaderType type, const std::string& filepath) {
 		_name = filepath;
 		_id = glCreateShader(OpenGLShaderType[type]);
-		if (_id == 0)
-			std::cerr << "Could not create shader: " + _name << std::endl;
-
+		if (_id == 0) {
+			//std::cerr << "Could not create shader: " + _name << std::endl;
+			LOGE("Could not create shader: " + _name);
+		}
+			
 		// Read shader source code into attribute
 		Utils::readFile(filepath, std::ios_base::in, _source);
 
@@ -58,7 +60,8 @@ namespace rsm {
 			std::string message(log);
 			delete[] log;
 
-			std::cerr << "Couldn't compile shader: " << _name << "\n Compilation log:\n" << message;
+			//std::cerr << "Couldn't compile shader: " << _name << "\n Compilation log:\n" << message;
+			LOGE("Couldn't compile shader: " + _name + "\n Compilation log:\n" + message);
 		}
 	}
 
@@ -91,9 +94,11 @@ namespace rsm {
 
 	bool Shader::link() {
 		_id = glCreateProgram();
-		if (_id == 0)
-			std::cerr << "Could not create shader: " + _name << std::endl;
-
+		if (_id == 0) {
+			//std::cerr << "Could not create shader: " + _name << std::endl;
+			LOGE("Could not create shader: " + _name);
+		}
+			
 		for (ShaderSource src : _shaders) {
 			glAttachShader(_id, src.id());
 			// Check attachment error
@@ -114,7 +119,10 @@ namespace rsm {
 			glGetProgramInfoLog(_id, logLen, &logLen, log);
 
 			std::string strLog(log);
-			std::cerr << "Shader " << _name << " linkage log:\n" << strLog;
+
+			//std::cerr << "Shader " << _name << " linkage log:\n" << strLog;
+			LOGE("Shader " + _name + " linkage log:\n" + strLog);
+
 			delete[] log;
 
 			// Detach shaders

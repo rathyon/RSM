@@ -1,7 +1,7 @@
 /*
 	This is where GLUT/GLEW is initialized and the Windows section of the project connects to the core
 */
-#include "DesktopApp.h"
+#include "WindowsApp.h"
 
 #include <iostream>
 #include <sstream>

@@ -1,4 +1,4 @@
-package com.rbenjamim.gir;
+package com.rbenjamim.rsm;
 
 public class Configs {
 

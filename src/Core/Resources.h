@@ -27,14 +27,11 @@ namespace rsm {
 		static Resources& get();
 
 		void init();
+		void cleanup();
 
 		void addShader(const std::string& name, const std::shared_ptr<Shader>& shader);
-
 		bool removeShader(const std::string& name);
-
 		Shader* getShader(const std::string& name);
-
-		void cleanup();
 
 	private:
 		Resources();

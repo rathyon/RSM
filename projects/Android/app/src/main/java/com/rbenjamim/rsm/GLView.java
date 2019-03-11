@@ -1,4 +1,4 @@
-package com.rbenjamim.gir;
+package com.rbenjamim.rsm;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
@@ -8,7 +8,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.opengles.GL10;
 
-import static com.rbenjamim.gir.Configs.*;
+import static com.rbenjamim.rsm.Configs.*;
 
 public class GLView extends GLSurfaceView {
 
@@ -25,17 +25,17 @@ public class GLView extends GLSurfaceView {
 
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-            MobileApp.init();
+            AndroidApp.init();
         }
 
         @Override
         public void onSurfaceChanged(GL10 gl, int width, int height) {
-            MobileApp.resize(width, height);
+            AndroidApp.resize(width, height);
         }
 
         @Override
         public void onDrawFrame(GL10 gl) {
-            MobileApp.render();
+            AndroidApp.render();
         }
     }
 

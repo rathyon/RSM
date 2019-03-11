@@ -1,8 +1,8 @@
-package com.rbenjamim.gir;
+package com.rbenjamim.rsm;
 
-public class MobileApp {
+public class AndroidApp {
     static {
-        System.loadLibrary("MobileGIRAppLib");
+        System.loadLibrary("AndroidRSM-lib");
     }
 
     public static native void init();
