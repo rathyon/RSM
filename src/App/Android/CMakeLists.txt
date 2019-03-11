@@ -8,9 +8,10 @@ cmake_minimum_required(VERSION 3.4.1)
 set(SOURCE_DIR ${CMAKE_SOURCE_DIR}/../../../src/)
 
 file (GLOB SOURCE_FILES
+        ${SOURCE_DIR}RSM.h
         ${SOURCE_DIR}*.cpp
         ${SOURCE_DIR}*/*.cpp
-        ${SOURCE_DIR}*/Android/*.cpp)
+        ${SOURCE_DIR}App/Android/*.cpp)
 
 add_library( # Sets the name of the library.
         AndroidRSM-lib

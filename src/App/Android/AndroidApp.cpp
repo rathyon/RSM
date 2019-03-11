@@ -1,8 +1,6 @@
-#include "Core/OpenGLApplication.h"
+#include "App/OpenGLApplication.h"
 
 using namespace rsm;
-
-// MOBILE IMPORTING
 
 rsm::OpenGLApplication* glApp;
 

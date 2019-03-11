@@ -40,12 +40,12 @@
     <Filter Include="Source Files\Shaders">
       <UniqueIdentifier>{56859ec6-d510-471f-8ae7-d18145227ffe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Math">
+      <UniqueIdentifier>{e807b527-5d71-4dbc-ab4c-fa586d7fe728}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Core\OpenGL.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Core\OpenGLApplication.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Core\Resources.cpp">
@@ -60,11 +60,20 @@
     <ClCompile Include="..\..\..\src\App\Windows\WindowsApp.cpp">
       <Filter>Source Files\App</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\App\OpenGLApplication.cpp">
+      <Filter>Source Files\App</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Core\Scene.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Core\Model.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Core\SceneObject.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\Core\OpenGLApplication.h">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\Core\OpenGL.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
@@ -82,6 +91,21 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\App\Windows\WindowsApp.h">
       <Filter>Header Files\App</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\App\OpenGLApplication.h">
+      <Filter>Header Files\App</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Core\Scene.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Core\Model.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Core\SceneObject.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Math\RSMaths.h">
+      <Filter>Header Files\Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

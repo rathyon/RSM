@@ -25,7 +25,7 @@ const char *getGLErrorString(GLenum err)
 void checkOpenGLError(const std::string& error) {
 	if (isOpenGLError()) {
 		//std::cerr << error << std::endl;
-		LOGE(error);
+		LOGE(error.c_str());
 		//std::cin.get();
 		exit(EXIT_FAILURE);
 	}
@@ -39,7 +39,8 @@ bool isOpenGLError() {
 		isError = true;
 		errString = getGLErrorString(errCode);
 		//std::cerr << "OpenGL ERROR [" << errString << "]." << std::endl;
-		LOGE("OpenGL ERROR [" << errString << "].");
+		LOGE("OpenGL ERROR !");
+		LOGE(errString);
 	}
 	return isError;
 }

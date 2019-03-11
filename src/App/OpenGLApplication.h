@@ -1,10 +1,10 @@
 #ifndef __RSM_OGLAPP_H__
 #define __RSM_OGLAPP_H__
 
-#include "OpenGL.h"
+#include "Core/OpenGL.h"
 
 #include "Resources.h"
-#include "../Graphics/Shader.h"
+#include "Shader.h"
 
 namespace rsm {
 

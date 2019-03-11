@@ -6,7 +6,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "../RSM.h"
+#include <RSM.h>
 
 // Macro to syntax sugar the singleton getter
 // ex: RM.getTexture("albedo");

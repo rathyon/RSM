@@ -8,7 +8,7 @@ bool Utils::readFile(const std::string& filepath, std::ios_base::openmode mode, 
 	std::ifstream file(filepath, mode);
 	if (file.fail()) {
 		//perror(filepath.c_str());
-		LOGE(filepath.c_str());
+		LOGE(filepath);
 		return false;
 	}
 
