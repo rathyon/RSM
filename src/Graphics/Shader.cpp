@@ -62,6 +62,9 @@ namespace rsm {
 
 			//std::cerr << "Couldn't compile shader: " << _name << "\n Compilation log:\n" << message;
 			LOGE("Couldn't compile shader: " + _name + "\n Compilation log:\n" + message);
+
+			//cleanup the shader
+			glDeleteShader(_id);
 		}
 	}
 
@@ -84,26 +87,37 @@ namespace rsm {
 		return _name;
 	}
 
-	const std::vector<ShaderSource>& Shader::shaders() const {
+	const std::vector<GLuint>& Shader::shaders() const {
 		return _shaders;
 	}
 
 	void Shader::addShader(const ShaderSource& src) {
-		_shaders.push_back(src);
+		_shaders.push_back(src.id());
 	}
 
 	bool Shader::link() {
+
 		_id = glCreateProgram();
 		if (_id == 0) {
+
+			GLint logLen;
+			glGetProgramiv(_id, GL_INFO_LOG_LENGTH, &logLen);
+
+			char* log = new char[logLen];
+			glGetProgramInfoLog(_id, logLen, &logLen, log);
+
+			std::string strLog(log);
+			delete[] log;
+
 			//std::cerr << "Could not create shader: " + _name << std::endl;
 			LOGE("Could not create shader: " + _name);
 		}
-			
-		for (ShaderSource src : _shaders) {
-			glAttachShader(_id, src.id());
+
+		for (GLuint sid : _shaders) {
+			glAttachShader(_id, sid);
 			// Check attachment error
-			checkOpenGLError("Could not attach shader (" + std::to_string(src.id()) +
-				") to program (" + std::to_string(_id) + ") " + src.name() + ".");
+			checkOpenGLError("Could not attach shader (" + std::to_string(sid) + ") " +
+				"to program (" + std::to_string(_id) + ") " + _name + ".");
 		}
 
 		glLinkProgram(_id);
@@ -126,8 +140,8 @@ namespace rsm {
 			delete[] log;
 
 			// Detach shaders
-			for (ShaderSource src : _shaders) {
-				glDetachShader(_id, src.id());
+			for (GLuint sid : _shaders) {
+				glDetachShader(_id, sid);
 			}
 
 			// Delete the program
@@ -136,9 +150,9 @@ namespace rsm {
 			return false;
 		}
 
-		// Detach shaders after successful linking
-		for (ShaderSource src : _shaders) {
-			glDetachShader(_id, src.id());
+		// Detach (or delete?) shaders after successful linking
+		for (GLuint sid : _shaders) {
+			glDetachShader(_id, sid);
 		}
 
 		return true;

@@ -7,7 +7,7 @@
 #include <sstream>
 
 /*
-	The current directory for this file is [...] RSM\projects\Windows\RSM
+	The current directory for this file is [...] RSM/projects/Windows/RSM
 */
 
 #define WND_W 800
@@ -61,43 +61,16 @@ void rsm::init(int argc, char* argv[]) {
 	glApp->init();
 	RM.init();
 
-	/** /
-	Shader vShader = Shader(VERTEX_SHADER, "../../Shaders/vertex.vs");
-	vShader.inject("#version 330 core\n");
-
-	Shader fShader = Shader(FRAGMENT_SHADER, "../../Shaders/frag.fs");
-	fShader.inject("#version 330 core\n");
-
-	sref<Shader> program = make_sref<Shader>("ShaderProgram");
-
-	vShader.compile();
-	fShader.compile();
-
-	program->attach(vShader);
-	program->attach(fShader);
-
-	RM.addShader("program", program);
-	/**/
-
 	ShaderSource vShader = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/vertex.vs");
 	ShaderSource fShader = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/frag.fs");
-
 	vShader.inject("#version 330 core\n");
 	fShader.inject("#version 330 core\n");
-
 	vShader.compile();
 	fShader.compile();
 
-	LOG(vShader.source());
-	LOG(fShader.source());
-
-	std::cin.get();
-
 	sref<Shader> program = make_sref<Shader>("ShaderProgram");
-
 	program->addShader(vShader);
 	program->addShader(fShader);
-
 	program->link();
 
 	RM.addShader("ShaderProgram", program);

@@ -47,7 +47,7 @@ namespace rsm {
 
 		GLuint id() const;
 		const std::string& name() const;
-		const std::vector<ShaderSource>& shaders() const;
+		const std::vector<GLuint>& shaders() const;
 
 		void addShader(const ShaderSource& source);
 		bool link();
@@ -55,7 +55,7 @@ namespace rsm {
 	private:
 		GLuint _id;
 		std::string _name;
-		std::vector<ShaderSource> _shaders;
+		std::vector<GLuint> _shaders;
 	};
 
 }

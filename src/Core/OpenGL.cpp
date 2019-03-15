@@ -39,7 +39,7 @@ bool isOpenGLError() {
 		isError = true;
 		errString = getGLErrorString(errCode);
 		//std::cerr << "OpenGL ERROR [" << errString << "]." << std::endl;
-		LOGE("OpenGL ERROR !");
+		LOGE("OpenGL ERROR!");
 		LOGE(errString);
 	}
 	return isError;
