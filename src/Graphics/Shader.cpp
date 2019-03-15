@@ -18,7 +18,6 @@ namespace rsm {
 		// Read shader source code into attribute
 		Utils::readFile(filepath, std::ios_base::in, _source);
 
-		compile();
 	}
 
 	ShaderSource::~ShaderSource() {

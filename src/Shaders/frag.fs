@@ -1,4 +1,3 @@
-in vec3 position;
 
 out vec4 out_color;
 

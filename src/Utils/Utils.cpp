@@ -8,6 +8,7 @@ bool Utils::readFile(const std::string& filepath, std::ios_base::openmode mode, 
 	std::ifstream file(filepath, mode);
 	if (file.fail()) {
 		//perror(filepath.c_str());
+		LOGE("Failed to read file:");
 		LOGE(filepath);
 		return false;
 	}
@@ -22,6 +23,6 @@ bool Utils::readFile(const std::string& filepath, std::ios_base::openmode mode, 
 
 void Utils::throwError(const std::string& error) {
 	LOGE(error);
-	//std::cin.get();
+	std::cin.get();
 	exit(EXIT_FAILURE);
 }

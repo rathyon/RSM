@@ -6,6 +6,10 @@
 #include <iostream>
 #include <sstream>
 
+/*
+	The current directory for this file is [...] RSM\projects\Windows\RSM
+*/
+
 #define WND_W 800
 #define WND_H 640
 
@@ -74,6 +78,29 @@ void rsm::init(int argc, char* argv[]) {
 
 	RM.addShader("program", program);
 	/**/
+
+	ShaderSource vShader = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/vertex.vs");
+	ShaderSource fShader = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/frag.fs");
+
+	vShader.inject("#version 330 core\n");
+	fShader.inject("#version 330 core\n");
+
+	vShader.compile();
+	fShader.compile();
+
+	LOG(vShader.source());
+	LOG(fShader.source());
+
+	std::cin.get();
+
+	sref<Shader> program = make_sref<Shader>("ShaderProgram");
+
+	program->addShader(vShader);
+	program->addShader(fShader);
+
+	program->link();
+
+	RM.addShader("ShaderProgram", program);
 
 	glApp->prepare();
 }

@@ -26,7 +26,7 @@ void checkOpenGLError(const std::string& error) {
 	if (isOpenGLError()) {
 		//std::cerr << error << std::endl;
 		LOGE(error.c_str());
-		//std::cin.get();
+		std::cin.get();
 		exit(EXIT_FAILURE);
 	}
 }
