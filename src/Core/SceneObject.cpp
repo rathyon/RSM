@@ -3,40 +3,40 @@
 using namespace rsm;
 
 SceneObject::SceneObject() {
-	_position = glm::vec3(0);
-	_scale = glm::vec3(1);
-	_rotation = glm::quat();
+	_position = vec3(0);
+	_scale = vec3(1);
+	_rotation = quat();
 	_parent = nullptr;
 }
 
-SceneObject::SceneObject(const glm::vec3& position) {
+SceneObject::SceneObject(const vec3& position) {
 	_position = position;
-	_scale = glm::vec3(1);
-	_rotation = glm::quat();
+	_scale = vec3(1);
+	_rotation = quat();
 	_parent = nullptr;
 }
 
-glm::vec3& SceneObject::position() {
+vec3& SceneObject::position() {
 	return _position;
 }
 
-glm::vec3& SceneObject::scale() {
+vec3& SceneObject::scale() {
 	return _scale;
 }
 
-glm::quat& SceneObject::rotation() {
+quat& SceneObject::rotation() {
 	return _rotation;
 }
 
-void SceneObject::setPosition(const glm::vec3& position) {
+void SceneObject::setPosition(const vec3& position) {
 	_position = position;
 }
 
 void SceneObject::setScale(const float x, const float y, const float z) {
-	_scale = glm::vec3(x, y, z);
+	_scale = vec3(x, y, z);
 }
 
-void SceneObject::setRotation(const glm::quat& rotation) {
+void SceneObject::setRotation(const quat& rotation) {
 	_rotation = rotation;
 }
 

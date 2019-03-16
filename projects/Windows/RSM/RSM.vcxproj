@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\src\App\OpenGLApplication.cpp" />
     <ClCompile Include="..\..\..\src\App\Windows\WindowsApp.cpp" />
+    <ClCompile Include="..\..\..\src\Core\Mesh.cpp" />
     <ClCompile Include="..\..\..\src\Core\Model.cpp" />
     <ClCompile Include="..\..\..\src\Core\OpenGL.cpp" />
     <ClCompile Include="..\..\..\src\Core\Resources.cpp" />
@@ -32,6 +33,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\src\App\OpenGLApplication.h" />
     <ClInclude Include="..\..\..\src\App\Windows\WindowsApp.h" />
+    <ClInclude Include="..\..\..\src\Core\Mesh.h" />
     <ClInclude Include="..\..\..\src\Core\Model.h" />
     <ClInclude Include="..\..\..\src\Core\OpenGL.h" />
     <ClInclude Include="..\..\..\src\Core\Resources.h" />
@@ -100,13 +102,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)..\..\bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>intermediate\$(Configuration)\$(Platform)\</IntDir>
-    <IncludePath>$(SolutionDir)..\..\src;$(SolutionDir)..\..\src\App;$(SolutionDir)..\..\src\Core;$(SolutionDir)..\..\src\Graphics;$(SolutionDir)..\..\src\GUI;$(SolutionDir)..\..\src\Materials;$(SolutionDir)..\..\src\Math;$(SolutionDir)..\..\src\Lights;$(SolutionDir)..\..\src\Utils;$(SolutionDir)..\..\ext\freeglut\include;$(SolutionDir)..\..\ext\glew\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\..\src;$(SolutionDir)..\..\src\App;$(SolutionDir)..\..\src\Core;$(SolutionDir)..\..\src\Graphics;$(SolutionDir)..\..\src\GUI;$(SolutionDir)..\..\src\Materials;$(SolutionDir)..\..\src\Math;$(SolutionDir)..\..\src\Lights;$(SolutionDir)..\..\src\Utils;$(SolutionDir)..\..\ext\freeglut\include;$(SolutionDir)..\..\ext\glew\include;$(SolutionDir)..\..\ext\tinyobj;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath);$(SolutionDir)..\..\ext\freeglut\lib\$(Platform);$(SolutionDir)..\..\ext\glew\lib\Release\$(Platform)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\..\bin\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>intermediate\$(Configuration)\$(Platform)\</IntDir>
-    <IncludePath>$(SolutionDir)..\..\src;$(SolutionDir)..\..\src\App;$(SolutionDir)..\..\src\Core;$(SolutionDir)..\..\src\Graphics;$(SolutionDir)..\..\src\GUI;$(SolutionDir)..\..\src\Materials;$(SolutionDir)..\..\src\Math;$(SolutionDir)..\..\src\Lights;$(SolutionDir)..\..\src\Utils;$(SolutionDir)..\..\ext\freeglut\include;$(SolutionDir)..\..\ext\glew\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\..\src;$(SolutionDir)..\..\src\App;$(SolutionDir)..\..\src\Core;$(SolutionDir)..\..\src\Graphics;$(SolutionDir)..\..\src\GUI;$(SolutionDir)..\..\src\Materials;$(SolutionDir)..\..\src\Math;$(SolutionDir)..\..\src\Lights;$(SolutionDir)..\..\src\Utils;$(SolutionDir)..\..\ext\freeglut\include;$(SolutionDir)..\..\ext\glew\include;$(SolutionDir)..\..\ext\tinyobj;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath);$(SolutionDir)..\..\ext\freeglut\lib\$(Platform);$(SolutionDir)..\..\ext\glew\lib\Release\$(Platform)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

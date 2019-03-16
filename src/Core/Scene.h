@@ -7,19 +7,16 @@ namespace rsm {
 
 	class Model;
 
-	template<class T>
-	using vec = std::vector<T>;
-
 	class Scene {
 	public:
 		Scene();
 
 		void addModel(const sref<Model>& model);
 
-		const vec<sref<Model>>& models() const;
+		const std::vector<sref<Model>>& models() const;
 
 	private:
-		vec<sref<Model>> _models;
+		std::vector<sref<Model>> _models;
 	};
 
 }

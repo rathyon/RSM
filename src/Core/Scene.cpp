@@ -10,6 +10,6 @@ void Scene::addModel(const sref<Model>& model) {
 	_models.push_back(model);
 }
 
-const vec<sref<Model>>& Scene::models() const {
+const std::vector<sref<Model>>& Scene::models() const {
 	return _models;
 }
