@@ -3,6 +3,7 @@
 
 #include "SceneObject.h"
 #include "Mesh.h"
+#include "Material.h"
 
 namespace rsm {
 
@@ -16,18 +17,18 @@ namespace rsm {
 		~Model();
 
 		const sref<Mesh>& mesh() const;
-		//const sref<Material>& material() const;
+		const sref<Material>& material() const;
 		//const mat3& normalMatrix() const;
 
 		void setMesh(const sref<Mesh>& mesh);
-		//void setMaterial(const sref<Material>& material);
+		void setMaterial(const sref<Material>& material);
 
 		void prepare();
 		void draw();
 
 	private:
 		sref<Mesh> _mesh;
-		//sref<Material> _material;
+		sref<Material> _material;
 
 		//mat3 _normalMatrix;
 	};

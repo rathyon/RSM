@@ -15,8 +15,16 @@ const sref<Mesh>& Model::mesh() const {
 	return _mesh;
 }
 
+const sref<Material>& Model::material() const {
+	return _material;
+}
+
 void Model::setMesh(const sref<Mesh>& mesh) {
 	_mesh = mesh;
+}
+
+void Model::setMaterial(const sref<Material>& material) {
+	_material = material;
 }
 
 //upload geometry to the GPU
@@ -64,7 +72,12 @@ void Model::prepare() {
 
 void Model::draw() {
 
-	//TODO material, shader program integration
+	glUseProgram(_material->program());
+
+	//glUniformMatrix4fv(glGetUniformLocation(_material->program(), "ModelMatrix"), 1, GL_FALSE, objToWorld());
+	//glUniformMatrix3fv(glGetUniformLocation(_material->program(), "NormalMatrix"), 1, GL_FALSE, normalMatrix());
+
+	_material->uploadData();
 
 	glBindVertexArray(_mesh->VAO());
 

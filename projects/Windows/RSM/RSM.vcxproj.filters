@@ -75,6 +75,12 @@
     <ClCompile Include="..\..\..\src\Core\Mesh.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphics\Material.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphics\BlinnPhongMaterial.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Core\OpenGL.h">
@@ -113,12 +119,24 @@
     <ClInclude Include="..\..\..\src\Core\Mesh.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\Material.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\BlinnPhongMaterial.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\src\Shaders\frag.fs">
       <Filter>Source Files\Shaders</Filter>
     </None>
     <None Include="..\..\..\src\Shaders\vertex.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\Shaders\BlinnPhong.fs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\Shaders\BlinnPhong.vs">
       <Filter>Source Files\Shaders</Filter>
     </None>
   </ItemGroup>

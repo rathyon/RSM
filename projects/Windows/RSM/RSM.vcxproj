@@ -27,6 +27,8 @@
     <ClCompile Include="..\..\..\src\Core\Resources.cpp" />
     <ClCompile Include="..\..\..\src\Core\Scene.cpp" />
     <ClCompile Include="..\..\..\src\Core\SceneObject.cpp" />
+    <ClCompile Include="..\..\..\src\Graphics\BlinnPhongMaterial.cpp" />
+    <ClCompile Include="..\..\..\src\Graphics\Material.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Shader.cpp" />
     <ClCompile Include="..\..\..\src\Utils\Utils.cpp" />
   </ItemGroup>
@@ -39,12 +41,16 @@
     <ClInclude Include="..\..\..\src\Core\Resources.h" />
     <ClInclude Include="..\..\..\src\Core\Scene.h" />
     <ClInclude Include="..\..\..\src\Core\SceneObject.h" />
+    <ClInclude Include="..\..\..\src\Graphics\BlinnPhongMaterial.h" />
+    <ClInclude Include="..\..\..\src\Graphics\Material.h" />
     <ClInclude Include="..\..\..\src\Graphics\Shader.h" />
     <ClInclude Include="..\..\..\src\Math\RSMaths.h" />
     <ClInclude Include="..\..\..\src\RSM.h" />
     <ClInclude Include="..\..\..\src\Utils\Utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\src\Shaders\BlinnPhong.fs" />
+    <None Include="..\..\..\src\Shaders\BlinnPhong.vs" />
     <None Include="..\..\..\src\Shaders\frag.fs" />
     <None Include="..\..\..\src\Shaders\vertex.vs" />
   </ItemGroup>
