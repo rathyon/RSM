@@ -5,21 +5,6 @@
 
 namespace rsm {
 
-	const GLenum OpenGLShaderType[] {
-		GL_VERTEX_SHADER,
-		GL_FRAGMENT_SHADER,
-		//GL_GEOMETRY_SHADER, // OpenGL ES doesn't have it
-		//GL_COMPUTE_SHADER	// OpenGL ES doesn't have it
-	};
-
-	const enum ShaderType {
-		VERTEX_SHADER     = 0,
-		FRAGMENT_SHADER   = 1,
-		//GEOMETRY_SHADER   = 2,
-		//COMPUTE_SHADER    = 3,
-		//SHADER_TYPE_COUNT = 4
-	};
-
 	class ShaderSource {
 	public:
 		ShaderSource(ShaderType type, const std::string& filepath);

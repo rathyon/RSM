@@ -75,6 +75,19 @@ void rsm::init(int argc, char* argv[]) {
 
 	RM.addShader("ShaderProgram", program);
 
+	/**/
+	sref<Mesh> cube_mesh = make_sref<Mesh>("../../../assets/cube.obj");
+	RM.addMesh("cube_mesh", cube_mesh);
+
+	sref<Model> test_cube = make_sref<Model>(cube_mesh);
+	RM.addModel("test_cube", test_cube);
+
+	test_cube->prepare();
+
+	/**/
+	
+	checkOpenGLError("Error during loading and setup!");
+
 	glApp->prepare();
 }
 

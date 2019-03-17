@@ -3,6 +3,7 @@
 
 #include "OpenGL.h"
 #include "RSMaths.h"
+//#include "Resources.h"
 
 using namespace glm;
 
@@ -18,26 +19,29 @@ namespace rsm {
 	class Mesh {
 	public:
 
-		Mesh();
 		Mesh(const std::string filepath);
 		~Mesh();
 
+		const GLuint& VAO() const;
 		const std::vector<Vertex>& vertices() const;
-		const std::vector<uint>& indices() const;
+		const std::vector<int>& indices() const;
 
 		void addVertex(const Vertex& vertex);
-		void addIndex(const uint& idx);
+		void addIndex(const int& idx);
 
+		void setVAO(const GLuint& vao);
 		void setVertices(const std::vector<Vertex>& vertices);
-		void setIndices(const std::vector<uint>& indices);
+		void setIndices(const std::vector<int>& indices);
 
 		bool loadObj(const std::string filepath);
 
 		//void computeTangents();
 
 	private:
+		GLuint _VAO;
+
 		std::vector<Vertex> _vertices;
-		std::vector<uint> _indices;
+		std::vector<int> _indices;
 	};
 }
 

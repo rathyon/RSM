@@ -33,6 +33,9 @@ void OpenGLApplication::init() {
 }
 
 void OpenGLApplication::prepare() {
+
+	/* Prepare Models here */
+
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 
