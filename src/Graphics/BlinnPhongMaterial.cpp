@@ -8,6 +8,7 @@ BlinnPhongMaterial::BlinnPhongMaterial() {
 	_ambient = vec3(0);
 	_diffuse = vec3(0);
 	_specular = vec3(0);
+	_shininess = 1.0f;
 }
 
 void BlinnPhongMaterial::uploadData() {
@@ -15,6 +16,7 @@ void BlinnPhongMaterial::uploadData() {
 	setVec3("ambient", _ambient);
 	setVec3("diffuse", _diffuse);
 	setVec3("specular", _specular);
+	setFloat("shininess", _shininess);
 }
 
 void BlinnPhongMaterial::setAmbient(const vec3& ambient) {
@@ -29,6 +31,10 @@ void BlinnPhongMaterial::setSpecular(const vec3& specular) {
 	_specular = specular;
 }
 
+void BlinnPhongMaterial::setShininess(float shininess) {
+	_shininess = shininess;
+}
+
 vec3 BlinnPhongMaterial::ambient() const {
 	return _ambient;
 }
@@ -37,4 +43,8 @@ vec3 BlinnPhongMaterial::diffuse() const {
 }
 vec3 BlinnPhongMaterial::specular() const {
 	return _specular;
+}
+
+float BlinnPhongMaterial::shininess() const {
+	return _shininess;
 }

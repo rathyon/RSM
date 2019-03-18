@@ -21,9 +21,12 @@ namespace rsm {
 		void setSpecular(const vec3& specular);
 		//void setNormal(const Texture& normalTex);
 
+		void setShininess(float shininess);
+
 		vec3 ambient() const;
 		vec3 diffuse() const;
 		vec3 specular() const;
+		float shininess() const;
 
 		//Texture diffuseTex() const;
 		//Texture normalTex() const;
@@ -32,6 +35,7 @@ namespace rsm {
 		vec3 _ambient;
 		vec3 _diffuse;
 		vec3 _specular;
+		float _shininess;
 
 		//Texture _diffuseTex;
 		//Texture _specularTex;
