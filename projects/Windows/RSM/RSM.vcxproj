@@ -30,6 +30,8 @@
     <ClCompile Include="..\..\..\src\Graphics\BlinnPhongMaterial.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Material.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Shader.cpp" />
+    <ClCompile Include="..\..\..\src\Lights\Light.cpp" />
+    <ClCompile Include="..\..\..\src\Lights\PointLight.cpp" />
     <ClCompile Include="..\..\..\src\Utils\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -44,6 +46,8 @@
     <ClInclude Include="..\..\..\src\Graphics\BlinnPhongMaterial.h" />
     <ClInclude Include="..\..\..\src\Graphics\Material.h" />
     <ClInclude Include="..\..\..\src\Graphics\Shader.h" />
+    <ClInclude Include="..\..\..\src\Lights\Light.h" />
+    <ClInclude Include="..\..\..\src\Lights\PointLight.h" />
     <ClInclude Include="..\..\..\src\Math\RSMaths.h" />
     <ClInclude Include="..\..\..\src\RSM.h" />
     <ClInclude Include="..\..\..\src\Utils\Utils.h" />
