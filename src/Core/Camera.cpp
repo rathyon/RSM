@@ -1,15 +1,13 @@
 #include "Camera.h"
 
-#include "glm/gtx/transform.hpp"
-
 using namespace rsm;
 
 Camera::Camera() { }
 
 Camera::Camera(int width, int height, 
 	const glm::vec3& eye, const glm::vec3& at, const glm::vec3& up,
-	float near, float far)
-	: _width(width), _height(height), _near(near), _far(far) {
+	float n, float f)
+	: _width(width), _height(height), _near(n), _far(f) {
 
 	lookAt(eye, at, up);
 
@@ -30,11 +28,11 @@ float Camera::aspect() const {
 	return (float)_width / (float)_height;
 }
 
-float Camera::near() const {
+float Camera::n() const {
 	return _near;
 }
 
-float Camera::far() const {
+float Camera::f() const {
 	return _far;
 }
 

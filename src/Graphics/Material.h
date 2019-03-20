@@ -17,7 +17,7 @@ namespace rsm {
 
 		void setProgram(const GLuint& prog);
 
-		virtual void uploadData() const = 0;
+		virtual void uploadData() = 0;
 
 	protected:
 		GLuint _prog;

@@ -4,10 +4,10 @@ using namespace rsm;
 
 PointLight::PointLight() : Light() { }
 
-PointLight::PointLight(const vec3& emission, float intensity)
+PointLight::PointLight(const glm::vec3& emission, float intensity)
 	: Light(emission, intensity) { }
 
-PointLight::PointLight(const vec3& emission, float intensity, const vec3& position)
+PointLight::PointLight(const glm::vec3& emission, float intensity, const glm::vec3& position)
 	: Light(emission, intensity, position) { }
 
 void PointLight::toData(LightData& data) const {

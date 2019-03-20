@@ -4,14 +4,24 @@
 #include "Core/OpenGL.h"
 
 #include "Resources.h"
-#include "Shader.h"
+
+#include "Scene.h"
+
+#include "Perspective.h"
+
 #include "Model.h"
+
+#include "PointLight.h"
+
+#include "Shader.h"
+
+#include "BlinnPhongMaterial.h"
 
 namespace rsm {
 
 	class OpenGLApplication {
 	public:
-		OpenGLApplication();
+		OpenGLApplication(int width, int height);
 
 		void init();
 		void prepare();
@@ -25,9 +35,11 @@ namespace rsm {
 		int getWidth();
 		int getHeight();
 
-	protected:
+	private:
 		int _width;
 		int _height;
+
+		Scene _scene;
 	};
 }
 

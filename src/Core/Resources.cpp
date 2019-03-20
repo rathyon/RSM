@@ -14,15 +14,15 @@ void Resources::init() {
 
 }
 
-void Resources::addMesh(const std::string& name, const std::shared_ptr<Mesh>& mesh) {
+void Resources::addMesh(const std::string& name, const sref<Mesh>& mesh) {
 	_meshes[name] = mesh;
 }
 
-void Resources::addModel(const std::string& name, const std::shared_ptr<Model>& model) {
+void Resources::addModel(const std::string& name, const sref<Model>& model) {
 	_models[name] = model;
 }
 
-void Resources::addShader(const std::string& name, const std::shared_ptr<Shader>& shader) {
+void Resources::addShader(const std::string& name, const sref<Shader>& shader) {
 	_shaders[name] = shader;
 }
 
@@ -53,17 +53,20 @@ bool Resources::removeShader(const std::string& name) {
 	return false;
 }
 
-Mesh* Resources::getMesh(const std::string& name) {
-	return _meshes.at(name).get();
+sref<Mesh> Resources::getMesh(const std::string& name) {
+	//return _meshes.at(name).get();
+	return _meshes.at(name);
 }
 
-Model* Resources::getModel(const std::string& name) {
-	return _models.at(name).get();
+sref<Model> Resources::getModel(const std::string& name) {
+	//return _models.at(name).get();
+	return _models.at(name);
 }
 
 
-Shader* Resources::getShader(const std::string& name) {
-	return _shaders.at(name).get();
+sref<Shader> Resources::getShader(const std::string& name) {
+	//return _shaders.at(name).get();
+	return _shaders.at(name);
 }
 
 void Resources::cleanup() {

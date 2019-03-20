@@ -16,7 +16,7 @@
 using namespace rsm;
 
 void rsm::init(int argc, char* argv[]) {
-	glApp = new OpenGLApplication();
+	glApp = new OpenGLApplication(WND_W, WND_H);
 
 	width = WND_W;
 	height = WND_H;
@@ -61,6 +61,11 @@ void rsm::init(int argc, char* argv[]) {
 	glApp->init();
 	RM.init();
 
+	/* ===================================================================================
+				Shaders and Materials
+	=====================================================================================*/
+	/**/
+
 	ShaderSource vShader = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/vertex.vs");
 	ShaderSource fShader = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/frag.fs");
 	vShader.inject("#version 330 core\n");
@@ -75,17 +80,35 @@ void rsm::init(int argc, char* argv[]) {
 
 	RM.addShader("ShaderProgram", program);
 
+	sref<BlinnPhongMaterial> bp_orange = make_sref<BlinnPhongMaterial>();
+	bp_orange->setDiffuse(glm::vec3(1.0f, 0.5f, 0.2f));
+	bp_orange->setSpecular(glm::vec3(1.0f));
+	bp_orange->setShininess(32.0f);
+
+	bp_orange->setProgram(program->id());
+
 	/**/
+	/* ===================================================================================
+				Meshes and Models
+	=====================================================================================*/
+	/**/
+
 	sref<Mesh> cube_mesh = make_sref<Mesh>("../../../assets/cube.obj");
 	RM.addMesh("cube_mesh", cube_mesh);
 
 	sref<Model> test_cube = make_sref<Model>(cube_mesh);
+	test_cube->setMaterial(bp_orange);
+
 	RM.addModel("test_cube", test_cube);
 
-	test_cube->prepare();
+	/**/
+	/* ===================================================================================
+				Textures
+	=====================================================================================*/
+	/**/
 
 	/**/
-	
+
 	checkOpenGLError("Error during loading and setup!");
 
 	glApp->prepare();

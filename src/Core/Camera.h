@@ -17,14 +17,14 @@ namespace rsm {
 		Camera();
 		Camera(int width, int height,
 			const glm::vec3& eye, const glm::vec3& at, const glm::vec3& up,
-			float near, float far);
+			float n, float f);
 
 		int width() const;
 		int height() const;
 
 		float aspect() const;
-		float near() const;
-		float far() const;
+		float n() const;
+		float f() const;
 
 		glm::vec3 right() const;
 		glm::vec3 front() const;

@@ -3,7 +3,7 @@
 
 #include <cmath>
 
-#define GLM_FORCE_MESSAGES //build log of GLM for the given platform
+#define GLM_ENABLE_EXPERIMENTAL
 
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"

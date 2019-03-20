@@ -15,8 +15,8 @@ namespace rsm {
 	// Light data for shader blocks
 	// CARE: data is properly aligned, do not change
 	struct LightData {
-		vec3 position;
-		vec3 emission;    // "color" of the light
+		glm::vec3 position;
+		glm::vec3 emission;    // "color" of the light
 		float intensity;
 		int type;
 		bool state;       // on or off
@@ -25,19 +25,19 @@ namespace rsm {
 	class Light : public SceneObject {
 	public:
 		Light();
-		Light(const vec3& emission, float intensity);
-		Light(const vec3& emission, float intensity, const vec3& position);
+		Light(const glm::vec3& emission, float intensity);
+		Light(const glm::vec3& emission, float intensity, const glm::vec3& position);
 		//Light(const vec3& emission, float intensity, const mat4& lightToWorld);
 
 		bool isOn() const;
 		bool castingShadows() const;
 		float intensity() const;
-		vec3 emission() const;
+		glm::vec3 emission() const;
 
 		void setOn(bool on);
 		void setCastShadows(bool val);
 		void setIntensity(float intensity);
-		void setEmission(vec3& emission);
+		void setEmission(glm::vec3& emission);
 
 		virtual void toData(LightData& data) const = 0;
 
@@ -45,7 +45,7 @@ namespace rsm {
 		bool _on;
 		bool _shadows;
 		float _intensity;
-		vec3 _emission;
+		glm::vec3 _emission;
 	};
 
 }

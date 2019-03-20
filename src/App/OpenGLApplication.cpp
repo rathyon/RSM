@@ -6,18 +6,15 @@
 
 using namespace rsm;
 
-GLfloat vertices[] = {
-	-0.5f, -0.5f, 0.0f,
-	 0.5f, -0.5f, 0.0f,
-	 0.0f,  0.5f, 0.0f
-};
-
-GLuint VBO, VAO;
-
-OpenGLApplication::OpenGLApplication() {
+OpenGLApplication::OpenGLApplication(int width, int height) {
+	_width = width;
+	_height = height;
 }
 
 void OpenGLApplication::init() {
+	// init Scene
+	_scene = Scene();
+
 	// init random seed
 	srand(static_cast <unsigned> (time(0)));
 
@@ -34,21 +31,29 @@ void OpenGLApplication::init() {
 
 void OpenGLApplication::prepare() {
 
+	/* Prepare Camera here */
+	sref<Camera> mainCamera = make_sref<Perspective>(_width, _height,
+		vec3(0.0f, 10.0f, -10.0f),
+		vec3(0.0f, 0.0f, 0.0f),
+		vec3(0.0f, 1.0f, 0.0f),
+		0.1f, 500.0f, 60.0f);
+
+	_scene.addCamera(mainCamera);
+
+	/* Prepare Lights here */
+	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(0.0f, 5.0f, 0.0f));
+
+	_scene.addLight(candle);
+
 	/* Prepare Models here */
 
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
+	sref<Model> cube = RM.getModel("test_cube");
+	cube->prepare();
+	cube->setPosition(glm::vec3(0, 0, 0));
+	cube->setScale(1.0f, 1.0f, 1.0f);
+	cube->updateMatrix();
 
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
-	//unbind buffers
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+	_scene.addModel(RM.getModel("test_cube"));
 
 }
 
@@ -75,13 +80,6 @@ void OpenGLApplication::render() { // receive objects and camera args
 	// upload camera...
 
 	// draw objects...
-	//checkOpenGLError("Error!");
-
-	glUseProgram(RM.getShader("ShaderProgram")->id());
-
-	glBindVertexArray(VAO);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-	glBindVertexArray(0);
 
 	glUseProgram(0);
 	checkOpenGLError("Error!");

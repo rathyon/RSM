@@ -8,8 +8,8 @@ namespace rsm {
 	class PointLight : public Light {
 	public:
 		PointLight();
-		PointLight(const vec3& emission, float intensity);
-		PointLight(const vec3& emission, float intensity, const vec3& position);
+		PointLight(const glm::vec3& emission, float intensity);
+		PointLight(const glm::vec3& emission, float intensity, const glm::vec3& position);
 
 		void toData(LightData& data) const override;
 	
