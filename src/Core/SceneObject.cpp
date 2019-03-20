@@ -3,41 +3,64 @@
 using namespace rsm;
 
 SceneObject::SceneObject() {
-	_position = vec3(0);
-	_scale = vec3(1);
-	_rotation = quat();
+	_position = glm::vec3(0);
+	_scale = glm::vec3(1);
+	_rotation = glm::quat();
 	_parent = nullptr;
 }
 
-SceneObject::SceneObject(const vec3& position) {
+SceneObject::SceneObject(const glm::vec3& position) {
 	_position = position;
-	_scale = vec3(1);
-	_rotation = quat();
+	_scale = glm::vec3(1);
+	_rotation = glm::quat();
 	_parent = nullptr;
 }
 
-vec3& SceneObject::position() {
+SceneObject::SceneObject(const glm::mat4& objToWorld) {
+	_objToWorld = objToWorld;
+	_parent = nullptr;
+
+	_position = glm::vec3(_objToWorld[0][3],
+		             _objToWorld[1][3],
+					 _objToWorld[2][3]);
+}
+
+glm::vec3& SceneObject::position() {
 	return _position;
 }
 
-vec3& SceneObject::scale() {
+glm::vec3& SceneObject::scale() {
 	return _scale;
 }
 
-quat& SceneObject::rotation() {
+glm::quat& SceneObject::rotation() {
 	return _rotation;
 }
 
-void SceneObject::setPosition(const vec3& position) {
+glm::mat4& SceneObject::objToWorld() {
+	return _objToWorld;
+}
+
+void SceneObject::setPosition(const glm::vec3& position) {
 	_position = position;
 }
 
 void SceneObject::setScale(const float x, const float y, const float z) {
-	_scale = vec3(x, y, z);
+	_scale = glm::vec3(x, y, z);
 }
 
-void SceneObject::setRotation(const quat& rotation) {
+void SceneObject::setRotation(const glm::quat& rotation) {
 	_rotation = rotation;
+}
+
+void SceneObject::setObjToWorld(const glm::mat4& mat) {
+	_objToWorld = mat;
+}
+
+void SceneObject::updateMatrix() {
+	_objToWorld = glm::translate(glm::mat4(), _position) *
+				  glm::mat4_cast(_rotation) *
+				  glm::scale(glm::mat4(), _scale);
 }
 
 sref<SceneObject> SceneObject::parent() const {

@@ -4,31 +4,34 @@
 #include <RSM.h>
 #include <RSMaths.h>
 
-using namespace glm;
-
 namespace rsm {
 
 	class SceneObject {
 	public:
 		SceneObject();
-		SceneObject(const vec3& position);
+		SceneObject(const glm::vec3& position);
+		SceneObject(const glm::mat4& objToWorld);
 
-		vec3& position();
-		vec3& scale();
-		quat& rotation();
+		glm::vec3& position();
+		glm::vec3& scale();
+		glm::quat& rotation();
+		glm::mat4& objToWorld();
 
 		sref<SceneObject> parent() const;
 
-		void setPosition(const vec3& position);
+		void setPosition(const glm::vec3& position);
 		void setScale(const float x, const float y, const float z);
-		void setRotation(const quat& rotation);
+		void setRotation(const glm::quat& rotation);
+		void setObjToWorld(const glm::mat4& mat);
 
-		//virtual void updateMatrix();
+		virtual void updateMatrix();
 
 	protected:
-		vec3 _position;
-		vec3 _scale;
-		quat _rotation;
+		glm::vec3 _position;
+		glm::vec3 _scale;
+		glm::quat _rotation;
+
+		glm::mat4 _objToWorld;
 
 		sref<SceneObject> _parent;
 	};

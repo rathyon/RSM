@@ -21,9 +21,11 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\src\App\OpenGLApplication.cpp" />
     <ClCompile Include="..\..\..\src\App\Windows\WindowsApp.cpp" />
+    <ClCompile Include="..\..\..\src\Core\Camera.cpp" />
     <ClCompile Include="..\..\..\src\Core\Mesh.cpp" />
     <ClCompile Include="..\..\..\src\Core\Model.cpp" />
     <ClCompile Include="..\..\..\src\Core\OpenGL.cpp" />
+    <ClCompile Include="..\..\..\src\Core\Perspective.cpp" />
     <ClCompile Include="..\..\..\src\Core\Resources.cpp" />
     <ClCompile Include="..\..\..\src\Core\Scene.cpp" />
     <ClCompile Include="..\..\..\src\Core\SceneObject.cpp" />
@@ -37,9 +39,11 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\src\App\OpenGLApplication.h" />
     <ClInclude Include="..\..\..\src\App\Windows\WindowsApp.h" />
+    <ClInclude Include="..\..\..\src\Core\Camera.h" />
     <ClInclude Include="..\..\..\src\Core\Mesh.h" />
     <ClInclude Include="..\..\..\src\Core\Model.h" />
     <ClInclude Include="..\..\..\src\Core\OpenGL.h" />
+    <ClInclude Include="..\..\..\src\Core\Perspective.h" />
     <ClInclude Include="..\..\..\src\Core\Resources.h" />
     <ClInclude Include="..\..\..\src\Core\Scene.h" />
     <ClInclude Include="..\..\..\src\Core\SceneObject.h" />
