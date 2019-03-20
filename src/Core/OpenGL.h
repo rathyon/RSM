@@ -17,6 +17,8 @@
 
 #endif
 
+#define NUM_LIGHTS 1
+
 const GLenum OpenGLShaderType[]{
 	GL_VERTEX_SHADER,
 	GL_FRAGMENT_SHADER,
@@ -37,6 +39,11 @@ const enum AttributeType {
 	NORMAL   = 1,
 	UV       = 2,
 	TANGENT  = 3
+};
+
+const enum BufferIndices {
+	CAMERA_BUFFER_IDX = 0,
+	LIGHTS_BUFFER_IDX = 1
 };
 
 void checkOpenGLError(const std::string& error);

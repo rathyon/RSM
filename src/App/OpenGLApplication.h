@@ -36,10 +36,20 @@ namespace rsm {
 		int getHeight();
 
 	private:
+		void prepareCameraBuffer();
+		void prepareLightsBuffer();
+
+		void uploadCameraBuffer();
+		void uploadLightsBuffer();
+
 		int _width;
 		int _height;
 
+		GLuint _cameraBuffer;
+		GLuint _lightsBuffer;
+
 		Scene _scene;
+		sref<Camera> _camera;
 	};
 }
 

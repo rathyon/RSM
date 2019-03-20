@@ -27,3 +27,11 @@ const std::vector<sref<Light>>& Scene::lights() const {
 const std::vector<sref<Model>>& Scene::models() const {
 	return _models;
 }
+
+void Scene::draw() {
+
+	for (sref<Model> model : _models) {
+		model->draw();
+	}
+
+}

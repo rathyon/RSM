@@ -6,7 +6,7 @@ layout(location = 2) in vec2 TexCoords;
 uniform mat4 ModelMatrix;
 uniform mat3 NormalMatrix;
 
-uniform CameraBlock {
+uniform cameraBlock {
 	mat4 ViewMatrix;
 	mat4 ProjMatrix;
 	mat4 ViewProjMatrix;

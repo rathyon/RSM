@@ -105,3 +105,10 @@ void Camera::updateOrientation(float dpdx, float dydx) {
 	else if (_pitch < -glm::half_pi<float>())
 		_pitch = -glm::half_pi<float>();
 }
+
+void Camera::toData(CameraData& data) {
+	data.viewMatrix = viewMatrix();
+	data.projMatrix = projMatrix();
+	data.viewProjMatrix = viewProjMatrix();
+	data.viewPos = position();
+}

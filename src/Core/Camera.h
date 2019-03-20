@@ -35,12 +35,12 @@ namespace rsm {
 
 		const glm::mat4& viewMatrix() const;
 		const glm::mat4& projMatrix() const;
-
 		glm::mat4 viewProjMatrix() const;
 
 		void updateViewMatrix();
-
 		void updateOrientation(float dp, float dy);
+
+		void toData(CameraData& data);
 
 	protected:
 		glm::mat4 _projMatrix;

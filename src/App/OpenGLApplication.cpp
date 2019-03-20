@@ -29,16 +29,38 @@ void OpenGLApplication::init() {
 	//glEnable(GL_MULTISAMPLE);
 }
 
+int OpenGLApplication::getWidth() {
+	return _width;
+}
+int OpenGLApplication::getHeight() {
+	return _height;
+}
+
+void OpenGLApplication::cleanup() {
+
+}
+
+void OpenGLApplication::update(float dt) {
+
+}
+
+void OpenGLApplication::reshape(int w, int h) {
+	_width = w;
+	_height = h;
+	glViewport(0, 0, w, h);
+}
+
+
 void OpenGLApplication::prepare() {
 
 	/* Prepare Camera here */
-	sref<Camera> mainCamera = make_sref<Perspective>(_width, _height,
-		vec3(0.0f, 10.0f, -10.0f),
+	_camera = make_sref<Perspective>(_width, _height,
+		vec3(0.0f, 10.0f, 10.0f),
 		vec3(0.0f, 0.0f, 0.0f),
 		vec3(0.0f, 1.0f, 0.0f),
 		0.1f, 500.0f, 60.0f);
 
-	_scene.addCamera(mainCamera);
+	_scene.addCamera(_camera);
 
 	/* Prepare Lights here */
 	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(0.0f, 5.0f, 0.0f));
@@ -55,20 +77,10 @@ void OpenGLApplication::prepare() {
 
 	_scene.addModel(RM.getModel("test_cube"));
 
-}
+	// Prepare shared buffers
+	prepareCameraBuffer();
+	prepareLightsBuffer();
 
-void OpenGLApplication::cleanup() {
-
-}
-
-void OpenGLApplication::update(float dt) {
-	
-}
-
-void OpenGLApplication::reshape(int w, int h) {
-	_width = w;
-	_height = h;
-	glViewport(0, 0, w, h);
 }
 
 void OpenGLApplication::render() { // receive objects and camera args
@@ -77,17 +89,60 @@ void OpenGLApplication::render() { // receive objects and camera args
 	// Upload constant buffers to the GPU
 
 	// upload lights...
+	uploadLightsBuffer();
 	// upload camera...
+	uploadCameraBuffer();
 
 	// draw objects...
+	_scene.draw();
 
-	glUseProgram(0);
 	checkOpenGLError("Error!");
 }
 
-int OpenGLApplication::getWidth() {
-	return _width;
+void OpenGLApplication::prepareCameraBuffer() {
+	glGenBuffers(1, &_cameraBuffer);
+	glBindBuffer(GL_UNIFORM_BUFFER, _cameraBuffer);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(CameraData), 0, GL_DYNAMIC_DRAW);
+	glBindBufferBase(GL_UNIFORM_BUFFER, CAMERA_BUFFER_IDX, _cameraBuffer);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
 }
-int OpenGLApplication::getHeight() {
-	return _height;
+
+void OpenGLApplication::prepareLightsBuffer() {
+	glGenBuffers(1, &_lightsBuffer);
+	glBindBuffer(GL_UNIFORM_BUFFER, _lightsBuffer);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(LightData) * NUM_LIGHTS, 0, GL_DYNAMIC_DRAW);
+	glBindBufferBase(GL_UNIFORM_BUFFER, LIGHTS_BUFFER_IDX, _lightsBuffer);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
+void OpenGLApplication::uploadCameraBuffer() {
+	CameraData data;
+	_camera->toData(data);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, _cameraBuffer);
+	GLvoid* p = glMapBuffer(GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
+	memcpy(p, &data, sizeof(CameraData));
+	glUnmapBuffer(GL_UNIFORM_BUFFER);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
+void OpenGLApplication::uploadLightsBuffer() {
+	const std::vector<sref<Light>>& lights = _scene.lights();
+
+	LightData data[NUM_LIGHTS];
+	memset(data, 0, sizeof(LightData) * NUM_LIGHTS);
+
+	//check actual number of lights before copying light data
+	// lights.size is size_t, be careful...
+	int numLights = std::min(NUM_LIGHTS, (int)lights.size());
+	for (int l = 0; l < numLights; l++)
+		lights[l]->toData(data[l]);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, _lightsBuffer);
+	GLvoid* p = glMapBuffer(GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
+	memcpy(p, &data, sizeof(LightData) * NUM_LIGHTS);
+
+	glUnmapBuffer(GL_UNIFORM_BUFFER);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }

@@ -13,15 +13,17 @@ namespace rsm {
 		Model(const sref<Mesh>& mesh);
 		Model(const vec3& position);
 		Model(const sref<Mesh>& mesh, const vec3& position);
-		//Model(const mat4& objToWorld);
+		Model(const mat4& objToWorld);
 		~Model();
 
 		const sref<Mesh>& mesh() const;
 		const sref<Material>& material() const;
-		//const mat3& normalMatrix() const;
+		const mat3& normalMatrix() const;
 
 		void setMesh(const sref<Mesh>& mesh);
 		void setMaterial(const sref<Material>& material);
+
+		void updateMatrix() override;
 
 		void prepare();
 		void draw();
@@ -30,7 +32,7 @@ namespace rsm {
 		sref<Mesh> _mesh;
 		sref<Material> _material;
 
-		//mat3 _normalMatrix;
+		mat3 _normalMatrix;
 	};
 
 }

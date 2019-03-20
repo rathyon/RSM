@@ -5,9 +5,10 @@ using namespace rsm;
 
 Model::Model() { }
 
-Model::Model(const sref<Mesh>& mesh) : SceneObject(), _mesh(mesh) { }
-Model::Model(const vec3& position) : SceneObject(position) { }
-Model::Model(const sref<Mesh>& mesh, const vec3& position) : SceneObject(position), _mesh(mesh) { }
+Model::Model(const sref<Mesh>& mesh) : SceneObject(), _mesh(mesh), _material(nullptr) { }
+Model::Model(const vec3& position) : SceneObject(position), _material(nullptr) { }
+Model::Model(const sref<Mesh>& mesh, const vec3& position) : SceneObject(position), _mesh(mesh), _material(nullptr) { }
+Model::Model(const mat4& objToWorld) : SceneObject(objToWorld), _material(nullptr) { }
 
 Model::~Model() { }
 
@@ -17,6 +18,15 @@ const sref<Mesh>& Model::mesh() const {
 
 const sref<Material>& Model::material() const {
 	return _material;
+}
+
+const mat3& Model::normalMatrix() const {
+	return _normalMatrix;
+}
+
+void Model::updateMatrix() {
+	SceneObject::updateMatrix();
+	_normalMatrix = glm::transpose(glm::inverse(mat3(_objToWorld)));
 }
 
 void Model::setMesh(const sref<Mesh>& mesh) {
@@ -71,11 +81,12 @@ void Model::prepare() {
 }
 
 void Model::draw() {
+	updateMatrix();
 
 	glUseProgram(_material->program());
 
-	//glUniformMatrix4fv(glGetUniformLocation(_material->program(), "ModelMatrix"), 1, GL_FALSE, objToWorld());
-	//glUniformMatrix3fv(glGetUniformLocation(_material->program(), "NormalMatrix"), 1, GL_FALSE, normalMatrix());
+	glUniformMatrix4fv(glGetUniformLocation(_material->program(), "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(objToWorld()));
+	glUniformMatrix3fv(glGetUniformLocation(_material->program(), "NormalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMatrix()));
 
 	_material->uploadData();
 

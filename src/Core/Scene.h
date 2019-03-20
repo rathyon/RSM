@@ -21,6 +21,8 @@ namespace rsm {
 		const std::vector<sref<Light>>& lights() const;
 		const std::vector<sref<Model>>& models() const;
 
+		void draw();
+
 	private:
 		std::vector<sref<Camera>> _cameras;
 		std::vector<sref<Light>> _lights;
