@@ -56,10 +56,10 @@ void OpenGLApplication::prepare() {
 	/* Prepare Camera here */
 
 	_camera = make_sref<Perspective>(_width, _height,
-		vec3(5.0f, 5.0f, 5.0f),
-		vec3(0.0f, 0.0f, 0.0f),
+		vec3(0.0f, 50.0f, 0.0f),
+		vec3(-30000.0f, 50.0f, 0.0f),
 		vec3(0.0f, 1.0f, 0.0f),
-		0.1f, 100.0f, 30.0f);
+		0.1f, 100000.0f, 60.0f);
 
 	_scene.addCamera(_camera);
 
@@ -70,16 +70,22 @@ void OpenGLApplication::prepare() {
 
 	/* Prepare Models here */
 
+	/** /
 	sref<Model> cube = RM.getModel("test_cube");
 	cube->prepare();
-	cube->setObjToWorld(
-		glm::mat4(1.f,0.f,0.f,0.f,
-				  0.f,1.f,0.f,0.f,
-				  0.f,0.f,1.f,0.f,
-				  -0.5f,-0.5f,-0.5f,1.f)
-	);
-
 	_scene.addModel(cube);
+	/**/
+
+	/** /
+	sref<Model> bunny = RM.getModel("bunny");
+	bunny->prepare();
+	_scene.addModel(bunny);
+	/**/
+
+	sref<Model> sponza = RM.getModel("sponza");
+	sponza->prepare();
+	sponza->setScale(1.0f, 1.0f, 1.0f);
+	_scene.addModel(sponza);
 
 
 	// Prepare shared buffers

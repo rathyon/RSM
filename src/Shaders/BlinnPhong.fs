@@ -37,8 +37,8 @@ out vec4 outColor;
 
 void main(void) {
 
+	/** /
 	vec3 N = normalize(vsIn.normal);
-
 	// temporary directional light for testing
 	vec3 L = normalize(vec3(0,1,1));
 	vec3 V = normalize(ViewPos - vsIn.position);
@@ -56,4 +56,7 @@ void main(void) {
 	vec3 retColor = ambient + diff + spec;
 
 	outColor = vec4(retColor, 1.0);
+	/**/
+	vec3 N = normalize(vsIn.normal);
+	outColor = vec4(N, 1.0);
 }
