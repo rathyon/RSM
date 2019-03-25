@@ -10,6 +10,8 @@ namespace rsm {
 	class BlinnPhongMaterial : public Material {
 	public:
 		BlinnPhongMaterial();
+		//TODO constructor with all parameters
+
 
 		void uploadData();
 

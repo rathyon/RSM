@@ -1,8 +1,7 @@
 
-// Passes everything in world coordinates to the fragment shader
 in FragData {
 	vec3 position;
-	vec3 normal; 
+	vec3 normal;
 	vec2 texCoords;
 } vsIn;
 
@@ -27,6 +26,7 @@ uniform lightBlock {
 	Light lights[NUM_LIGHTS];
 };
 
+
 //Material parameters
 uniform vec3 ambient;
 uniform vec3 diffuse;
@@ -37,5 +37,5 @@ out vec4 outColor;
 
 void main(void) {
 
-	outColor = vec4(1.0, 1.0, 1.0, 1.0);
+	outColor = vec4(diffuse, 1.0);
 }

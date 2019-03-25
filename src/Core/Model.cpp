@@ -5,6 +5,7 @@ using namespace rsm;
 
 Model::Model() { }
 
+// TODO fix this pls, incoherent
 Model::Model(const sref<Mesh>& mesh) : SceneObject(), _mesh(mesh), _material(nullptr) { }
 Model::Model(const vec3& position) : SceneObject(position), _material(nullptr) { }
 Model::Model(const sref<Mesh>& mesh, const vec3& position) : SceneObject(position), _mesh(mesh), _material(nullptr) { }

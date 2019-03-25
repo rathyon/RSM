@@ -10,8 +10,8 @@
 	The current directory for this file is [...] RSM/projects/Windows/RSM
 */
 
-#define WND_W 800
-#define WND_H 640
+#define WND_W 640
+#define WND_H 480
 
 using namespace rsm;
 
@@ -66,8 +66,8 @@ void rsm::init(int argc, char* argv[]) {
 	=====================================================================================*/
 	/**/
 
-	ShaderSource vShader = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/vertex.vs");
-	ShaderSource fShader = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/frag.fs");
+	ShaderSource vShader = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/BlinnPhong.vs");
+	ShaderSource fShader = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/BlinnPhong.fs");
 	vShader.inject("#version 330 core\n");
 	fShader.inject("#version 330 core\n");
 	vShader.compile();
@@ -76,16 +76,19 @@ void rsm::init(int argc, char* argv[]) {
 	sref<Shader> program = make_sref<Shader>("ShaderProgram");
 	program->addShader(vShader);
 	program->addShader(fShader);
+
 	program->link();
 
 	RM.addShader("ShaderProgram", program);
 
-	sref<BlinnPhongMaterial> bp_orange = make_sref<BlinnPhongMaterial>();
-	bp_orange->setDiffuse(glm::vec3(1.0f, 0.5f, 0.2f));
-	bp_orange->setSpecular(glm::vec3(1.0f));
-	bp_orange->setShininess(32.0f);
+	/**/
+	sref<BlinnPhongMaterial> bp_test = make_sref<BlinnPhongMaterial>();
+	bp_test->setDiffuse(glm::vec3(1.0f, 0.5f, 0.2f));
+	bp_test->setSpecular(glm::vec3(1.0f));
+	bp_test->setShininess(32.0f);
 
-	bp_orange->setProgram(program->id());
+	bp_test->setProgram(program->id());
+	/**/
 
 	/**/
 	/* ===================================================================================
@@ -97,7 +100,7 @@ void rsm::init(int argc, char* argv[]) {
 	RM.addMesh("cube_mesh", cube_mesh);
 
 	sref<Model> test_cube = make_sref<Model>(cube_mesh);
-	test_cube->setMaterial(bp_orange);
+	test_cube->setMaterial(bp_test);
 
 	RM.addModel("test_cube", test_cube);
 
