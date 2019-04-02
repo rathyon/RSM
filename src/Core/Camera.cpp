@@ -38,28 +38,24 @@ float Camera::f() const {
 	return _far;
 }
 
-// TODO check these values
 glm::vec3 Camera::right() const {
 	return glm::vec3(_objToWorld[0][0],
 					 _objToWorld[0][1],
 					 _objToWorld[0][2]);
 }
 
-// TODO check these values
 glm::vec3 Camera::front() const {
 	return glm::vec3(_objToWorld[2][0],
 					 _objToWorld[2][1],
 					 _objToWorld[2][2]);
 }
 
-// TODO check these values
 glm::vec3 Camera::up() const {
 	return glm::vec3(_objToWorld[1][0],
 					 _objToWorld[1][1],
 					 _objToWorld[1][2]);
 }
 
-// TODO check these values
 void Camera::lookAt(const glm::vec3& eye, const glm::vec3& at, const glm::vec3& up) {
 	_position = eye;
 	_objToWorld = glm::lookAt(eye, at, up);
@@ -88,7 +84,6 @@ glm::mat4 Camera::viewProjMatrix() const {
 	return _projMatrix * _objToWorld;
 }
 
-// TODO check these values
 void Camera::updateViewMatrix() {
 	glm::mat4 rotX = glm::rotate(_pitch, glm::vec3(1, 0, 0));
 	glm::mat4 rotY = glm::rotate(_yaw, glm::vec3(0, 1, 0));

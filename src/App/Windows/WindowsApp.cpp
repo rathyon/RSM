@@ -10,8 +10,11 @@
 	The current directory for this file is [...] RSM/projects/Windows/RSM
 */
 
-#define WND_W 1600
-#define WND_H 900
+// 1600 x 900
+// 800 x 450
+
+#define WND_W 800
+#define WND_H 450
 
 using namespace rsm;
 
@@ -73,13 +76,13 @@ void rsm::init(int argc, char* argv[]) {
 	vShader.compile();
 	fShader.compile();
 
-	sref<Shader> program = make_sref<Shader>("ShaderProgram");
+	sref<Shader> program = make_sref<Shader>("MainProgram");
 	program->addShader(vShader);
 	program->addShader(fShader);
 
 	program->link();
 
-	RM.addShader("ShaderProgram", program);
+	RM.addShader("MainProgram", program);
 
 	/**/
 	sref<BlinnPhongMaterial> bp_test = make_sref<BlinnPhongMaterial>();
@@ -96,7 +99,7 @@ void rsm::init(int argc, char* argv[]) {
 	=====================================================================================*/
 	/**/
 
-	/** /
+	/**/
 	sref<Mesh> cube_mesh = make_sref<Mesh>("../../../assets/cube.obj");
 	sref<Model> test_cube = make_sref<Model>(cube_mesh);
 	test_cube->setMaterial(bp_test);
@@ -112,7 +115,7 @@ void rsm::init(int argc, char* argv[]) {
 	RM.addModel("bunny", bunny);
 	/**/
 
-	/**/
+	/** /
 	sref<Mesh> sponza_mesh = make_sref<Mesh>("../../../assets/sponza.obj");
 	sref<Model> sponza = make_sref<Model>(sponza_mesh);
 	sponza->setMaterial(bp_test);

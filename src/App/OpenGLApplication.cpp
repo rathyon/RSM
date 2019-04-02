@@ -56,8 +56,8 @@ void OpenGLApplication::prepare() {
 	/* Prepare Camera here */
 
 	_camera = make_sref<Perspective>(_width, _height,
-		vec3(0.0f, 50.0f, 0.0f),
-		vec3(-30000.0f, 50.0f, 0.0f),
+		vec3(2.0f, 2.0f, 2.0f),
+		vec3(0.0f, 0.0f, 0.0f),
 		vec3(0.0f, 1.0f, 0.0f),
 		0.1f, 100000.0f, 60.0f);
 
@@ -65,12 +65,12 @@ void OpenGLApplication::prepare() {
 
 	/* Prepare Lights here */
 
-	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(0.0f, 20.0f, 0.0f));
+	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
 	_scene.addLight(candle);
 
 	/* Prepare Models here */
 
-	/** /
+	/**/
 	sref<Model> cube = RM.getModel("test_cube");
 	cube->prepare();
 	_scene.addModel(cube);
@@ -82,11 +82,12 @@ void OpenGLApplication::prepare() {
 	_scene.addModel(bunny);
 	/**/
 
+	/** /
 	sref<Model> sponza = RM.getModel("sponza");
 	sponza->prepare();
 	sponza->setScale(1.0f, 1.0f, 1.0f);
 	_scene.addModel(sponza);
-
+	/**/
 
 	// Prepare shared buffers
 	prepareCameraBuffer();
@@ -139,13 +140,13 @@ void OpenGLApplication::uploadCameraBuffer() {
 }
 
 void OpenGLApplication::uploadLightsBuffer() {
+	/**/
 	const std::vector<sref<Light>>& lights = _scene.lights();
 
 	LightData data[NUM_LIGHTS];
 	memset(data, 0, sizeof(LightData) * NUM_LIGHTS);
 
 	//check actual number of lights before copying light data
-	// lights.size is size_t, be careful...
 	int numLights = std::min(NUM_LIGHTS, (int)lights.size());
 	for (int l = 0; l < numLights; l++)
 		lights[l]->toData(data[l]);
@@ -156,4 +157,63 @@ void OpenGLApplication::uploadLightsBuffer() {
 
 	glUnmapBuffer(GL_UNIFORM_BUFFER);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	/**/
+
+	/** /
+	GLuint prog = RM.getShader("MainProgram")->id();
+	GLuint blockIndex = glGetUniformBlockIndex(prog, "lightBlock");
+	LOG("BlockIndex for lightBlock is: ");
+	LOG(blockIndex);
+
+	GLint blockSize;
+	glGetActiveUniformBlockiv(prog, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
+	LOG("BlockSize for lightBlock is: ");
+	LOG(blockSize);
+
+	const GLchar* names[] = {
+		"lights[0].position",
+		"lights[0].emission",
+		"lights[0].intensity",
+		"lights[0].type",
+		"lights[0].state"
+	};
+
+	GLuint indices[5];
+	glGetUniformIndices(prog, 5, names, indices);
+	LOG("Indices");
+	LOG(indices[0]);
+	LOG(indices[1]);
+	LOG(indices[2]);
+	LOG(indices[3]);
+	LOG(indices[4]);
+
+	GLint offset[5];
+	glGetActiveUniformsiv(prog, 5, indices, GL_UNIFORM_OFFSET, offset);
+	LOG("Offsets");
+	LOG(offset[0]);
+	LOG(offset[1]);
+	LOG(offset[2]);
+	LOG(offset[3]);
+	LOG(offset[4]);
+
+	GLfloat position[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	GLfloat emission[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	GLfloat intensity = 1.0f;
+	GLint type = 1;
+	GLboolean state = true;
+
+	GLubyte* blockBuffer = (GLubyte*)malloc(blockSize);
+
+	memcpy(blockBuffer + offset[0], position, 4 * sizeof(GLfloat));
+	memcpy(blockBuffer + offset[1], emission, 4 * sizeof(GLfloat));
+	memcpy(blockBuffer + offset[2], &intensity, sizeof(GLfloat));
+	memcpy(blockBuffer + offset[3], &type, sizeof(GLint));
+	memcpy(blockBuffer + offset[4], &state, sizeof(GLboolean));
+
+	glBindBuffer(GL_UNIFORM_BUFFER, _lightsBuffer);
+	glBufferData(GL_UNIFORM_BUFFER, blockSize, blockBuffer, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	std::cin.get();
+	/**/
 }
