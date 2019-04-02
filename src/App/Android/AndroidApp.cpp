@@ -5,7 +5,11 @@ using namespace rsm;
 rsm::OpenGLApplication* glApp;
 
 void init() {
-    glApp = new OpenGLApplication();
+    /**
+     * IMPORTANT: SUPPOSEDLY reshape is always called at least once...
+     * So I'm just using useless values: 1920x1080
+     */
+    glApp = new OpenGLApplication(1920, 1080);
     glApp->init();
 
     /** /

@@ -18,3 +18,8 @@ Perspective::Perspective(int width, int height,
 float Perspective::fov() const {
 	return _fov;
 }
+
+void Perspective::updateProjMatrix(int width, int height) {
+	Camera::updateProjMatrix(width, height);
+	_projMatrix = glm::perspective(glm::radians(_fov), aspect(), _near, _far);
+}

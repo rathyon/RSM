@@ -9,9 +9,17 @@ set(SOURCE_DIR ${CMAKE_SOURCE_DIR}/../../../src/)
 
 file (GLOB SOURCE_FILES
         ${SOURCE_DIR}RSM.h
-        ${SOURCE_DIR}*.cpp
-        ${SOURCE_DIR}*/*.cpp
-        ${SOURCE_DIR}App/Android/*.cpp)
+        ${SOURCE_DIR}*
+        ${SOURCE_DIR}App/*
+        ${SOURCE_DIR}Core/*
+        ${SOURCE_DIR}Graphics/*
+        ${SOURCE_DIR}GUI/*
+        ${SOURCE_DIR}Lights/*
+        ${SOURCE_DIR}Materials/*
+        ${SOURCE_DIR}Math/*
+        ${SOURCE_DIR}Utils/*
+        ${SOURCE_DIR}App/Android/*
+        ${SOURCE_DIR}../ext/tinyobj/*)
 
 add_library( # Sets the name of the library.
         AndroidRSM-lib

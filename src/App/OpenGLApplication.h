@@ -1,21 +1,16 @@
 #ifndef __RSM_OGLAPP_H__
 #define __RSM_OGLAPP_H__
 
-#include "Core/OpenGL.h"
+#include "Core\OpenGL.h"
+#include "Core\Resources.h"
+#include "Core\Scene.h"
+#include "Core\Perspective.h"
+#include "Core\Model.h"
 
-#include "Resources.h"
+#include "Lights\PointLight.h"
 
-#include "Scene.h"
-
-#include "Perspective.h"
-
-#include "Model.h"
-
-#include "PointLight.h"
-
-#include "Shader.h"
-
-#include "BlinnPhongMaterial.h"
+#include "Graphics\Shader.h"
+#include "Graphics\BlinnPhongMaterial.h"
 
 namespace rsm {
 

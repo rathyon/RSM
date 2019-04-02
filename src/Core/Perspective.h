@@ -13,6 +13,7 @@ namespace rsm {
 			float n, float f, float fov);
 
 		float fov() const;
+		void updateProjMatrix(int width, int height) override;
 
 	private:
 		float _fov;

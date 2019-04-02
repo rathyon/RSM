@@ -25,7 +25,7 @@ const char *getGLErrorString(GLenum err)
 void checkOpenGLError(const std::string& error) {
 	if (isOpenGLError()) {
 		//std::cerr << error << std::endl;
-		LOGE(error.c_str());
+		LOGE(error);
 		std::cin.get();
 		exit(EXIT_FAILURE);
 	}

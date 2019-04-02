@@ -38,6 +38,7 @@ namespace rsm {
 		glm::mat4 viewProjMatrix() const;
 
 		void updateViewMatrix();
+		virtual void updateProjMatrix(int width, int height);
 		void updateOrientation(float dp, float dy);
 
 		void toData(CameraData& data);

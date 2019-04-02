@@ -1,7 +1,7 @@
 #ifndef __RSM_LIGHT_H__
 #define __RSM_LIGHT_H__
 
-#include "SceneObject.h"
+#include "Core\SceneObject.h"
 
 namespace rsm {
 

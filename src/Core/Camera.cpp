@@ -93,6 +93,11 @@ void Camera::updateViewMatrix() {
 	_objToWorld = orientation * glm::translate(-_position);
 }
 
+void Camera::updateProjMatrix(int width, int height) {
+	_width = width;
+	_height = height;
+}
+
 void Camera::updateOrientation(float dpdx, float dydx) {
 	_pitch += dpdx;
 	_yaw -= dydx;

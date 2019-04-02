@@ -41,12 +41,13 @@ void OpenGLApplication::cleanup() {
 }
 
 void OpenGLApplication::update(float dt) {
-	//_camera->updateViewMatrix();
+	_camera->updateViewMatrix();
 }
 
 void OpenGLApplication::reshape(int w, int h) {
 	_width = w;
 	_height = h;
+	_camera->updateProjMatrix(w, h);
 	glViewport(0, 0, w, h);
 }
 
@@ -70,7 +71,7 @@ void OpenGLApplication::prepare() {
 
 	/* Prepare Models here */
 
-	/**/
+	/** /
 	sref<Model> cube = RM.getModel("test_cube");
 	cube->prepare();
 	_scene.addModel(cube);
@@ -133,9 +134,7 @@ void OpenGLApplication::uploadCameraBuffer() {
 	_camera->toData(data);
 
 	glBindBuffer(GL_UNIFORM_BUFFER, _cameraBuffer);
-	GLvoid* p = glMapBuffer(GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
-	memcpy(p, &data, sizeof(CameraData));
-	glUnmapBuffer(GL_UNIFORM_BUFFER);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(CameraData), &data, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
@@ -151,11 +150,15 @@ void OpenGLApplication::uploadLightsBuffer() {
 	for (int l = 0; l < numLights; l++)
 		lights[l]->toData(data[l]);
 
+	/** /
 	glBindBuffer(GL_UNIFORM_BUFFER, _lightsBuffer);
 	GLvoid* p = glMapBuffer(GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
 	memcpy(p, &data, sizeof(LightData) * NUM_LIGHTS);
-
 	glUnmapBuffer(GL_UNIFORM_BUFFER);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	/**/
+	glBindBuffer(GL_UNIFORM_BUFFER, _lightsBuffer);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(LightData)*NUM_LIGHTS, data, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	/**/
 

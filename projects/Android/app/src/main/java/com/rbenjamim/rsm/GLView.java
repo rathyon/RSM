@@ -1,6 +1,7 @@
 package com.rbenjamim.rsm;
 
 import android.content.Context;
+import android.opengl.GLES32;
 import android.opengl.GLSurfaceView;
 
 import javax.microedition.khronos.egl.EGL10;
@@ -24,6 +25,7 @@ public class GLView extends GLSurfaceView {
     private static class Renderer implements GLSurfaceView.Renderer{
 
         @Override
+        // pass width and height of screen here
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
             AndroidApp.init();
         }

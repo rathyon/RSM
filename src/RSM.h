@@ -19,8 +19,8 @@
 #ifdef __ANDROID__
 #include <android/log.h>
 
-#define LOG(str) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, (str).c_str())
-#define LOGE(str) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, (str).c_str())
+#define LOG(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
 #else
 

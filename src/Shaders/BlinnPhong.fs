@@ -7,8 +7,8 @@ in FragData {
 } vsIn;
 
 struct Light {
-	vec4 position;
-	vec4 emission;
+	vec3 position;
+	vec3 emission;
 	float intensity;
 	int type;
 	bool state; 

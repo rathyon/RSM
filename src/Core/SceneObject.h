@@ -2,7 +2,7 @@
 #define __RSM_SCENEOBJ_H__
 
 #include <RSM.h>
-#include <RSMaths.h>
+#include "Math\RSMaths.h"
 
 namespace rsm {
 

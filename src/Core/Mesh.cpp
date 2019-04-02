@@ -1,7 +1,7 @@
 #include "Mesh.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
-#include "tiny_obj_loader.h"
+#include "..\ext\tinyobj\tiny_obj_loader.h"
 
 using namespace rsm;
 

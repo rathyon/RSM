@@ -3,7 +3,7 @@
 
 #include "SceneObject.h"
 #include "Mesh.h"
-#include "Material.h"
+#include "Graphics\Material.h"
 
 namespace rsm {
 
