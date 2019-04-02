@@ -19,6 +19,8 @@ bool Utils::readFile(const std::string& filepath, std::ios_base::openmode mode, 
 
 	str.assign((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 	file.close();
+
+	return true;
 }
 
 void Utils::throwError(const std::string& error) {

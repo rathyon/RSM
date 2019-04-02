@@ -66,12 +66,12 @@ void OpenGLApplication::prepare() {
 
 	/* Prepare Lights here */
 
-	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(-2.0f, 2.0f, 2.0f));
 	_scene.addLight(candle);
 
 	/* Prepare Models here */
 
-	/** /
+	/**/
 	sref<Model> cube = RM.getModel("test_cube");
 	cube->prepare();
 	_scene.addModel(cube);
@@ -102,14 +102,15 @@ void OpenGLApplication::render() { // receive objects and camera args
 	// Upload constant buffers to the GPU
 
 	// upload lights...
-	uploadLightsBuffer();
+	//uploadLightsBuffer();
+	uploadLights();
 	// upload camera...
 	uploadCameraBuffer();
 
 	// draw objects...
 	_scene.draw();
 
-	checkOpenGLError("Error!");
+	checkOpenGLError("Error in render loop!");
 }
 
 void OpenGLApplication::prepareCameraBuffer() {
@@ -219,4 +220,36 @@ void OpenGLApplication::uploadLightsBuffer() {
 
 	std::cin.get();
 	/**/
+}
+
+void OpenGLApplication::uploadLights() {
+	GLuint prog = RM.getShader("MainProgram")->id();
+	const std::vector<sref<Light>>& lights = _scene.lights();
+	LightData data;
+	std::string name;
+	std::string prefix;
+	glUseProgram(prog);
+
+	// I'll be assuming NUM_LIGHTS is always the actual number of lights in the scene at all times
+	for (int l = 0; l < NUM_LIGHTS; l++) {
+		lights[l]->toData(data);
+
+		prefix = "lights[" + std::to_string(l) + "].";
+
+		name = prefix + "position";
+		glUniform3fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(data.position));
+
+		name = (prefix + "emission").c_str();
+		glUniform3fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(data.emission));
+
+		name = (prefix + "intensity").c_str();
+		glUniform1f(glGetUniformLocation(prog, name.c_str()), data.intensity);
+
+		name = (prefix + "type").c_str();
+		glUniform1i(glGetUniformLocation(prog, name.c_str()), data.type);
+
+		name = (prefix + "state").c_str();
+		glUniform1i(glGetUniformLocation(prog, name.c_str()), data.state);
+	}
+	glUseProgram(0);
 }

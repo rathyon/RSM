@@ -19,14 +19,14 @@
 
 #define NUM_LIGHTS 1
 
-GLenum OpenGLShaderType[]{
+const GLenum OpenGLShaderType[]{
 	GL_VERTEX_SHADER,
 	GL_FRAGMENT_SHADER,
 	//GL_GEOMETRY_SHADER, // OpenGL ES doesn't have it ?
 	//GL_COMPUTE_SHADER	// OpenGL ES doesn't have it ?
 };
 
-enum ShaderType {
+const enum ShaderType {
 	VERTEX_SHADER     = 0,
 	FRAGMENT_SHADER   = 1,
 	GEOMETRY_SHADER   = 2,
@@ -34,14 +34,14 @@ enum ShaderType {
 	SHADER_TYPE_COUNT = 4
 };
 
-enum AttributeType {
+const enum AttributeType {
 	POSITION = 0,
 	NORMAL   = 1,
 	UV       = 2,
 	TANGENT  = 3
 };
 
-enum BufferIndices {
+const enum BufferIndices {
 	CAMERA_BUFFER_IDX = 0,
 	LIGHTS_BUFFER_IDX = 1
 };

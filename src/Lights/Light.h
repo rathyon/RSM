@@ -7,9 +7,9 @@ namespace rsm {
 
 	// Used to pass the type id to shaders
 	enum LightType : int {
-		LIGHTYPE_POINT = 0,
-		LIGHTYPE_SPOT  = 1,
-		LIGHTYPE_DIR   = 2,
+		LIGHTYPE_DIR   = 0,
+		LIGHTYPE_POINT = 1,
+		LIGHTYPE_SPOT  = 2,
 	};
 
 	// Light data for shader blocks

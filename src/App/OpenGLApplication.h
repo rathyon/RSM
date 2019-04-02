@@ -37,6 +37,8 @@ namespace rsm {
 		void uploadCameraBuffer();
 		void uploadLightsBuffer();
 
+		void uploadLights();
+
 		int _width;
 		int _height;
 
