@@ -99,7 +99,7 @@ void rsm::init(int argc, char* argv[]) {
 	=====================================================================================*/
 	/**/
 
-	/**/
+	/** /
 	sref<Mesh> cube_mesh = make_sref<Mesh>("../../../assets/cube.obj");
 	sref<Model> test_cube = make_sref<Model>(cube_mesh);
 	test_cube->setMaterial(bp_test);

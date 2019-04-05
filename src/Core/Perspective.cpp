@@ -5,7 +5,7 @@ using namespace rsm;
 Perspective::Perspective() { }
 
 Perspective::Perspective(int width, int height,
-	glm::vec3& eye, glm::vec3& at, glm::vec3& up,
+	glm::vec3 eye, glm::vec3 at, glm::vec3 up,
 	float n, float f, float fov)
 
 	: Camera(width, height, eye, at, up, n, f), _fov(fov) {

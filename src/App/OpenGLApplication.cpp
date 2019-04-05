@@ -71,7 +71,7 @@ void OpenGLApplication::prepare() {
 
 	/* Prepare Models here */
 
-	/**/
+	/** /
 	sref<Model> cube = RM.getModel("test_cube");
 	cube->prepare();
 	_scene.addModel(cube);
@@ -97,13 +97,13 @@ void OpenGLApplication::prepare() {
 }
 
 void OpenGLApplication::render() { // receive objects and camera args
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	glClearColor(0.1f, 1.0f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	// Upload constant buffers to the GPU
 
 	// upload lights...
 	//uploadLightsBuffer();
-	uploadLights();
+	//uploadLights();
 	// upload camera...
 	uploadCameraBuffer();
 
@@ -151,74 +151,9 @@ void OpenGLApplication::uploadLightsBuffer() {
 	for (int l = 0; l < numLights; l++)
 		lights[l]->toData(data[l]);
 
-	/** /
-	glBindBuffer(GL_UNIFORM_BUFFER, _lightsBuffer);
-	GLvoid* p = glMapBuffer(GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
-	memcpy(p, &data, sizeof(LightData) * NUM_LIGHTS);
-	glUnmapBuffer(GL_UNIFORM_BUFFER);
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-	/**/
 	glBindBuffer(GL_UNIFORM_BUFFER, _lightsBuffer);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(LightData)*NUM_LIGHTS, data, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-	/**/
-
-	/** /
-	GLuint prog = RM.getShader("MainProgram")->id();
-	GLuint blockIndex = glGetUniformBlockIndex(prog, "lightBlock");
-	LOG("BlockIndex for lightBlock is: ");
-	LOG(blockIndex);
-
-	GLint blockSize;
-	glGetActiveUniformBlockiv(prog, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
-	LOG("BlockSize for lightBlock is: ");
-	LOG(blockSize);
-
-	const GLchar* names[] = {
-		"lights[0].position",
-		"lights[0].emission",
-		"lights[0].intensity",
-		"lights[0].type",
-		"lights[0].state"
-	};
-
-	GLuint indices[5];
-	glGetUniformIndices(prog, 5, names, indices);
-	LOG("Indices");
-	LOG(indices[0]);
-	LOG(indices[1]);
-	LOG(indices[2]);
-	LOG(indices[3]);
-	LOG(indices[4]);
-
-	GLint offset[5];
-	glGetActiveUniformsiv(prog, 5, indices, GL_UNIFORM_OFFSET, offset);
-	LOG("Offsets");
-	LOG(offset[0]);
-	LOG(offset[1]);
-	LOG(offset[2]);
-	LOG(offset[3]);
-	LOG(offset[4]);
-
-	GLfloat position[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	GLfloat emission[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	GLfloat intensity = 1.0f;
-	GLint type = 1;
-	GLboolean state = true;
-
-	GLubyte* blockBuffer = (GLubyte*)malloc(blockSize);
-
-	memcpy(blockBuffer + offset[0], position, 4 * sizeof(GLfloat));
-	memcpy(blockBuffer + offset[1], emission, 4 * sizeof(GLfloat));
-	memcpy(blockBuffer + offset[2], &intensity, sizeof(GLfloat));
-	memcpy(blockBuffer + offset[3], &type, sizeof(GLint));
-	memcpy(blockBuffer + offset[4], &state, sizeof(GLboolean));
-
-	glBindBuffer(GL_UNIFORM_BUFFER, _lightsBuffer);
-	glBufferData(GL_UNIFORM_BUFFER, blockSize, blockBuffer, GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-	std::cin.get();
 	/**/
 }
 
@@ -239,16 +174,16 @@ void OpenGLApplication::uploadLights() {
 		name = prefix + "position";
 		glUniform3fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(data.position));
 
-		name = (prefix + "emission").c_str();
+		name = prefix + "emission";
 		glUniform3fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(data.emission));
 
-		name = (prefix + "intensity").c_str();
+		name = prefix + "intensity";
 		glUniform1f(glGetUniformLocation(prog, name.c_str()), data.intensity);
 
-		name = (prefix + "type").c_str();
+		name = prefix + "type";
 		glUniform1i(glGetUniformLocation(prog, name.c_str()), data.type);
 
-		name = (prefix + "state").c_str();
+		name = prefix + "state";
 		glUniform1i(glGetUniformLocation(prog, name.c_str()), data.state);
 	}
 	glUseProgram(0);

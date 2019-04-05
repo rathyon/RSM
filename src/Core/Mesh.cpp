@@ -7,7 +7,8 @@ using namespace rsm;
 
 Mesh::Mesh(const std::string filepath) {
 	if (!loadObj(filepath)) {
-		LOGE("Failed to load obj: " + filepath);
+		LOGE("Failed to load obj:");
+		LOGE("%s", filepath.c_str());
 	}
 	// load into resource manager here?
 }
@@ -55,12 +56,18 @@ bool Mesh::loadObj(const std::string filepath) {
 	std::string err;
 
 	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filepath.c_str())) {
-		LOGE("Failed to load obj " + filepath + ": " + err);
+		LOGE("Failed to load obj");
+		LOGE("%s", filepath.c_str());
+		LOGE("Error message:");
+		LOGE("%s", err.c_str());
 		return false;
 	}
 
-	if (warn.size() > 0)
-		LOG("Tinyobj warning: " + warn);
+	if (warn.size() > 0){
+		LOG("Tinyobj warning:");
+		LOG("%s", warn.c_str());
+	}
+
 
 	// When calling LoadObj, triangulate is on by default, if I want to not use triangulation,
 	// the Vertex creation needs to be changed: I assume all faces are triangles, check num_face_vertices

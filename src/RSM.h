@@ -24,8 +24,8 @@
 
 #else
 
-#define LOG(str) std::cout << str << std::endl
-#define LOGE(str) std::cerr << str << std::endl
+#define LOG(...) printf(__VA_ARGS__)
+#define LOGE(...) printf(__VA_ARGS__)
 
 #endif
 

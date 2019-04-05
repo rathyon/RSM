@@ -8,9 +8,7 @@ namespace rsm {
 	class Perspective : public Camera {
 	public:
 		Perspective();
-		Perspective(int width, int height,
-			glm::vec3& eye, glm::vec3& at, glm::vec3& up,
-			float n, float f, float fov);
+		Perspective(int width, int height, glm::vec3 eye, glm::vec3 at, glm::vec3 up, float n, float f, float fov);
 
 		float fov() const;
 		void updateProjMatrix(int width, int height) override;

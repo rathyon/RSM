@@ -43,7 +43,7 @@ void reshape(int w, int h) {
 
 void render() {
     // get deltaTime, send it to update
-    //glApp->update();
+    glApp->update(0.0f);
     glApp->render();
 }
 
