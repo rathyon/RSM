@@ -41,6 +41,7 @@ out vec4 outColor;
 
 void main(void) {
 
+	/** /
 	vec3 N = normalize(vsIn.normal);
 	vec3 V = normalize(ViewPos - vsIn.position);
 	vec3 L;
@@ -66,5 +67,7 @@ void main(void) {
 	}
 
 	outColor = vec4(retColor, 1.0);
+	/**/
 
+	outColor = vec4(vsIn.normal, 1.0);
 }

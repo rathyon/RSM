@@ -13,8 +13,8 @@
 // 1600 x 900
 // 800 x 450
 
-#define WND_W 800
-#define WND_H 450
+#define WND_W 1600
+#define WND_H 900
 
 using namespace rsm;
 
@@ -84,6 +84,8 @@ void rsm::init(int argc, char* argv[]) {
 
 	RM.addShader("MainProgram", program);
 
+	glApp->addProgram(program->id());
+
 	/**/
 	sref<BlinnPhongMaterial> bp_test = make_sref<BlinnPhongMaterial>();
 	bp_test->setDiffuse(glm::vec3(1.0f, 0.5f, 0.2f));
@@ -99,7 +101,7 @@ void rsm::init(int argc, char* argv[]) {
 	=====================================================================================*/
 	/**/
 
-	/** /
+	/**/
 	sref<Mesh> cube_mesh = make_sref<Mesh>("../../../assets/cube.obj");
 	sref<Model> test_cube = make_sref<Model>(cube_mesh);
 	test_cube->setMaterial(bp_test);

@@ -27,15 +27,15 @@ namespace rsm {
 		void update(float dt);
 		void render(); // receive scene and camera args
 
+		void addProgram(GLuint prog);
+
 		int getWidth();
 		int getHeight();
 
 	private:
 		void prepareCameraBuffer();
-		void prepareLightsBuffer();
 
 		void uploadCameraBuffer();
-		void uploadLightsBuffer();
 
 		void uploadLights();
 
@@ -43,7 +43,7 @@ namespace rsm {
 		int _height;
 
 		GLuint _cameraBuffer;
-		GLuint _lightsBuffer;
+		std::vector<GLuint> _programs;
 
 		Scene _scene;
 		sref<Camera> _camera;
