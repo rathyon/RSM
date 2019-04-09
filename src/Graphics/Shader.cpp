@@ -11,13 +11,24 @@ namespace rsm {
 		_name = filepath;
 		_id = glCreateShader(OpenGLShaderType[type]);
 		if (_id == 0) {
-			LOGE("Could not create shader:");
-			LOGE("%s", _name.c_str());
+			LOGE("Could not create shader:\n");
+			LOGE("%s\n", _name.c_str());
 		}
 
 		// Read shader source code into attribute
 		Utils::readFile(filepath, std::ios_base::in, _source);
 
+	}
+
+	ShaderSource::ShaderSource(ShaderType type, std::string name, const char* source) {
+		_name = name;
+		_id = glCreateShader(OpenGLShaderType[type]);
+		if (_id == 0) {
+			LOGE("Could not create shader:\n");
+			LOGE("%s\n", _name.c_str());
+		}
+
+		_source = std::string(source);
 	}
 
 	ShaderSource::~ShaderSource() {
@@ -60,10 +71,10 @@ namespace rsm {
 			std::string message(log);
 			delete[] log;
 
-			LOGE("Couldn't compile shader:");
-			LOGE("%s", _name.c_str());
-			LOGE("Compilation log:");
-			LOGE("%s", message.c_str());
+			LOGE("Couldn't compile shader:\n");
+			LOGE("%s\n", _name.c_str());
+			LOGE("Compilation log:\n");
+			LOGE("%s\n", message.c_str());
 
 			//cleanup the shader
 			glDeleteShader(_id);
@@ -111,8 +122,8 @@ namespace rsm {
 			std::string strLog(log);
 			delete[] log;
 
-			LOGE("Could not create shader:");
-			LOGE("%s", _name.c_str());
+			LOGE("Could not create shader:\n");
+			LOGE("%s\n", _name.c_str());
 		}
 
 		for (GLuint sid : _shaders) {
@@ -136,10 +147,10 @@ namespace rsm {
 
 			std::string strLog(log);
 
-			LOGE("Couldn't link shader:");
-			LOGE("%s", _name.c_str());
-			LOGE("Linkage log:");
-			LOGE("%s", strLog.c_str());
+			LOGE("Couldn't link shader:\n");
+			LOGE("%s\n", _name.c_str());
+			LOGE("Linkage log:\n");
+			LOGE("%s\n", strLog.c_str());
 
 			delete[] log;
 

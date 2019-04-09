@@ -101,7 +101,7 @@ void rsm::init(int argc, char* argv[]) {
 	=====================================================================================*/
 	/**/
 
-	/**/
+	/** /
 	sref<Mesh> cube_mesh = make_sref<Mesh>("../../../assets/cube.obj");
 	sref<Model> test_cube = make_sref<Model>(cube_mesh);
 	test_cube->setMaterial(bp_test);
@@ -117,7 +117,7 @@ void rsm::init(int argc, char* argv[]) {
 	RM.addModel("bunny", bunny);
 	/**/
 
-	/** /
+	/**/
 	sref<Mesh> sponza_mesh = make_sref<Mesh>("../../../assets/sponza.obj");
 	sref<Model> sponza = make_sref<Model>(sponza_mesh);
 	sponza->setMaterial(bp_test);

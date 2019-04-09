@@ -6,11 +6,13 @@
 using namespace rsm;
 
 Mesh::Mesh(const std::string filepath) {
-	if (!loadObj(filepath)) {
-		LOGE("Failed to load obj:");
-		LOGE("%s", filepath.c_str());
-	}
-	// load into resource manager here?
+	_name = filepath;
+	loadObj(true, filepath.c_str());
+}
+
+Mesh::Mesh(const std::string name, const char* source) {
+	_name = name;
+	loadObj(false, source);
 }
 
 Mesh::~Mesh() {}
@@ -46,7 +48,7 @@ void Mesh::setIndices(const std::vector<int>& indices) {
 	std::copy(indices.begin(), indices.end(), _indices.begin());
 }
 
-bool Mesh::loadObj(const std::string filepath) {
+bool Mesh::loadObj(bool fromFile, const char* source) {
 	tinyobj::attrib_t attrib;
 
 	std::vector<tinyobj::shape_t> shapes;
@@ -55,19 +57,28 @@ bool Mesh::loadObj(const std::string filepath) {
 	std::string warn;
 	std::string err;
 
-	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filepath.c_str())) {
-		LOGE("Failed to load obj");
-		LOGE("%s", filepath.c_str());
-		LOGE("Error message:");
-		LOGE("%s", err.c_str());
+	bool successful;
+	if (fromFile) {
+		successful = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, source);
+	}
+	else {
+		//std::basic_istringstream<char> sourcestream(source);
+		std::istringstream sourcestream(source);
+		successful = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, &sourcestream);
+	}
+
+	if (!successful) {
+		LOGE("Failed to load obj!\n");
+		LOGE("%s\n", _name.c_str());
+		LOGE("Error message:\n");
+		LOGE("%s\n", err.c_str());
 		return false;
 	}
-
-	if (warn.size() > 0){
-		LOG("Tinyobj warning:");
-		LOG("%s", warn.c_str());
+	
+	if (warn.size() > 0) {
+		LOG("Tinyobj warning:\n");
+		LOG("%s\n", warn.c_str());
 	}
-
 
 	// When calling LoadObj, triangulate is on by default, if I want to not use triangulation,
 	// the Vertex creation needs to be changed: I assume all faces are triangles, check num_face_vertices

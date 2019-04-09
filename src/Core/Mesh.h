@@ -20,6 +20,7 @@ namespace rsm {
 	public:
 
 		Mesh(const std::string filepath);
+		Mesh(const std::string name, const char* source);
 		~Mesh();
 
 		const GLuint& VAO() const;
@@ -33,15 +34,17 @@ namespace rsm {
 		void setVertices(const std::vector<Vertex>& vertices);
 		void setIndices(const std::vector<int>& indices);
 
-		bool loadObj(const std::string filepath);
-
 		//void computeTangents();
 
 	private:
+		std::string _name;
+
 		GLuint _VAO;
 
 		std::vector<Vertex> _vertices;
 		std::vector<int> _indices;
+
+		bool loadObj(bool fromFile, const char* source);
 	};
 }
 

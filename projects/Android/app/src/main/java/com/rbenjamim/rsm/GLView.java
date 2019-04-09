@@ -1,6 +1,7 @@
 package com.rbenjamim.rsm;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.opengl.GLES32;
 import android.opengl.GLSurfaceView;
 
@@ -13,8 +14,11 @@ import static com.rbenjamim.rsm.Configs.*;
 
 public class GLView extends GLSurfaceView {
 
-    public GLView(Context context){
+    public static AssetManager assetManager;
+
+    public GLView(Context context, AssetManager aMgr){
         super(context);
+        assetManager = aMgr;
 
         setEGLConfigChooser(RED_BITS, GREEN_BITS, BLUE_BITS, ALPHA_BITS, DEPTH_BITS, STENCIL_BITS);
         //setEGLConfigChooser(new ConfigChooser());
@@ -25,9 +29,8 @@ public class GLView extends GLSurfaceView {
     private static class Renderer implements GLSurfaceView.Renderer{
 
         @Override
-        // pass width and height of screen here
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-            AndroidApp.init();
+            AndroidApp.init(assetManager);
         }
 
         @Override

@@ -8,6 +8,7 @@ namespace rsm {
 	class ShaderSource {
 	public:
 		ShaderSource(ShaderType type, const std::string& filepath);
+		ShaderSource(ShaderType type, std::string name, const char* source);
 		~ShaderSource();
 
 		GLuint id() const;
