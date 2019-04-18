@@ -18,10 +18,12 @@ namespace rsm {
 		void setAmbient(const vec3& ambient);
 
 		void setDiffuse(const vec3& diffuse);
-		//void setDiffuse(const Texture& diffTex);
+		void setDiffuseTex(GLuint diffTex);
 
 		void setSpecular(const vec3& specular);
-		//void setNormal(const Texture& normalTex);
+		void setSpecularTex(GLuint specTex);
+
+		void setNormalTex(GLuint normalTex);
 
 		void setShininess(float shininess);
 
@@ -30,8 +32,9 @@ namespace rsm {
 		vec3 specular() const;
 		float shininess() const;
 
-		//Texture diffuseTex() const;
-		//Texture normalTex() const;
+		GLuint diffuseTex() const;
+		GLuint specularTex() const;
+		GLuint normalTex() const;
 
 	private:
 		vec3 _ambient;
@@ -39,8 +42,9 @@ namespace rsm {
 		vec3 _specular;
 		float _shininess;
 
-		//Texture _diffuseTex;
-		//Texture _specularTex;
+		GLuint _diffuseTex;
+		GLuint _specularTex;
+		GLuint _normalTex;
 	};
 
 }

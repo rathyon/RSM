@@ -25,19 +25,40 @@ const int NUM_LIGHTS = 1;
 
 uniform Light lights[NUM_LIGHTS];
 
-/** /
-uniform lightBlock {
-	Light lights[NUM_LIGHTS];
-};
-/**/
-
 //Material parameters
 uniform vec3 ambient;
 uniform vec3 diffuse;
 uniform vec3 specular;
 uniform float shininess;
 
+uniform sampler2D diffuseTex;
+uniform sampler2D specularTex;
+uniform sampler2D normalTex;
+
+/* ==============================================================================
+        Stage Outputs
+ ============================================================================== */
+
 out vec4 outColor;
+
+// for specular maps
+float fetchParameter(sampler2D samp, float val){
+	if(val >= 0.0){
+		return val;
+	}
+	else{
+		return texture(samp, vsIn.texCoords).r;
+	}
+}
+
+vec3 fetchDiffuse(){
+	if(diffuse.r > 0.0){
+		return diffuse;
+	}
+	else{
+		return texture(diffuseTex, vsIn.texCoords).rgb;
+	}
+}
 
 void main(void) {
 
@@ -60,8 +81,8 @@ void main(void) {
 		float NdotL = dot(N, L);
 		float NdotH = dot(N, H);
 
-		vec3 diff = lights[i].emission * diffuse * NdotL;
-		vec3 spec = lights[i].emission * specular * pow(NdotH, shininess);
+		vec3 diff = lights[i].emission * fetchDiffuse() * NdotL;
+		vec3 spec = lights[i].emission * fetchParameter(specularTex, specular.r) * pow(NdotH, shininess);
 
 		retColor += diff + spec;
 	}
@@ -69,5 +90,5 @@ void main(void) {
 	outColor = vec4(retColor, 1.0);
 	/**/
 
-	outColor = vec4(vsIn.normal, 1.0);
+	outColor = vec4(fetchDiffuse(), 1.0);
 }

@@ -5,10 +5,14 @@ using namespace rsm;
 BlinnPhongMaterial::BlinnPhongMaterial() {
 	// when final shaders are done, set _prog here!
 
-	_ambient = vec3(0);
-	_diffuse = vec3(0);
-	_specular = vec3(0);
-	_shininess = 1.0f;
+	_ambient = vec3(0.0f);
+	_diffuse = vec3(0.0f);
+	_specular = vec3(0.0f);
+	_shininess = 0.0f;
+
+	_diffuseTex = -1;
+	_specularTex = -1;
+	_normalTex = -1;
 }
 
 void BlinnPhongMaterial::uploadData() {
@@ -17,6 +21,24 @@ void BlinnPhongMaterial::uploadData() {
 	setVec3("diffuse", _diffuse);
 	setVec3("specular", _specular);
 	setFloat("shininess", _shininess);
+
+	if (_diffuseTex != -1) {
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, _diffuseTex);
+		setSampler("diffuseTex", 0);
+	}
+
+	if (_specularTex != -1) {
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, _specularTex);
+		setSampler("diffuseTex", 1);
+	}
+
+	if (_normalTex != -1) {
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, _normalTex);
+		setSampler("diffuseTex", 2);
+	}
 }
 
 void BlinnPhongMaterial::setAmbient(const vec3& ambient) {
@@ -27,8 +49,20 @@ void BlinnPhongMaterial::setDiffuse(const vec3& diffuse) {
 	_diffuse = diffuse;
 }
 
+void BlinnPhongMaterial::setDiffuseTex(GLuint diffTex) {
+	_diffuseTex = diffTex;
+}
+
 void BlinnPhongMaterial::setSpecular(const vec3& specular) {
 	_specular = specular;
+}
+
+void BlinnPhongMaterial::setSpecularTex(GLuint specTex) {
+	_specularTex = specTex;
+}
+
+void BlinnPhongMaterial::setNormalTex(GLuint normTex) {
+	_normalTex = normTex;
 }
 
 void BlinnPhongMaterial::setShininess(float shininess) {
@@ -47,4 +81,14 @@ vec3 BlinnPhongMaterial::specular() const {
 
 float BlinnPhongMaterial::shininess() const {
 	return _shininess;
+}
+
+GLuint BlinnPhongMaterial::diffuseTex() const {
+	return _diffuseTex;
+}
+GLuint BlinnPhongMaterial::specularTex() const {
+	return _specularTex;
+}
+GLuint BlinnPhongMaterial::normalTex() const {
+	return _normalTex;
 }

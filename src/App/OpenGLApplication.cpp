@@ -24,7 +24,7 @@ void OpenGLApplication::init() {
 	glDepthFunc(GL_LEQUAL);
 	glDepthMask(GL_TRUE);
 	glEnable(GL_CULL_FACE);
-	//glCullFace(GL_BACK);
+	glCullFace(GL_BACK);
 	//glFrontFace(GL_CCW);
 	//glEnable(GL_MULTISAMPLE);
 }
@@ -45,6 +45,7 @@ void OpenGLApplication::cleanup() {
 }
 
 void OpenGLApplication::update(float dt) {
+	//_camera->updateOrientation(0.0f, dt * 0.05f);
 	_camera->updateViewMatrix();
 }
 
@@ -61,7 +62,7 @@ void OpenGLApplication::prepare() {
 	/* Prepare Camera here */
 
 	// cube cam
-	/** /
+	/**/
 	_camera = make_sref<Perspective>(_width, _height,
 		vec3(5.0f, 5.0f, 5.0f),
 		vec3(0.0f, 0.0f, 0.0f),
@@ -70,11 +71,13 @@ void OpenGLApplication::prepare() {
 	/**/
 
 	// sponza cam
+	/** /
     _camera = make_sref<Perspective>(_width, _height,
          vec3(0.0f, 300.0f, 0.0f),
          vec3(-3000.0f, 300.0f, 0.0f),
          vec3(0.0f, 1.0f, 0.0f),
-         0.1f, 1000000.0f, 60.0f);
+         0.1f, 100000000.0f, 60.0f);
+	/**/
 
 	_scene.addCamera(_camera);
 
@@ -86,7 +89,7 @@ void OpenGLApplication::prepare() {
 
 	/* Prepare Models here */
 
-	/** /
+	/**/
 	sref<Model> cube = RM.getModel("test_cube");
 	cube->prepare();
 	_scene.addModel(cube);
@@ -98,7 +101,7 @@ void OpenGLApplication::prepare() {
 	_scene.addModel(bunny);
 	/**/
 
-	/**/
+	/** /
 	sref<Model> sponza = RM.getModel("sponza");
 	sponza->prepare();
 	_scene.addModel(sponza);

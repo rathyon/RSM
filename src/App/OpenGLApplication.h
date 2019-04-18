@@ -11,6 +11,7 @@
 
 #include "Graphics\Shader.h"
 #include "Graphics\BlinnPhongMaterial.h"
+#include "Graphics\Texture.h"
 
 namespace rsm {
 

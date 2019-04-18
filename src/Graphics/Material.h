@@ -27,6 +27,8 @@ namespace rsm {
 		void setVec4(const std::string& name, vec4& vec);
 		void setMat3(const std::string& name, mat3& mat);
 		void setMat4(const std::string& name, mat4& mat);
+
+		void setSampler(const std::string& name, int id);
 	};
 
 }

@@ -29,3 +29,7 @@ void Material::setMat3(const std::string& name, mat3& mat) {
 void Material::setMat4(const std::string& name, mat4& mat) {
 	glUniformMatrix4fv(glGetUniformLocation(_prog, name.c_str()), 1, GL_FALSE, value_ptr(mat));
 }
+
+void Material::setSampler(const std::string& name, int id) {
+	glUniform1i(glGetUniformLocation(_prog, name.c_str()), id);
+}

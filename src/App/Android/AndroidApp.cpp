@@ -2,12 +2,17 @@
 
 #include <android/asset_manager_jni.h>
 
+#include <time.h>
+
 using namespace rsm;
 
 rsm::OpenGLApplication* glApp;
 AAssetManager* assetManager;
 
+long oldTimeSinceStart;
+
 char* getAssetSource(const char* filepath);
+long getCurrentTime();
 
 void init() {
     /**
@@ -101,6 +106,7 @@ void init() {
     LOG("AndroidApp successfully initialized!\n");
     glApp->prepare();
     LOG("AndroidApp successfully prepared!\n");
+    oldTimeSinceStart = getCurrentTime();
 }
 
 void reshape(int w, int h) {
@@ -109,7 +115,17 @@ void reshape(int w, int h) {
 
 void render() {
     // get deltaTime, send it to update
-    glApp->update(0.0f);
+    long timeSinceStart = getCurrentTime();
+    long deltaTime = timeSinceStart - oldTimeSinceStart;
+    oldTimeSinceStart = timeSinceStart;
+
+    // nano to microseconds
+    float dt = float(deltaTime) * 1000.0f;
+    if(dt > 0.25f)
+        dt = 0.25f;
+
+    glApp->update(dt);
+
     glApp->render();
 }
 
@@ -122,6 +138,16 @@ char* getAssetSource(const char* filepath) {
     filesource[filesize] = '\0';
 
     return filesource;
+}
+
+/*
+ * Returns current time in nanoseconds (10^-9 sec)
+ */
+long getCurrentTime(){
+    struct timespec now;
+    clock_gettime(CLOCK_MONOTONIC, &now);
+    // in nanoseconds
+    return (now.tv_sec * 1000000000) + now.tv_nsec;
 }
 
 extern "C"

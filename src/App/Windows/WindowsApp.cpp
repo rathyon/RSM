@@ -65,6 +65,23 @@ void rsm::init(int argc, char* argv[]) {
 	RM.init();
 
 	/* ===================================================================================
+				Textures
+	=====================================================================================*/
+	/**/
+
+	/**/
+	Image cube_diff;
+	cube_diff.loadFromFile("../../../assets/textures/cube/diffuse.png", IMG_2D);
+	Image cube_spec;
+	cube_diff.loadFromFile("../../../assets/textures/cube/glossiness.png", IMG_2D);
+	sref<Texture> cube_diffTex = make_sref<Texture>(cube_diff);
+	sref<Texture> cube_specTex = make_sref<Texture>(cube_spec);
+	/**/
+
+
+	/**/
+
+	/* ===================================================================================
 				Shaders and Materials
 	=====================================================================================*/
 	/**/
@@ -88,8 +105,12 @@ void rsm::init(int argc, char* argv[]) {
 
 	/**/
 	sref<BlinnPhongMaterial> bp_test = make_sref<BlinnPhongMaterial>();
+	/** /
 	bp_test->setDiffuse(glm::vec3(1.0f, 0.5f, 0.2f));
 	bp_test->setSpecular(glm::vec3(1.0f));
+	/**/
+	bp_test->setDiffuseTex(cube_diffTex->id());
+	bp_test->setSpecularTex(cube_specTex->id());
 	bp_test->setShininess(32.0f);
 
 	bp_test->setProgram(program->id());
@@ -101,8 +122,8 @@ void rsm::init(int argc, char* argv[]) {
 	=====================================================================================*/
 	/**/
 
-	/** /
-	sref<Mesh> cube_mesh = make_sref<Mesh>("../../../assets/cube.obj");
+	/**/
+	sref<Mesh> cube_mesh = make_sref<Mesh>("../../../assets/models/cube.obj");
 	sref<Model> test_cube = make_sref<Model>(cube_mesh);
 	test_cube->setMaterial(bp_test);
 	RM.addMesh("cube_mesh", cube_mesh);
@@ -110,25 +131,19 @@ void rsm::init(int argc, char* argv[]) {
 	/**/
 
 	/** /
-	sref<Mesh> bunny_mesh = make_sref<Mesh>("../../../assets/bunny.obj");
+	sref<Mesh> bunny_mesh = make_sref<Mesh>("../../../assets/models/bunny.obj");
 	sref<Model> bunny = make_sref<Model>(bunny_mesh);
 	bunny->setMaterial(bp_test);
 	RM.addMesh("bunny_mesh", bunny_mesh);
 	RM.addModel("bunny", bunny);
 	/**/
 
-	/**/
-	sref<Mesh> sponza_mesh = make_sref<Mesh>("../../../assets/sponza.obj");
+	/** /
+	sref<Mesh> sponza_mesh = make_sref<Mesh>("../../../assets/models/sponza.obj");
 	sref<Model> sponza = make_sref<Model>(sponza_mesh);
 	sponza->setMaterial(bp_test);
 	RM.addMesh("sponza_mesh", sponza_mesh);
 	RM.addModel("sponza", sponza);
-	/**/
-
-	/**/
-	/* ===================================================================================
-				Textures
-	=====================================================================================*/
 	/**/
 
 	/**/
