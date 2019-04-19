@@ -26,6 +26,14 @@ const GLenum OpenGLShaderType[]{
 	//GL_COMPUTE_SHADER	// OpenGL ES doesn't have it ?
 };
 
+const GLenum OpenGLPixelFormats[] = {
+	0,
+	GL_RED,
+	GL_RG,
+	GL_RGB,
+	GL_RGBA
+};
+
 const GLenum OpenGLTexTargets[] = {
 	GL_TEXTURE_1D,
 	GL_TEXTURE_2D,

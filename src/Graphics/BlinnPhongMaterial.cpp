@@ -31,14 +31,15 @@ void BlinnPhongMaterial::uploadData() {
 	if (_specularTex != -1) {
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, _specularTex);
-		setSampler("diffuseTex", 1);
+		setSampler("specularTex", 1);
 	}
 
 	if (_normalTex != -1) {
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, _normalTex);
-		setSampler("diffuseTex", 2);
+		setSampler("normalTex", 2);
 	}
+
 }
 
 void BlinnPhongMaterial::setAmbient(const vec3& ambient) {

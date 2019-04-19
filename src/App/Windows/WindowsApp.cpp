@@ -73,9 +73,12 @@ void rsm::init(int argc, char* argv[]) {
 	Image cube_diff;
 	cube_diff.loadFromFile("../../../assets/textures/cube/diffuse.png", IMG_2D);
 	Image cube_spec;
-	cube_diff.loadFromFile("../../../assets/textures/cube/glossiness.png", IMG_2D);
+	cube_spec.loadFromFile("../../../assets/textures/cube/glossiness.png", IMG_2D);
 	sref<Texture> cube_diffTex = make_sref<Texture>(cube_diff);
 	sref<Texture> cube_specTex = make_sref<Texture>(cube_spec);
+
+	cube_diff.freeImage();
+	cube_spec.freeImage();
 	/**/
 
 
@@ -111,6 +114,7 @@ void rsm::init(int argc, char* argv[]) {
 	/**/
 	bp_test->setDiffuseTex(cube_diffTex->id());
 	bp_test->setSpecularTex(cube_specTex->id());
+	//bp_test->setSpecular(glm::vec3(1.0f));
 	bp_test->setShininess(32.0f);
 
 	bp_test->setProgram(program->id());

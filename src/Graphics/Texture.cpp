@@ -10,11 +10,22 @@ Texture::Texture(Image img) {
 
 	glBindTexture(OpenGLTexTargets[_type], _id);
 
+	LOG("Number of channels: %d", img.channels());
+
 	if (_type == IMG_1D) {
 
 	}
 	else if (_type == IMG_2D) {
-		glTexImage2D(OpenGLTexTargets[_type], 0, GL_RGB, img.width(), img.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, img.data());
+		glTexImage2D(OpenGLTexTargets[_type],
+			0, 
+			OpenGLPixelFormats[img.channels()], 
+			img.width(), 
+			img.height(),
+			0, 
+			OpenGLPixelFormats[img.channels()], 
+			GL_UNSIGNED_BYTE, 
+			img.data());
+
 		glGenerateMipmap(OpenGLTexTargets[_type]);
 	}
 	else if (_type == IMG_3D) {

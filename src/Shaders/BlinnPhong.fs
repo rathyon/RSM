@@ -43,7 +43,7 @@ out vec4 outColor;
 
 // for specular maps
 float fetchParameter(sampler2D samp, float val){
-	if(val >= 0.0){
+	if(val > 0.0){
 		return val;
 	}
 	else{
@@ -62,7 +62,7 @@ vec3 fetchDiffuse(){
 
 void main(void) {
 
-	/** /
+	/**/
 	vec3 N = normalize(vsIn.normal);
 	vec3 V = normalize(ViewPos - vsIn.position);
 	vec3 L;
@@ -90,5 +90,5 @@ void main(void) {
 	outColor = vec4(retColor, 1.0);
 	/**/
 
-	outColor = vec4(fetchDiffuse(), 1.0);
+	//outColor = vec4(vec3(fetchParameter(specularTex, specular.r)), 1.0);
 }
