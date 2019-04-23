@@ -62,7 +62,7 @@ void OpenGLApplication::prepare() {
 	/* Prepare Camera here */
 
 	// cube cam
-	/**/
+	/** /
 	_camera = make_sref<Perspective>(_width, _height,
 		vec3(5.0f, 5.0f, 5.0f),
 		vec3(0.0f, 0.0f, 0.0f),
@@ -71,7 +71,7 @@ void OpenGLApplication::prepare() {
 	/**/
 
 	// sponza cam
-	/** /
+	/**/
     _camera = make_sref<Perspective>(_width, _height,
          vec3(0.0f, 300.0f, 0.0f),
          vec3(-3000.0f, 300.0f, 0.0f),
@@ -89,7 +89,7 @@ void OpenGLApplication::prepare() {
 
 	/* Prepare Models here */
 
-	/**/
+	/** /
 	sref<Model> cube = RM.getModel("test_cube");
 	cube->prepare();
 	_scene.addModel(cube);
@@ -101,7 +101,7 @@ void OpenGLApplication::prepare() {
 	_scene.addModel(bunny);
 	/**/
 
-	/** /
+	/**/
 	sref<Model> sponza = RM.getModel("sponza");
 	sponza->prepare();
 	_scene.addModel(sponza);

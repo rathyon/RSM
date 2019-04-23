@@ -9,19 +9,20 @@ namespace rsm {
 
 	class Model : public SceneObject {
 	public:
-		Model();
-		Model(const sref<Mesh>& mesh);
-		Model(const vec3& position);
-		Model(const sref<Mesh>& mesh, const vec3& position);
-		Model(const mat4& objToWorld);
+		Model(const std::string& name);
+		Model(const std::string& name, const vec3& position);
+		Model(const std::string& name, const mat4& objToWorld);
+
 		~Model();
 
-		const sref<Mesh>& mesh() const;
-		const sref<Material>& material() const;
-		const mat3& normalMatrix() const;
+		void loadFromFile(const std::string& filepath);
+		void loadFromMemory(const char* source);
 
-		void setMesh(const sref<Mesh>& mesh);
-		void setMaterial(const sref<Material>& material);
+		// temporary solution
+		void setMaterial(sref<Material> material);
+
+		std::vector<sref<Mesh>>& meshes();
+		const mat3& normalMatrix() const;
 
 		void updateMatrix() override;
 
@@ -29,10 +30,11 @@ namespace rsm {
 		void draw();
 
 	private:
-		sref<Mesh> _mesh;
-		sref<Material> _material;
-
+		std::string _name;
+		std::vector<sref<Mesh>> _meshes;
 		mat3 _normalMatrix;
+
+		bool loadObj(bool fromFile, const char* source);
 	};
 
 }

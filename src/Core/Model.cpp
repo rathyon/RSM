@@ -1,24 +1,33 @@
 #include "Model.h"
 #include <cstddef>
 
+#define TINYOBJLOADER_IMPLEMENTATION
+#include "..\ext\tinyobj\tiny_obj_loader.h"
+
 using namespace rsm;
 
-Model::Model() { }
+Model::Model(const std::string& name) : _name(name) { }
 
-// TODO fix this pls, incoherent
-Model::Model(const sref<Mesh>& mesh) : SceneObject(), _mesh(mesh), _material(nullptr) { }
-Model::Model(const vec3& position) : SceneObject(position), _material(nullptr) { }
-Model::Model(const sref<Mesh>& mesh, const vec3& position) : SceneObject(position), _mesh(mesh), _material(nullptr) { }
-Model::Model(const mat4& objToWorld) : SceneObject(objToWorld), _material(nullptr) { }
+Model::Model(const std::string& name, const vec3& position) : SceneObject(position), _name(name) { }
+Model::Model(const std::string& name, const mat4& objToWorld) : SceneObject(objToWorld), _name(name) { }
 
 Model::~Model() { }
 
-const sref<Mesh>& Model::mesh() const {
-	return _mesh;
+void Model::loadFromFile(const std::string& filepath) {
+	loadObj(true, filepath.c_str());
+}
+void Model::loadFromMemory(const char* source) {
+	loadObj(false, source);
 }
 
-const sref<Material>& Model::material() const {
-	return _material;
+void Model::setMaterial(sref<Material> material) {
+	for (sref<Mesh> mesh : _meshes) {
+		mesh->setMaterial(material);
+	}
+}
+
+std::vector<sref<Mesh>>& Model::meshes() {
+	return _meshes;
 }
 
 const mat3& Model::normalMatrix() const {
@@ -30,72 +39,102 @@ void Model::updateMatrix() {
 	_normalMatrix = glm::transpose(glm::inverse(mat3(_objToWorld)));
 }
 
-void Model::setMesh(const sref<Mesh>& mesh) {
-	_mesh = mesh;
-}
-
-void Model::setMaterial(const sref<Material>& material) {
-	_material = material;
-}
-
-//upload geometry to the GPU
 void Model::prepare() {
-	
-	std::vector<Vertex> vertices = _mesh->vertices();
-	std::vector<int> indices = _mesh->indices();
-
-	GLuint vao;
-	glGenVertexArrays(1, &vao);
-	_mesh->setVAO(vao);
-
-	glBindVertexArray(_mesh->VAO());
-
-	// 2 VBOs per VAO: vertices + indices
-	GLuint VBOs[2] = { 0, 0 };
-	glGenBuffers(2, VBOs);
-
-	// vertex buffer
-	glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
-
-	// vertex buffer attribute layout
-	glEnableVertexAttribArray(POSITION);
-	glVertexAttribPointer(POSITION, 3, GL_FLOAT, GL_FALSE, (GLsizei)sizeof(Vertex), (const void*)offsetof(Vertex, position));
-
-	glEnableVertexAttribArray(NORMAL);
-	glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, (GLsizei)sizeof(Vertex), (const void*)offsetof(Vertex, normal));
-
-	glEnableVertexAttribArray(UV);
-	glVertexAttribPointer(UV, 2, GL_FLOAT, GL_FALSE, (GLsizei)sizeof(Vertex), (const void*)offsetof(Vertex, uv));
-
-	//glEnableVertexAttribArray(TANGENT);
-	//glVertexAttribPointer(TANGENT, 3, GL_FLOAT, GL_FALSE, (GLsizei)sizeof(Vertex), (const void*)offsetof(Vertex, tangent));
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	// index buffer
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, VBOs[1]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * indices.size(), &indices[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	glBindVertexArray(0);
+	for (sref<Mesh> mesh : _meshes) {
+		mesh->prepare();
+	}
 }
 
 void Model::draw() {
 	updateMatrix();
+	for (sref<Mesh> mesh : _meshes) {
+		mesh->draw(objToWorld(), normalMatrix());
+	}
+}
 
-	glUseProgram(_material->program());
 
-	glUniformMatrix4fv(glGetUniformLocation(_material->program(), "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(objToWorld()));
-	glUniformMatrix3fv(glGetUniformLocation(_material->program(), "NormalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMatrix()));
+bool Model::loadObj(bool fromFile, const char* source) {
+	tinyobj::attrib_t attrib;
 
-	_material->uploadData();
+	std::vector<tinyobj::shape_t> shapes;
+	std::vector<tinyobj::material_t> materials;
 
-	glBindVertexArray(_mesh->VAO());
+	std::string warn;
+	std::string err;
 
-	glDrawArrays(GL_TRIANGLES, 0, _mesh->vertices().size());
 
-	glBindVertexArray(0);
+	// When calling LoadObj, triangulate is on by default, if I want to not use triangulation,
+	// the Vertex creation needs to be changed: I assume all faces are triangles, check num_face_vertices
+	bool successful;
+	if (fromFile) {
+		successful = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, source);
+	}
+	else {
+		std::istringstream sourcestream(source);
+		successful = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, &sourcestream);
+	}
 
-	glUseProgram(0);
+	if (!successful) {
+		LOGE("Failed to load obj!\n");
+		LOGE("%s\n", _name.c_str());
+		LOGE("Error message:\n");
+		LOGE("%s\n", err.c_str());
+		return false;
+	}
+
+	if (warn.size() > 0) {
+		LOG("Tinyobj warning:\n");
+		LOG("%s\n", warn.c_str());
+	}
+
+	// Shape == Mesh
+	// loop over each shape
+	for (tinyobj::shape_t shape : shapes) {
+		int vcount = 0;
+		sref<Mesh> mesh =  make_sref<Mesh>();
+		mesh->setName(shape.name);
+
+		/*
+		std::vector<int> mats;
+		for (int mat : shape.mesh.material_ids) {
+			if (std::find(mats.begin(), mats.end(), mat) == mats.end()) {
+				mats.push_back(mat);
+			}
+		}
+		*/
+
+		// loop over each vertex
+		for (tinyobj::index_t index : shape.mesh.indices) {
+			Vertex vertex;
+
+			vertex.position = {
+				attrib.vertices[3 * index.vertex_index + 0],
+				attrib.vertices[3 * index.vertex_index + 1],
+				attrib.vertices[3 * index.vertex_index + 2]
+			};
+
+			if (attrib.normals.size() > 0) {
+				vertex.normal = {
+					attrib.normals[3 * index.normal_index + 0],
+					attrib.normals[3 * index.normal_index + 1],
+					attrib.normals[3 * index.normal_index + 2]
+				};
+			}
+
+			if (attrib.texcoords.size() > 0) {
+				vertex.uv = {
+					attrib.texcoords[2 * index.texcoord_index + 0],
+					attrib.texcoords[2 * index.texcoord_index + 1]
+				};
+			}
+
+			mesh->addVertex(vertex);
+			mesh->addIndex(vcount);
+			vcount++;
+		}
+
+		_meshes.push_back(mesh);
+	}
+
+	return true;
 }
