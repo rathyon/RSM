@@ -148,7 +148,7 @@ void rsm::init(int argc, char* argv[]) {
 	/**/
 
 	sref<Model> sponza = make_sref<Model>("sponza");
-	sponza->loadFromFile("../../../assets/models/sponza/sponza.obj");
+	sponza->loadFromFile("../../../assets/models/crytek sponza/sponza.obj");
 	sponza->setMaterial(bp_test);
 
 	RM.addModel("sponza", sponza);

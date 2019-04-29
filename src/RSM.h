@@ -11,6 +11,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <sstream>
 
 #define make_sref std::make_shared
 

@@ -26,6 +26,14 @@ void Resources::addShader(const std::string& name, const sref<Shader>& shader) {
 	_shaders[name] = shader;
 }
 
+void Resources::addTexture(const std::string& name, const sref<Texture>& texture) {
+	_textures[name] = texture;
+}
+
+void Resources::addMaterial(const std::string& name, const sref<Material>& material) {
+	_materials[name] = material;
+}
+
 bool Resources::removeMesh(const std::string& name) {
 	auto it = _meshes.find(name);
 	if (it != _meshes.end()) {
@@ -53,6 +61,24 @@ bool Resources::removeShader(const std::string& name) {
 	return false;
 }
 
+bool Resources::removeTexture(const std::string& name) {
+	auto it = _textures.find(name);
+	if (it != _textures.end()) {
+		_textures.erase(name);
+		return true;
+	}
+	return false;
+}
+
+bool Resources::removeMaterial(const std::string& name) {
+	auto it = _materials.find(name);
+	if (it != _materials.end()) {
+		_materials.erase(name);
+		return true;
+	}
+	return false;
+}
+
 sref<Mesh> Resources::getMesh(const std::string& name) {
 	//return _meshes.at(name).get();
 	return _meshes.at(name);
@@ -63,10 +89,17 @@ sref<Model> Resources::getModel(const std::string& name) {
 	return _models.at(name);
 }
 
-
 sref<Shader> Resources::getShader(const std::string& name) {
 	//return _shaders.at(name).get();
 	return _shaders.at(name);
+}
+
+sref<Texture> Resources::getTexture(const std::string& name) {
+	return _textures.at(name);
+}
+
+sref<Material> Resources::getMaterial(const std::string& name) {
+	return _materials.at(name);
 }
 
 void Resources::cleanup() {
