@@ -3,7 +3,6 @@
 
 #include <RSM.h>
 #include "Math\RSMaths.h"
-#include "Resources.h"
 
 namespace rsm {
 

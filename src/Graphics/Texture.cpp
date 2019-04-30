@@ -10,7 +10,7 @@ Texture::Texture(Image img) {
 
 	glBindTexture(OpenGLTexTargets[_type], _id);
 
-	LOG("Number of channels: %d", img.channels());
+	//LOG("Number of channels: %d", img.channels());
 
 	if (_type == IMG_1D) {
 

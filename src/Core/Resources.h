@@ -8,6 +8,14 @@
 
 #include <RSM.h>
 
+/** /
+#include "Mesh.h"
+#include "Model.h"
+#include "Graphics\Shader.h"
+#include "Graphics\Texture.h"
+#include "Graphics\Material.h"
+/**/
+
 // Macro to syntax sugar the singleton getter
 // ex: RM.getTexture("albedo");
 

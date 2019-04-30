@@ -108,10 +108,8 @@ void rsm::init(int argc, char* argv[]) {
 
 	/**/
 	sref<BlinnPhongMaterial> bp_test = make_sref<BlinnPhongMaterial>();
-	/**/
 	bp_test->setDiffuse(glm::vec3(1.0f, 0.5f, 0.2f));
 	bp_test->setSpecular(glm::vec3(1.0f));
-	/**/
 	bp_test->setShininess(32.0f);
 
 	bp_test->setProgram(program->id());
@@ -123,33 +121,9 @@ void rsm::init(int argc, char* argv[]) {
 	=====================================================================================*/
 	/**/
 
-	/** /
-	sref<Mesh> cube_mesh = make_sref<Mesh>("../../../assets/models/cube/cube.obj");
-	sref<Model> test_cube = make_sref<Model>(cube_mesh);
-	test_cube->setMaterial(bp_test);
-	RM.addMesh("cube_mesh", cube_mesh);
-	RM.addModel("test_cube", test_cube);
-	/**/
-
-	/** /
-	sref<Mesh> bunny_mesh = make_sref<Mesh>("../../../assets/models/bunny/bunny.obj");
-	sref<Model> bunny = make_sref<Model>(bunny_mesh);
-	bunny->setMaterial(bp_test);
-	RM.addMesh("bunny_mesh", bunny_mesh);
-	RM.addModel("bunny", bunny);
-	/**/
-
-	/** /
-	sref<Mesh> sponza_mesh = make_sref<Mesh>("../../../assets/models/sponza/sponza.obj");
-	sref<Model> sponza = make_sref<Model>(sponza_mesh);
-	sponza->setMaterial(bp_test);
-	RM.addMesh("sponza_mesh", sponza_mesh);
-	RM.addModel("sponza", sponza);
-	/**/
-
 	sref<Model> sponza = make_sref<Model>("sponza");
-	sponza->loadFromFile("../../../assets/models/crytek sponza/sponza.obj");
-	sponza->setMaterial(bp_test);
+	sponza->loadFromFile("../../../assets/models/crytek sponza/sponza.obj", "../../../assets/models/crytek sponza/");
+	//sponza->setMaterial(bp_test);
 
 	RM.addModel("sponza", sponza);
 

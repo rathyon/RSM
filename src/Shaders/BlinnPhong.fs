@@ -90,5 +90,5 @@ void main(void) {
 	outColor = vec4(retColor, 1.0);
 	/**/
 
-	outColor = vec4(normalize(vsIn.normal), 1.0);
+	outColor = vec4(fetchDiffuse(), 1.0);
 }

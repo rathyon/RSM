@@ -1,9 +1,6 @@
 #ifndef __RSM_MODEL_H__
 #define __RSM_MODEL_H__
 
-#define TINYOBJLOADER_IMPLEMENTATION
-#include "..\ext\tinyobj\tiny_obj_loader.h"
-
 #include "SceneObject.h"
 #include "Mesh.h"
 #include "Graphics\BlinnPhongMaterial.h"
@@ -19,8 +16,8 @@ namespace rsm {
 
 		~Model();
 
-		void loadFromFile(const std::string& filepath);
-		void loadFromMemory(const char* source);
+		void loadFromFile(const std::string& filepath, const std::string& matpath);
+		void loadFromMemory(const char* objsource, const char* matsource);
 
 		// temporary solution
 		void setMaterial(sref<Material> material);
@@ -38,9 +35,7 @@ namespace rsm {
 		std::vector<sref<Mesh>> _meshes;
 		mat3 _normalMatrix;
 
-		void loadMtlFromFile(std::string& basedir, std::vector<tinyobj::material_t>& materials);
-
-		bool loadObj(bool fromFile, const char* source);
+		bool loadObj(bool fromFile, const char* objsource, const char* matsource);
 	};
 
 }

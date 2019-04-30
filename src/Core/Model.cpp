@@ -1,6 +1,12 @@
 #include "Model.h"
 #include <cstddef>
 
+#include "Resources.h"
+#include "Graphics\Shader.h"
+
+#define TINYOBJLOADER_IMPLEMENTATION
+#include "..\ext\tinyobj\tiny_obj_loader.h"
+
 using namespace rsm;
 
 Model::Model(const std::string& name) : _name(name) { }
@@ -10,11 +16,12 @@ Model::Model(const std::string& name, const mat4& objToWorld) : SceneObject(objT
 
 Model::~Model() { }
 
-void Model::loadFromFile(const std::string& filepath) {
-	loadObj(true, filepath.c_str());
+// im assuming mtl_basedir is always where .obj is (depends on how I organize assets and shit)
+void Model::loadFromFile(const std::string& objpath, const std::string& matpath) {
+	loadObj(true, objpath.c_str(), matpath.c_str());
 }
-void Model::loadFromMemory(const char* source) {
-	loadObj(false, source);
+void Model::loadFromMemory(const char* objsource, const char* matsource) {
+	loadObj(false, objsource, matsource);
 }
 
 void Model::setMaterial(sref<Material> material) {
@@ -49,42 +56,7 @@ void Model::draw() {
 	}
 }
 
-// I'm always loading as BP material
-void Model::loadMtlFromFile(std::string& basedir, std::vector<tinyobj::material_t>& materials) {
-	// check tiny_obj_loader.h for details
-	for (tinyobj::material_t material : materials) {
-		sref<BlinnPhongMaterial> mat = make_sref<BlinnPhongMaterial>();
-		mat->setAmbient(glm::vec3(material.ambient[0], material.ambient[1], material.ambient[2]));
-		mat->setDiffuse(glm::vec3(material.diffuse[0], material.diffuse[1], material.diffuse[2]));
-		mat->setSpecular(glm::vec3(material.specular[0], material.specular[1], material.specular[2]));
-		mat->setShininess(material.shininess);
-
-		if (material.diffuse_texname != "") {
-			Image diffuse;
-			diffuse.loadFromFile(basedir + "/" + material.diffuse_texname, IMG_2D);
-			sref<Texture> diffTex = make_sref<Texture>(diffuse);
-			RM.addTexture(material.diffuse_texname, diffTex);
-			mat->setDiffuseTex(diffTex->id());
-		}
-		if (material.specular_texname != "") {
-			Image specular;
-			specular.loadFromFile(basedir + "/" + material.specular_texname, IMG_2D);
-			sref<Texture> specTex = make_sref<Texture>(specular);
-			RM.addTexture(material.specular_texname, specTex);
-			mat->setSpecularTex(specTex->id());
-		}
-		if (material.bump_texname != "") {
-			Image normal;
-			normal.loadFromFile(basedir + "/" + material.bump_texname, IMG_2D);
-			sref<Texture> normTex = make_sref<Texture>(normal);
-			RM.addTexture(material.bump_texname, normTex);
-			mat->setNormalTex(normTex->id());
-		}
-		RM.addMaterial(material.name, mat);
-	}
-}
-
-bool Model::loadObj(bool fromFile, const char* source) {
+bool Model::loadObj(bool fromFile, const char* objsource, const char* matsource) {
 	tinyobj::attrib_t attrib;
 
 	std::vector<tinyobj::shape_t> shapes;
@@ -98,39 +70,76 @@ bool Model::loadObj(bool fromFile, const char* source) {
 	// the Vertex creation needs to be changed: I assume all faces are triangles, check num_face_vertices
 	bool successful;
 	if (fromFile) {
-		// im assuming mtl_basedir is always where .obj is (depends on how I organize assets and shit)
-		std::string objdir = std::string(source);
-		std::vector<std::string> objdirTok;
-		std::stringstream ss(objdir);
-		std::string aux;
-		while (getline(ss, aux, '/')) {
-			objdirTok.push_back(aux);
-		}
-		// remove chars from source to get basedir
-		std::string basedir = objdir.substr(0, objdir.size() - objdirTok.back().size() - 1) + "/";
-		successful = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, source, basedir.c_str());
-
-		if (!successful) {
-			LOGE("Failed to load obj!\n");
-			LOGE("%s\n", _name.c_str());
-			LOGE("Error message:\n");
-			LOGE("%s\n", err.c_str());
-			return false;
-		}
-
-		if(materials.size() > 0)
-			loadMtlFromFile(basedir, materials);
+		successful = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, objsource, matsource);
 	}
 	else {
-		std::istringstream sourcestream(source);
-		successful = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, &sourcestream);
+		std::istringstream objstream(objsource);
+		std::istringstream matstream(matsource);
+		tinyobj::MaterialStreamReader matReader(matstream);
+		successful = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, &objstream, &matReader);
+	}
 
-		if (!successful) {
-			LOGE("Failed to load obj!\n");
-			LOGE("%s\n", _name.c_str());
-			LOGE("Error message:\n");
-			LOGE("%s\n", err.c_str());
-			return false;
+	if (!successful) {
+		LOGE("Failed to load obj!\n");
+		LOGE("%s\n", _name.c_str());
+		LOGE("Error message:\n");
+		LOGE("%s\n", err.c_str());
+		return false;
+	}
+
+	if (materials.size() > 0) {
+		// check tiny_obj_loader.h for details
+		for (tinyobj::material_t material : materials) {
+			sref<BlinnPhongMaterial> mat = make_sref<BlinnPhongMaterial>();
+			mat->setProgram(RM.getShader("MainProgram")->id());
+			mat->setAmbient(glm::vec3(material.ambient[0], material.ambient[1], material.ambient[2]));
+			mat->setShininess(material.shininess);
+
+			// diffuse values
+			if (material.diffuse_texname != "") {
+				Image diffuse;
+				if (fromFile)
+					diffuse.loadFromFile(std::string(matsource) + "/" + material.diffuse_texname, IMG_2D);
+				else
+					diffuse.loadFromMemory(matsource, IMG_2D);
+
+				sref<Texture> diffTex = make_sref<Texture>(diffuse);
+				RM.addTexture(material.diffuse_texname, diffTex);
+				mat->setDiffuseTex(diffTex->id());
+			}
+			else {
+				mat->setDiffuse(glm::vec3(material.diffuse[0], material.diffuse[1], material.diffuse[2]));
+			}
+
+			// specular values
+			if (material.specular_texname != "") {
+				Image specular;
+				if (fromFile)
+					specular.loadFromFile(std::string(matsource) + "/" + material.specular_texname, IMG_2D);
+				else
+					specular.loadFromMemory(matsource, IMG_2D);
+
+				sref<Texture> specTex = make_sref<Texture>(specular);
+				RM.addTexture(material.specular_texname, specTex);
+				mat->setSpecularTex(specTex->id());
+			}
+			else {
+				mat->setSpecular(glm::vec3(material.specular[0], material.specular[1], material.specular[2]));
+			}
+
+			// normal / bump values
+			if (material.bump_texname != "") {
+				Image normal;
+				if (fromFile)
+					normal.loadFromFile(std::string(matsource) + "/" + material.bump_texname, IMG_2D);
+				else
+					normal.loadFromMemory(matsource, IMG_2D);
+
+				sref<Texture> normTex = make_sref<Texture>(normal);
+				RM.addTexture(material.bump_texname, normTex);
+				mat->setNormalTex(normTex->id());
+			}
+			RM.addMaterial(material.name, mat);
 		}
 	}
 
