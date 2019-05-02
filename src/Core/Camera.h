@@ -52,6 +52,12 @@ namespace rsm {
 		float _near;
 		float _far;
 
+		glm::vec3 _front;
+		glm::vec3 _right;
+		glm::vec3 _worldUp;
+		glm::vec3 _up;
+
+		// in radians
 		float _pitch; // rotation over right vector
 		float _yaw;   // rotation over up vector
 	};

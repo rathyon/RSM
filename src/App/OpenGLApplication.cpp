@@ -45,8 +45,7 @@ void OpenGLApplication::cleanup() {
 }
 
 void OpenGLApplication::update(float dt) {
-	//_camera->updateOrientation(0.0f, dt * 0.05f);
-	_camera->updateViewMatrix();
+	//_camera->updateViewMatrix();
 }
 
 void OpenGLApplication::reshape(int w, int h) {
@@ -56,22 +55,29 @@ void OpenGLApplication::reshape(int w, int h) {
 	glViewport(0, 0, w, h);
 }
 
+Scene OpenGLApplication::getScene() {
+	return _scene;
+}
+
+sref<Camera> OpenGLApplication::getCamera() {
+	return _camera;
+}
 
 void OpenGLApplication::prepare() {
 
 	/* Prepare Camera here */
 
 	// cube cam
-	/** /
+	/**/
 	_camera = make_sref<Perspective>(_width, _height,
-		vec3(5.0f, 5.0f, 5.0f),
 		vec3(0.0f, 0.0f, 0.0f),
+		vec3(0.0f, 0.0f, 1.0f),
 		vec3(0.0f, 1.0f, 0.0f),
 		0.1f, 1000000.0f, 60.0f);
 	/**/
 
 	// sponza cam
-	/**/
+	/** /
     _camera = make_sref<Perspective>(_width, _height,
          vec3(0.0f, 300.0f, 0.0f),
          vec3(-3000.0f, 300.0f, 0.0f),
@@ -90,15 +96,11 @@ void OpenGLApplication::prepare() {
 	/* Prepare Models here */
 
 	/** /
-	sref<Model> cube = RM.getModel("test_cube");
+	sref<Model> cube = RM.getModel("cube");
 	cube->prepare();
 	_scene.addModel(cube);
-	/**/
 
-	/** /
-	sref<Model> bunny = RM.getModel("bunny");
-	bunny->prepare();
-	_scene.addModel(bunny);
+	cube->setPosition(glm::vec3(0.0f, 0.0f, 10.0f));
 	/**/
 
 	/**/
@@ -145,24 +147,6 @@ void OpenGLApplication::uploadCameraBuffer() {
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(CameraData), &data, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
-
-/** /
-void OpenGLApplication::uploadLightsBuffer() {
-	const std::vector<sref<Light>>& lights = _scene.lights();
-
-	LightData data[NUM_LIGHTS];
-	memset(data, 0, sizeof(LightData) * NUM_LIGHTS);
-
-	//check actual number of lights before copying light data
-	int numLights = std::min(NUM_LIGHTS, (int)lights.size());
-	for (int l = 0; l < numLights; l++)
-		lights[l]->toData(data[l]);
-
-	glBindBuffer(GL_UNIFORM_BUFFER, _lightsBuffer);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(LightData)*NUM_LIGHTS, data, GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-}
-/**/
 
 void OpenGLApplication::uploadLights() {
 	const std::vector<sref<Light>>& lights = _scene.lights();

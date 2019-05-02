@@ -121,11 +121,24 @@ void rsm::init(int argc, char* argv[]) {
 	=====================================================================================*/
 	/**/
 
+	/** /
+	sref<Model> cube = make_sref<Model>("Cube");
+	cube->loadFromFile("../../../assets/models/cube/cube.obj", "../../../assets/models/cube");
+	RM.addModel("cube", cube);
+	cube->setMaterial(bp_test);
+	/**/
+
+	/**/
+	sref<Model> sponza = make_sref<Model>("sponza");
+	sponza->loadFromFile("../../../assets/models/sponza/sponza.obj", "../../../assets/models/sponza");
+	RM.addModel("sponza", sponza);
+	/**/
+
+	/** /
 	sref<Model> sponza = make_sref<Model>("sponza");
 	sponza->loadFromFile("../../../assets/models/crytek sponza/sponza.obj", "../../../assets/models/crytek sponza/");
-	//sponza->setMaterial(bp_test);
-
 	RM.addModel("sponza", sponza);
+	/**/
 
 	/**/
 
@@ -143,6 +156,26 @@ void rsm::update() {
 	// Limit the delta time to avoid large intervals
 	if (dt > 0.25f)
 		dt = 0.25f;
+
+	glApp->getCamera()->updateOrientation(mouseDy * dt * -1.0f, mouseDx * dt * 1.0f);
+	glApp->getCamera()->updateViewMatrix();
+
+	glm::vec3 moveDir = glm::vec3(0);
+
+	if (keys['w'])
+		moveDir += glApp->getCamera()->front();
+	else if (keys['s'])
+		moveDir += -glApp->getCamera()->front();
+
+	if (keys['d'])
+		moveDir += glApp->getCamera()->right();
+	else if (keys['a'])
+		moveDir += -glApp->getCamera()->right();
+
+	if (moveDir != glm::vec3(0)) {
+		glApp->getCamera()->setPosition(glApp->getCamera()->position() + glm::normalize(moveDir) * dt * 10.0f);
+		glApp->getCamera()->updateViewMatrix();
+	}
 
 	glApp->update(dt);
 }
@@ -166,6 +199,9 @@ void rsm::render() {
 	frameCount++;
 
 	glutSwapBuffers();
+
+	mouseDx = 0;
+	mouseDy = 0;
 }
 
 void rsm::reshape(int w, int h) {
@@ -176,12 +212,44 @@ void rsm::idle() {
 	glutPostRedisplay();
 }
 
+void rsm::updateMouse(int x, int y) {
+	int dx = -x + mouseX;
+	int dy = y - mouseY;
+
+	mouseX = x;
+	mouseY = y;
+
+	mouseDx = (mouseDx + (float)dx) / 2.0f;
+	mouseDy = (mouseDy + (float)dy) / 2.0f;
+}
+
+void rsm::mouseMotion(int x, int y) {
+	updateMouse(x, y);
+}
+
+void rsm::keyPress(unsigned char key, int x, int y) {
+	keys[key] = true;
+}
+
+void rsm::keyUp(unsigned char key, int x, int y) {
+	keys[key] = false;
+}
+
+void rsm::mouseClick(int button, int state, int x, int y) {
+	mouseX = x;
+	mouseY = y;
+}
+
 void rsm::setupCallbacks() {
 	glutDisplayFunc(render);
 	glutReshapeFunc(reshape);
 	glutIdleFunc(idle);
 	glutCloseFunc(cleanup);
 	glutTimerFunc(1000, updateFPS, 0);
+	glutMotionFunc(mouseMotion);
+	glutKeyboardFunc(keyPress);
+	glutKeyboardUpFunc(keyUp);
+	glutMouseFunc(mouseClick);
 }
 
 void rsm::loop() {

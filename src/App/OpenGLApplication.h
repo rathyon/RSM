@@ -33,6 +33,9 @@ namespace rsm {
 		int getWidth();
 		int getHeight();
 
+		Scene getScene();
+		sref<Camera> getCamera();
+
 	private:
 		void prepareCameraBuffer();
 
