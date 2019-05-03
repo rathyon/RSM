@@ -70,8 +70,8 @@ void OpenGLApplication::prepare() {
 	// cube cam
 	/**/
 	_camera = make_sref<Perspective>(_width, _height,
-		vec3(0.0f, 0.0f, 0.0f),
-		vec3(0.0f, 0.0f, 1.0f),
+		vec3(0.0f, 7.0f, 0.0f),
+		vec3(5.0f, 7.0f, 0.0f),
 		vec3(0.0f, 1.0f, 0.0f),
 		0.1f, 1000000.0f, 60.0f);
 	/**/
@@ -89,8 +89,11 @@ void OpenGLApplication::prepare() {
 
 	/* Prepare Lights here */
 
-	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(-2.0f, 2.0f, 2.0f));
+	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(0.0f, 0.0f, 0.0f));
 	_scene.addLight(candle);
+
+	//sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), 0.6f, glm::vec3(0.0f, -1.0f, 0.0f));
+	//_scene.addLight(sun);
 
 
 	/* Prepare Models here */
@@ -100,7 +103,7 @@ void OpenGLApplication::prepare() {
 	cube->prepare();
 	_scene.addModel(cube);
 
-	cube->setPosition(glm::vec3(0.0f, 0.0f, 10.0f));
+	cube->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	/**/
 
 	/**/
@@ -166,6 +169,9 @@ void OpenGLApplication::uploadLights() {
 			name = prefix + "position";
 			glUniform3fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(data.position));
 
+			name = prefix + "direction";
+			glUniform3fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(data.direction));
+
 			name = prefix + "emission";
 			glUniform3fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(data.emission));
 
@@ -177,6 +183,9 @@ void OpenGLApplication::uploadLights() {
 
 			name = prefix + "state";
 			glUniform1i(glGetUniformLocation(prog, name.c_str()), data.state);
+
+			name = prefix + "cutoff";
+			glUniform1f(glGetUniformLocation(prog, name.c_str()), data.cutoff);
 		}
 		glUseProgram(0);
 	}

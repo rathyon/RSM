@@ -7,7 +7,9 @@
 #include "Core\Perspective.h"
 #include "Core\Model.h"
 
+#include "Lights\DirectionalLight.h"
 #include "Lights\PointLight.h"
+#include "Lights\SpotLight.h"
 
 #include "Graphics\Shader.h"
 #include "Graphics\BlinnPhongMaterial.h"

@@ -35,6 +35,7 @@ namespace rsm {
 
 		const glm::mat4& viewMatrix() const;
 		const glm::mat4& projMatrix() const;
+
 		glm::mat4 viewProjMatrix() const;
 
 		void updateViewMatrix();
@@ -51,11 +52,6 @@ namespace rsm {
 
 		float _near;
 		float _far;
-
-		glm::vec3 _front;
-		glm::vec3 _right;
-		glm::vec3 _worldUp;
-		glm::vec3 _up;
 
 		// in radians
 		float _pitch; // rotation over right vector

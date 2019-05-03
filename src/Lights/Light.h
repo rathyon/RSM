@@ -16,10 +16,12 @@ namespace rsm {
 	// CARE: data is properly aligned, do not change
 	struct LightData {
 		glm::vec3 position;
+		glm::vec3 direction;   // for directional and spot lights
 		glm::vec3 emission;    // "color" of the light
 		float intensity;
 		int type;
 		bool state;       // on or off
+		float cutoff;
 	};
 
 	class Light : public SceneObject {

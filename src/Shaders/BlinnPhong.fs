@@ -8,10 +8,12 @@ in FragData {
 
 struct Light {
 	vec3 position;
+	vec3 direction;
 	vec3 emission;
 	float intensity;
 	int type;
-	bool state; 
+	bool state;
+	float cutoff;
 };
 
 uniform cameraBlock {
@@ -62,27 +64,28 @@ vec3 fetchDiffuse(){
 
 void main(void) {
 
-	/** /
+	/**/
 	vec3 N = normalize(vsIn.normal);
 	vec3 V = normalize(ViewPos - vsIn.position);
 	vec3 L;
 
 	vec3 retColor = ambient;
+
 	for(int i=0; i < NUM_LIGHTS; i++){
-		// if its a directional light
-		if(lights[i].type == 0){
-			L = normalize(-lights[i].position);
-		}
-		else{
-			L = normalize(lights[i].position - vsIn.position);
-		}
+
+		vec3 L = normalize(lights[i].position - vsIn.position);
 		vec3 H = normalize(L + V);
 
-		float NdotL = dot(N, L);
-		float NdotH = dot(N, H);
+		float NdotL = max(dot(N, L), 0.0);
+		float NdotH = max(dot(N, H), 0.0);
 
-		vec3 diff = lights[i].emission * fetchDiffuse() * NdotL;
-		vec3 spec = lights[i].emission * fetchParameter(specularTex, specular.r) * pow(NdotH, shininess);
+		vec3 diff = vec3(0, 0, 0);
+		vec3 spec = vec3(0, 0, 0);
+
+		if (NdotL > 0){
+			diff =  fetchDiffuse() * NdotL;
+			spec =  vec3(fetchParameter(specularTex, specular.r)) * pow(NdotH, shininess);
+		}
 
 		retColor += diff + spec;
 	}
@@ -90,5 +93,5 @@ void main(void) {
 	outColor = vec4(retColor, 1.0);
 	/**/
 
-	outColor = vec4(fetchDiffuse(), 1.0);
+	//outColor = vec4(fetchDiffuse(), 1.0);
 }

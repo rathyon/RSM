@@ -12,8 +12,10 @@ PointLight::PointLight(const glm::vec3& emission, float intensity, const glm::ve
 
 void PointLight::toData(LightData& data) const {
 	data.position = _position;
+	data.direction = glm::vec3(0);
 	data.emission = _emission;
 	data.intensity = _intensity;
 	data.type = LightType::LIGHTYPE_POINT;
 	data.state = _on;
+	data.cutoff = 0.0f;
 }

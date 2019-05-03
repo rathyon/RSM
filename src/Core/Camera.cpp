@@ -7,13 +7,13 @@ Camera::Camera() { }
 Camera::Camera(int width, int height, 
 	const glm::vec3& eye, const glm::vec3& at, const glm::vec3& up,
 	float n, float f)
-	: _width(width), _height(height), _near(n), _far(f), _worldUp(up) {
+	: _width(width), _height(height), _near(n), _far(f) {
 
 	lookAt(eye, at, up);
 
-	_front = glm::normalize(at - eye);
-	_right = glm::normalize(glm::cross(_worldUp, _front));
-	_up = glm::normalize(glm::cross(_front, _right));
+	glm::vec3 viewDir = glm::normalize(at - eye);
+	_pitch = asinf(-viewDir.y); // -viewDir.y
+	_yaw = atan2f(viewDir.x, -viewDir.z);
 }
 
 int Camera::width() const {
@@ -37,24 +37,35 @@ float Camera::f() const {
 }
 
 glm::vec3 Camera::right() const {
-	return _right;
+	return glm::vec3(_objToWorld[0][0],
+					 _objToWorld[0][1],
+					 _objToWorld[0][2]);
 }
 
 glm::vec3 Camera::front() const {
-	return _front;
+	return glm::vec3(_objToWorld[2][0],
+					 _objToWorld[2][1],
+					 _objToWorld[2][2]);
 }
 
 glm::vec3 Camera::up() const {
-	return _up;
+	return glm::vec3(_objToWorld[1][0],
+					 _objToWorld[1][1],
+					 _objToWorld[1][2]);
 }
 
 void Camera::lookAt(const glm::vec3& eye, const glm::vec3& at, const glm::vec3& up) {
 	_position = eye;
 	_objToWorld = glm::lookAt(eye, at, up);
+
+	glm::mat4 matOrient = _objToWorld;
+	// nullifying translation?
+	matOrient[0][3] = 0; matOrient[1][3] = 0; matOrient[2][3] = 0; matOrient[3][3] = 1;
+	_rotation = glm::quat(matOrient);
 }
 
 void Camera::lookAt(const glm::vec3& at) {
-	_objToWorld = glm::lookAt(_position, at, glm::vec3(0.0f, 1.0f, 0.0f));
+	_objToWorld = glm::lookAt(_position, at, glm::normalize(glm::vec3(0.01f, 1.0f, 0.0f)));
 }
 
 const glm::mat4& Camera::viewMatrix() const {
@@ -66,22 +77,17 @@ const glm::mat4& Camera::projMatrix() const {
 }
 
 glm::mat4 Camera::viewProjMatrix() const {
-	return _projMatrix * _objToWorld;
+	return projMatrix() * viewMatrix();
 }
 
 // check these values
 void Camera::updateViewMatrix() {
-	glm::vec3 front;
+	glm::mat4 rotX = glm::rotate(glm::mat4(), glm::degrees(_pitch), glm::vec3(1, 0, 0));
+	glm::mat4 rotY = glm::rotate(glm::mat4(), glm::degrees(_yaw), glm::vec3(0, 1, 0));
 
-	front.x = cos(_yaw) * cos(_pitch);
-	front.y = sin(_pitch);
-	front.z = sin(_yaw) * cos(_pitch);
+	glm::mat4 orientation = rotX * rotY;
 
-	_front = glm::normalize(front);
-	_right = glm::normalize(glm::cross(_front, _worldUp));
-	_up = glm::normalize(glm::cross(_right, _front));
-
-	lookAt(_position, _position + _front, _up);
+	_objToWorld = orientation * glm::translate(glm::mat4(), -_position);
 }
 
 void Camera::updateProjMatrix(int width, int height) {
@@ -110,5 +116,5 @@ void Camera::toData(CameraData& data) {
 	data.viewMatrix = viewMatrix();
 	data.projMatrix = projMatrix();
 	data.viewProjMatrix = viewProjMatrix();
-	data.viewPos = position();
+	data.viewPos = _position;
 }
