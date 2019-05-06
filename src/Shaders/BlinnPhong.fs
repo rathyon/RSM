@@ -69,11 +69,12 @@ void main(void) {
 	vec3 V = normalize(ViewPos - vsIn.position);
 	vec3 L;
 
-	vec3 retColor = ambient;
+	vec3 retColor = vec3(0);
 
 	for(int i=0; i < NUM_LIGHTS; i++){
 
-		vec3 L = normalize(lights[i].position - vsIn.position);
+		//vec3 L = normalize(lights[i].position - vsIn.position);
+		vec3 L = normalize(vec3(0,1,0));
 		vec3 H = normalize(L + V);
 
 		float NdotL = max(dot(N, L), 0.0);
@@ -83,8 +84,8 @@ void main(void) {
 		vec3 spec = vec3(0, 0, 0);
 
 		if (NdotL > 0){
-			diff =  fetchDiffuse() * NdotL;
-			spec =  vec3(fetchParameter(specularTex, specular.r)) * pow(NdotH, shininess);
+			diff =  lights[i].emission * fetchDiffuse() * NdotL;
+			spec =  lights[i].emission * fetchParameter(specularTex, specular.r) * pow(NdotH, shininess);
 		}
 
 		retColor += diff + spec;

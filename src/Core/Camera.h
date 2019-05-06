@@ -44,6 +44,8 @@ namespace rsm {
 
 		void toData(CameraData& data);
 
+		void info();
+
 	protected:
 		glm::mat4 _projMatrix;
 

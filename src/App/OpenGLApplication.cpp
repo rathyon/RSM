@@ -45,7 +45,7 @@ void OpenGLApplication::cleanup() {
 }
 
 void OpenGLApplication::update(float dt) {
-	//_camera->updateViewMatrix();
+
 }
 
 void OpenGLApplication::reshape(int w, int h) {
@@ -70,8 +70,8 @@ void OpenGLApplication::prepare() {
 	// cube cam
 	/**/
 	_camera = make_sref<Perspective>(_width, _height,
-		vec3(0.0f, 7.0f, 0.0f),
-		vec3(5.0f, 7.0f, 0.0f),
+		vec3(5.0f, 5.0f, 5.0f),
+		vec3(0.0f, 0.0f, 0.0f),
 		vec3(0.0f, 1.0f, 0.0f),
 		0.1f, 1000000.0f, 60.0f);
 	/**/
@@ -98,7 +98,7 @@ void OpenGLApplication::prepare() {
 
 	/* Prepare Models here */
 
-	/** /
+	/**/
 	sref<Model> cube = RM.getModel("cube");
 	cube->prepare();
 	_scene.addModel(cube);
@@ -106,10 +106,22 @@ void OpenGLApplication::prepare() {
 	cube->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	/**/
 
-	/**/
+	/** /
 	sref<Model> sponza = RM.getModel("sponza");
 	sponza->prepare();
 	_scene.addModel(sponza);
+	/**/
+
+	/** /
+	sref<Model> gallery = RM.getModel("gallery");
+	gallery->prepare();
+	_scene.addModel(gallery);
+	/**/
+
+	/** /
+	sref<Model> sibenik = RM.getModel("sibenik");
+	sibenik->prepare();
+	_scene.addModel(sibenik);
 	/**/
 
 	// Prepare shared buffers

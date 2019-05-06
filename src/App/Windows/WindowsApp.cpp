@@ -108,7 +108,7 @@ void rsm::init(int argc, char* argv[]) {
 
 	/**/
 	sref<BlinnPhongMaterial> bp_test = make_sref<BlinnPhongMaterial>();
-	bp_test->setDiffuse(glm::vec3(1.0f, 1.0f, 1.0f));
+	bp_test->setDiffuse(glm::vec3(1.0f, 0.5f, 0.0f));
 	bp_test->setSpecular(glm::vec3(1.0f));
 	bp_test->setShininess(32.0f);
 
@@ -121,23 +121,37 @@ void rsm::init(int argc, char* argv[]) {
 	=====================================================================================*/
 	/**/
 
-	/** /
+	/**/
 	sref<Model> cube = make_sref<Model>("Cube");
 	cube->loadFromFile("../../../assets/models/cube/cube.obj", "../../../assets/models/cube");
 	RM.addModel("cube", cube);
 	cube->setMaterial(bp_test);
 	/**/
 
-	/**/
+	/** /
 	sref<Model> sponza = make_sref<Model>("sponza");
 	sponza->loadFromFile("../../../assets/models/sponza/sponza.obj", "../../../assets/models/sponza");
 	RM.addModel("sponza", sponza);
+	//sponza->setMaterial(bp_test);
 	/**/
 
 	/** /
 	sref<Model> sponza = make_sref<Model>("sponza");
 	sponza->loadFromFile("../../../assets/models/crytek sponza/sponza.obj", "../../../assets/models/crytek sponza/");
 	RM.addModel("sponza", sponza);
+	/**/
+
+
+	/** /
+	sref<Model> gallery = make_sref<Model>("gallery");
+	gallery->loadFromFile("../../../assets/models/gallery/gallery.obj", "../../../assets/models/gallery/");
+	RM.addModel("gallery", gallery);
+	/**/
+
+	/** /
+	sref<Model> sibenik = make_sref<Model>("sibenik");
+	sibenik->loadFromFile("../../../assets/models/sibenik/sibenik.obj", "../../../assets/models/sibenik/");
+	RM.addModel("sibenik", sibenik);
 	/**/
 
 	/**/
@@ -157,14 +171,16 @@ void rsm::update() {
 	if (dt > 0.25f)
 		dt = 0.25f;
 
-	/** /
+
+
+	/**/
 	glApp->getCamera()->updateOrientation(mouseDy * dt * 0.75f, mouseDx * dt * 0.75f);
 	glApp->getCamera()->updateViewMatrix();
 
 	glm::vec3 moveDir = glm::vec3(0);
 
 	if (keys['w'])
-		moveDir += - glApp->getCamera()->front();
+		moveDir += -glApp->getCamera()->front();
 	else if (keys['s'])
 		moveDir += glApp->getCamera()->front();
 
@@ -173,7 +189,7 @@ void rsm::update() {
 	else if (keys['a'])
 		moveDir += -glApp->getCamera()->right();
 
-	if (moveDir != glm::vec3(0)) {
+	if (moveDir != glm::vec3(0.0f)) {
 		glApp->getCamera()->setPosition(glApp->getCamera()->position() + glm::normalize(moveDir) * dt * 10.0f);
 		glApp->getCamera()->updateViewMatrix();
 	}
@@ -231,6 +247,9 @@ void rsm::mouseMotion(int x, int y) {
 
 void rsm::keyPress(unsigned char key, int x, int y) {
 	keys[key] = true;
+
+	if (keys['f'])
+		glApp->getCamera()->info();
 }
 
 void rsm::keyUp(unsigned char key, int x, int y) {
