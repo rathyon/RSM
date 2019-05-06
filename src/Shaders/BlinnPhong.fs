@@ -60,6 +60,11 @@ vec3 fetchDiffuse(){
 		return diffuse;
 	}
 	else{
+		vec4 texel = texture(diffuseTex, vsIn.texCoords);
+
+		if (texel.a <= 0.0)
+			discard;
+
 		return texture(diffuseTex, vsIn.texCoords).rgb;
 	}
 }

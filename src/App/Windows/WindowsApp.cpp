@@ -136,17 +136,10 @@ void rsm::init(int argc, char* argv[]) {
 	//sponza->setMaterial(bp_test);
 	/**/
 
-	/**/
+	/** /
 	sref<Model> sponza = make_sref<Model>("sponza");
 	sponza->loadFromFile("../../../assets/models/crytek sponza/sponza.obj", "../../../assets/models/crytek sponza/");
 	RM.addModel("sponza", sponza);
-	/**/
-
-
-	/** /
-	sref<Model> gallery = make_sref<Model>("gallery");
-	gallery->loadFromFile("../../../assets/models/gallery/gallery.obj", "../../../assets/models/gallery/");
-	RM.addModel("gallery", gallery);
 	/**/
 
 	/** /
@@ -154,6 +147,13 @@ void rsm::init(int argc, char* argv[]) {
 	sibenik->loadFromFile("../../../assets/models/sibenik/sibenik.obj", "../../../assets/models/sibenik/");
 	RM.addModel("sibenik", sibenik);
 	/**/
+
+	/**/
+	sref<Model> Kitana = make_sref<Model>("Kitana");
+	Kitana->loadFromFile("../../../assets/models/Kitana/Kitana.obj", "../../../assets/models/Kitana/");
+	RM.addModel("Kitana", Kitana);
+	/**/
+
 
 	/**/
 

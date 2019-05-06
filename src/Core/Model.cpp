@@ -168,15 +168,6 @@ bool Model::loadObj(bool fromFile, const char* objsource, const char* matsource)
 			mesh->setMaterial(RM.getMaterial(mat.name));
 		}
 
-		/*
-		std::vector<int> mats;
-		for (int mat : shape.mesh.material_ids) {
-			if (std::find(mats.begin(), mats.end(), mat) == mats.end()) {
-				mats.push_back(mat);
-			}
-		}
-		*/
-
 		// loop over each vertex
 		for (tinyobj::index_t index : shape.mesh.indices) {
 			Vertex vertex;

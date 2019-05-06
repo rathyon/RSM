@@ -27,6 +27,8 @@ void OpenGLApplication::init() {
 	glCullFace(GL_BACK);
 	//glFrontFace(GL_CCW);
 	//glEnable(GL_MULTISAMPLE);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 int OpenGLApplication::getWidth() {
@@ -68,7 +70,7 @@ void OpenGLApplication::prepare() {
 	/* Prepare Camera here */
 
 	// cube cam
-	/** /
+	/**/
 	_camera = make_sref<Perspective>(_width, _height,
 		vec3(5.0f, 5.0f, 5.0f),
 		vec3(0.0f, 0.0f, 0.0f),
@@ -77,12 +79,12 @@ void OpenGLApplication::prepare() {
 	/**/
 
 	// sponza cam
-	/**/
+	/** /
     _camera = make_sref<Perspective>(_width, _height,
          vec3(0.0f, 15.0f, 0.0f),
          vec3(-15.0f, 15.0f, 0.0f),
          vec3(0.0f, 1.0f, 0.0f),
-         0.1f, 10000.0f, 60.0f);
+         0.1f, 1000000.0f, 60.0f);
 	/**/
 
 	_scene.addCamera(_camera);
@@ -94,13 +96,13 @@ void OpenGLApplication::prepare() {
 	_scene.addLight(spot);
 	/**/
 
-	/**/
+	/** /
 	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 10.0f, glm::vec3(0.0f, 15.0f, 0.0f));
 	_scene.addLight(candle);
 	/**/
 
-	/** /
-	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(-2.0f, -1.0f, 0.5f));
+	/**/
+	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(0.0f, -1.0f, -1.0f));
 	_scene.addLight(sun);
 	/**/
 
@@ -115,7 +117,7 @@ void OpenGLApplication::prepare() {
 	cube->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	/**/
 
-	/**/
+	/** /
 	sref<Model> sponza = RM.getModel("sponza");
 	sponza->prepare();
 	_scene.addModel(sponza);
@@ -124,15 +126,17 @@ void OpenGLApplication::prepare() {
 	/**/
 
 	/** /
-	sref<Model> gallery = RM.getModel("gallery");
-	gallery->prepare();
-	_scene.addModel(gallery);
-	/**/
-
-	/** /
 	sref<Model> sibenik = RM.getModel("sibenik");
 	sibenik->prepare();
 	_scene.addModel(sibenik);
+	/**/
+
+	/**/
+	sref<Model> Kitana = RM.getModel("Kitana");
+	Kitana->prepare();
+	_scene.addModel(Kitana);
+
+	Kitana->setScale(2.0f, 2.0f, 2.0f);
 	/**/
 
 	// Prepare shared buffers

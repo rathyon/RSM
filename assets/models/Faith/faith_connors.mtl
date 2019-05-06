@@ -1,0 +1,51 @@
+newmtl Model001_Material001
+map_Kd Faith_Arms_D.png
+map_bump Faith_Arms_N.png
+
+newmtl Model001_Material002
+map_Kd Faith_Arms_D.png
+map_bump Faith_Arms_N.png
+
+newmtl Model001_Material003
+map_Kd Faith_Head_D.png
+map_bump Faith_Head_N.png
+
+newmtl Model001_Material004
+map_Kd Faith_Head_D.png
+map_bump Faith_Head_N.png
+
+newmtl Model001_Material005
+map_Kd Faith_Glove_D.png
+map_bump Faith_Glove_N.png
+
+newmtl Model001_Material006
+map_Kd Faith_MagGlove_D.png
+map_bump Faith_MagGlove_N.png
+
+newmtl Model001_Material007
+map_Kd Faith_Magrope_D.png
+map_bump Faith_Magrope_N.png
+
+newmtl Model001_Material008
+map_Kd Faith_Lowerbody_D.png
+map_bump Faith_Lowerbody_N.png
+
+newmtl Model001_Material009
+map_Kd Faith_Upperbody_D.png
+map_bump Faith_Upperbody_N.png
+
+newmtl Model001_Material010
+map_Kd Faith_Teeth_D.png
+map_bump Faith_Teeth_N.png
+
+newmtl Model001_Material011
+map_Kd Faith_Eye_D.png
+map_bump Faith_Eye_N.png
+
+newmtl Model001_Material012
+map_Kd Faith_Hair_D.png
+map_bump Faith_Hair_N.png
+
+newmtl Model001_Material013
+map_Kd Faith_Lashes_D.png
+
