@@ -19,6 +19,8 @@ namespace rsm {
 		glm::vec3 direction;   // for directional and spot lights
 		glm::vec3 emission;    // "color" of the light
 		float intensity;
+		float linear;	 // attenuation
+		float quadratic; // attenuation
 		int type;
 		bool state;       // on or off
 		float cutoff;

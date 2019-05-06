@@ -82,7 +82,7 @@ void OpenGLApplication::prepare() {
          vec3(0.0f, 15.0f, 0.0f),
          vec3(-15.0f, 15.0f, 0.0f),
          vec3(0.0f, 1.0f, 0.0f),
-         0.1f, 100000000.0f, 60.0f);
+         0.1f, 10000.0f, 60.0f);
 	/**/
 
 	_scene.addCamera(_camera);
@@ -94,12 +94,12 @@ void OpenGLApplication::prepare() {
 	_scene.addLight(spot);
 	/**/
 
-	/** /
-	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(0.0f, 300.0f, 0.0f));
+	/**/
+	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 10.0f, glm::vec3(0.0f, 15.0f, 0.0f));
 	_scene.addLight(candle);
 	/**/
 
-	/**/
+	/** /
 	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(-2.0f, -1.0f, 0.5f));
 	_scene.addLight(sun);
 	/**/
@@ -200,6 +200,12 @@ void OpenGLApplication::uploadLights() {
 
 			name = prefix + "intensity";
 			glUniform1f(glGetUniformLocation(prog, name.c_str()), data.intensity);
+
+			name = prefix + "linear";
+			glUniform1f(glGetUniformLocation(prog, name.c_str()), data.linear);
+
+			name = prefix + "quadratic";
+			glUniform1f(glGetUniformLocation(prog, name.c_str()), data.quadratic);
 
 			name = prefix + "type";
 			glUniform1i(glGetUniformLocation(prog, name.c_str()), data.type);

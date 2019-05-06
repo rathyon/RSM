@@ -11,6 +11,8 @@ struct Light {
 	vec3 direction;
 	vec3 emission;
 	float intensity;
+	float linear;
+	float quadratic;
 	int type;
 	bool state;
 	float cutoff;
@@ -91,12 +93,22 @@ void main(void) {
 		float NdotL = max(dot(N, L), 0.0);
 		float NdotH = max(dot(N, H), 0.0);
 
-		vec3 diff = vec3(0, 0, 0);
-		vec3 spec = vec3(0, 0, 0);
+		vec3 diff = vec3(0);
+		vec3 spec = vec3(0);
 
 		if (NdotL > 0){
-			diff =  lights[i].emission * ( fetchDiffuse() * NdotL) * lights[i].intensity;
-			spec =  lights[i].emission * ( fetchParameter(specularTex, specular.r) * pow(NdotH, shininess)) * lights[i].intensity;
+
+			diff = lights[i].emission * lights[i].intensity * ( fetchDiffuse() * NdotL);
+			spec = lights[i].emission * lights[i].intensity * ( fetchParameter(specularTex, specular.r) * pow(NdotH, shininess));
+
+			// if not directional light
+			if (lights[i].type != 0){
+				float distance = length(lights[i].position - vsIn.position);
+				float attenuation = 1.0 / (1.0 + lights[i].linear * distance + lights[i].quadratic * pow(distance, 2));
+
+				diff *= attenuation;
+				spec *= attenuation;
+			}
 		}
 
 		retColor += diff + spec;
