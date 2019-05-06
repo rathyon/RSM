@@ -45,7 +45,7 @@ out vec4 outColor;
 
 // for specular maps
 float fetchParameter(sampler2D samp, float val){
-	if(val > 0.0){
+	if(val != -1.0){
 		return val;
 	}
 	else{
@@ -54,7 +54,7 @@ float fetchParameter(sampler2D samp, float val){
 }
 
 vec3 fetchDiffuse(){
-	if(diffuse.r > 0.0){
+	if(diffuse.r != -1.0){
 		return diffuse;
 	}
 	else{
@@ -64,7 +64,6 @@ vec3 fetchDiffuse(){
 
 void main(void) {
 
-	/**/
 	vec3 N = normalize(vsIn.normal);
 	vec3 V = normalize(ViewPos - vsIn.position);
 	vec3 L;
@@ -73,8 +72,20 @@ void main(void) {
 
 	for(int i=0; i < NUM_LIGHTS; i++){
 
-		//vec3 L = normalize(lights[i].position - vsIn.position);
-		vec3 L = normalize(vec3(0,1,0));
+		if (lights[i].type == 0){
+			L = normalize(-lights[i].direction);
+		}
+		else {
+			L = normalize(lights[i].position - vsIn.position);
+		}
+
+		if (lights[i].type == 2){
+			float theta = dot(L, normalize(-lights[i].direction));
+			if(theta <= lights[i].cutoff){
+				continue;
+			}
+		}
+
 		vec3 H = normalize(L + V);
 
 		float NdotL = max(dot(N, L), 0.0);
@@ -84,15 +95,12 @@ void main(void) {
 		vec3 spec = vec3(0, 0, 0);
 
 		if (NdotL > 0){
-			diff =  lights[i].emission * fetchDiffuse() * NdotL;
-			spec =  lights[i].emission * fetchParameter(specularTex, specular.r) * pow(NdotH, shininess);
+			diff =  lights[i].emission * ( fetchDiffuse() * NdotL) * lights[i].intensity;
+			spec =  lights[i].emission * ( fetchParameter(specularTex, specular.r) * pow(NdotH, shininess)) * lights[i].intensity;
 		}
 
 		retColor += diff + spec;
 	}
 
 	outColor = vec4(retColor, 1.0);
-	/**/
-
-	//outColor = vec4(fetchDiffuse(), 1.0);
 }

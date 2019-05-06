@@ -5,9 +5,9 @@ using namespace rsm;
 BlinnPhongMaterial::BlinnPhongMaterial() {
 	// when final shaders are done, set _prog here!
 
-	_ambient = vec3(0.0f);
-	_diffuse = vec3(0.0f);
-	_specular = vec3(0.0f);
+	_ambient = vec3(-1.0f);
+	_diffuse = vec3(-1.0f);
+	_specular = vec3(-1.0f);
 	_shininess = 0.0f;
 
 	_diffuseTex = -1;

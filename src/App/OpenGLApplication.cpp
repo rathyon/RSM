@@ -68,7 +68,7 @@ void OpenGLApplication::prepare() {
 	/* Prepare Camera here */
 
 	// cube cam
-	/**/
+	/** /
 	_camera = make_sref<Perspective>(_width, _height,
 		vec3(5.0f, 5.0f, 5.0f),
 		vec3(0.0f, 0.0f, 0.0f),
@@ -77,10 +77,10 @@ void OpenGLApplication::prepare() {
 	/**/
 
 	// sponza cam
-	/** /
+	/**/
     _camera = make_sref<Perspective>(_width, _height,
-         vec3(0.0f, 300.0f, 0.0f),
-         vec3(-3000.0f, 300.0f, 0.0f),
+         vec3(0.0f, 15.0f, 0.0f),
+         vec3(-15.0f, 15.0f, 0.0f),
          vec3(0.0f, 1.0f, 0.0f),
          0.1f, 100000000.0f, 60.0f);
 	/**/
@@ -89,16 +89,25 @@ void OpenGLApplication::prepare() {
 
 	/* Prepare Lights here */
 
-	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(0.0f, 0.0f, 0.0f));
-	_scene.addLight(candle);
+	/** /
+	sref<SpotLight> spot = make_sref<SpotLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, 60.0f, glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0, 15.0f, 0));
+	_scene.addLight(spot);
+	/**/
 
-	//sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), 0.6f, glm::vec3(0.0f, -1.0f, 0.0f));
-	//_scene.addLight(sun);
+	/** /
+	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(0.0f, 300.0f, 0.0f));
+	_scene.addLight(candle);
+	/**/
+
+	/**/
+	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(-2.0f, -1.0f, 0.5f));
+	_scene.addLight(sun);
+	/**/
 
 
 	/* Prepare Models here */
 
-	/**/
+	/** /
 	sref<Model> cube = RM.getModel("cube");
 	cube->prepare();
 	_scene.addModel(cube);
@@ -106,10 +115,12 @@ void OpenGLApplication::prepare() {
 	cube->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	/**/
 
-	/** /
+	/**/
 	sref<Model> sponza = RM.getModel("sponza");
 	sponza->prepare();
 	_scene.addModel(sponza);
+
+	sponza->setScale(0.05f, 0.05f, 0.05f);
 	/**/
 
 	/** /

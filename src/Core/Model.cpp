@@ -112,6 +112,7 @@ bool Model::loadObj(bool fromFile, const char* objsource, const char* matsource)
 			}
 
 			// specular values
+			/** /
 			if (material.specular_texname != "") {
 				Image specular;
 				if (fromFile)
@@ -126,6 +127,9 @@ bool Model::loadObj(bool fromFile, const char* objsource, const char* matsource)
 			else {
 				mat->setSpecular(glm::vec3(material.specular[0], material.specular[1], material.specular[2]));
 			}
+			/**/
+
+			mat->setSpecular(glm::vec3(material.specular[0], material.specular[1], material.specular[2]));
 
 			// normal / bump values
 			if (material.bump_texname != "") {

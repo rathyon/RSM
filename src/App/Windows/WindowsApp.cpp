@@ -121,13 +121,14 @@ void rsm::init(int argc, char* argv[]) {
 	=====================================================================================*/
 	/**/
 
-	/**/
+	/** /
 	sref<Model> cube = make_sref<Model>("Cube");
 	cube->loadFromFile("../../../assets/models/cube/cube.obj", "../../../assets/models/cube");
 	RM.addModel("cube", cube);
 	cube->setMaterial(bp_test);
 	/**/
 
+	// NOTE: for some reason this sponza doesn't behave well...
 	/** /
 	sref<Model> sponza = make_sref<Model>("sponza");
 	sponza->loadFromFile("../../../assets/models/sponza/sponza.obj", "../../../assets/models/sponza");
@@ -135,7 +136,7 @@ void rsm::init(int argc, char* argv[]) {
 	//sponza->setMaterial(bp_test);
 	/**/
 
-	/** /
+	/**/
 	sref<Model> sponza = make_sref<Model>("sponza");
 	sponza->loadFromFile("../../../assets/models/crytek sponza/sponza.obj", "../../../assets/models/crytek sponza/");
 	RM.addModel("sponza", sponza);
@@ -171,9 +172,6 @@ void rsm::update() {
 	if (dt > 0.25f)
 		dt = 0.25f;
 
-
-
-	/**/
 	glApp->getCamera()->updateOrientation(mouseDy * dt * 0.75f, mouseDx * dt * 0.75f);
 	glApp->getCamera()->updateViewMatrix();
 
@@ -193,7 +191,6 @@ void rsm::update() {
 		glApp->getCamera()->setPosition(glApp->getCamera()->position() + glm::normalize(moveDir) * dt * 10.0f);
 		glApp->getCamera()->updateViewMatrix();
 	}
-	/**/
 
 	glApp->update(dt);
 }
