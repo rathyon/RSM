@@ -91,7 +91,12 @@ bool Model::loadObj(bool fromFile, const char* objsource, const char* matsource)
 		// check tiny_obj_loader.h for details
 		for (tinyobj::material_t material : materials) {
 			sref<BlinnPhongMaterial> mat = make_sref<BlinnPhongMaterial>();
-			mat->setProgram(RM.getShader("MainProgram")->id());
+
+			if (material.diffuse_texname != "")
+				mat->setProgram(RM.getShader("BlinnPhongTex")->id());
+			else
+				mat->setProgram(RM.getShader("BlinnPhong")->id());
+
 			mat->setAmbient(glm::vec3(material.ambient[0], material.ambient[1], material.ambient[2]));
 			mat->setShininess(material.shininess);
 
@@ -136,9 +141,9 @@ bool Model::loadObj(bool fromFile, const char* objsource, const char* matsource)
 				else
 					normal.loadFromMemory(matsource, IMG_2D);
 
-				sref<Texture> normTex = make_sref<Texture>(normal);
-				RM.addTexture(material.bump_texname, normTex);
-				mat->setNormalTex(normTex->id());
+				sref<Texture> normMap = make_sref<Texture>(normal);
+				RM.addTexture(material.bump_texname, normMap);
+				mat->setNormalMap(normMap->id());
 			}
 			RM.addMaterial(material.name, mat);
 		}
@@ -177,7 +182,6 @@ bool Model::loadObj(bool fromFile, const char* objsource, const char* matsource)
 				attrib.vertices[3 * index.vertex_index + 1],
 				attrib.vertices[3 * index.vertex_index + 2]
 			};
-
 			if (attrib.normals.size() > 0) {
 				vertex.normal = {
 					attrib.normals[3 * index.normal_index + 0],
@@ -185,17 +189,56 @@ bool Model::loadObj(bool fromFile, const char* objsource, const char* matsource)
 					attrib.normals[3 * index.normal_index + 2]
 				};
 			}
-
 			if (attrib.texcoords.size() > 0) {
 				vertex.uv = {
 					attrib.texcoords[2 * index.texcoord_index + 0],
 					attrib.texcoords[2 * index.texcoord_index + 1]
 				};
 			}
-
 			mesh->addVertex(vertex);
 			mesh->addIndex(vcount);
 			vcount++;
+		}
+
+
+		// compute tangents
+		// formula from learnopengl.com
+		std::vector<glm::vec3> tangents(mesh->indices().size(), vec3(0.0f));
+		// for each 3 indexes...
+		for (int i = 0; i < mesh->indices().size(); i += 3) {
+			Vertex v1 = mesh->vertices()[mesh->indices()[i]];
+			Vertex v2 = mesh->vertices()[mesh->indices()[i + 1]];
+			Vertex v3 = mesh->vertices()[mesh->indices()[i + 2]];
+
+			glm::vec3 edge1 = v2.position - v1.position;
+			glm::vec3 edge2 = v3.position - v1.position;
+
+			glm::vec2 deltaUV1 = v2.uv - v1.uv;
+			glm::vec2 deltaUV2 = v3.uv - v1.uv;
+
+			// matrix inverse determinant
+			float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+			glm::vec3 tangent;
+
+			tangent.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+			tangent.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+			tangent.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+			tangent = glm::normalize(tangent);
+
+			tangents[i] += tangent;
+			tangents[i + 1] += tangent;
+			tangents[i + 2] += tangent;
+		}
+
+		// average out tangents for smooth result
+		for (int i = 0; i < mesh->vertices().size(); i++) {
+			glm::vec3 N = mesh->vertices()[i].normal;
+			glm::vec3 T = tangents[i];
+			mesh->vertices()[i].tangent = glm::normalize((T - N) * glm::dot(N, T));
+
+			// Calculate handedness ?
+			//tangent[a].w = (Dot(Cross(n, t), tan2[a]) < 0.0F) ? -1.0F : 1.0F;
 		}
 
 		_meshes.push_back(mesh);

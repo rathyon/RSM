@@ -72,10 +72,11 @@ const enum ShaderType {
 };
 
 const enum AttributeType {
-	POSITION = 0,
-	NORMAL   = 1,
-	UV       = 2,
-	TANGENT  = 3
+	POSITION  = 0,
+	NORMAL    = 1,
+	UV        = 2,
+	TANGENT   = 3,
+	BITANGENT = 4
 };
 
 const enum BufferIndices {

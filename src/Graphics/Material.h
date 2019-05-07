@@ -22,6 +22,7 @@ namespace rsm {
 	protected:
 		GLuint _prog;
 
+		void setInt(const std::string& name, int value);
 		void setFloat(const std::string& name, float value);
 		void setVec3(const std::string& name, vec3& vec);
 		void setVec4(const std::string& name, vec4& vec);

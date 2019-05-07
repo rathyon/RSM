@@ -70,7 +70,7 @@ void OpenGLApplication::prepare() {
 	/* Prepare Camera here */
 
 	// cube cam
-	/**/
+	/** /
 	_camera = make_sref<Perspective>(_width, _height,
 		vec3(5.0f, 5.0f, 5.0f),
 		vec3(0.0f, 0.0f, 0.0f),
@@ -79,7 +79,7 @@ void OpenGLApplication::prepare() {
 	/**/
 
 	// sponza cam
-	/** /
+	/**/
     _camera = make_sref<Perspective>(_width, _height,
          vec3(0.0f, 15.0f, 0.0f),
          vec3(-15.0f, 15.0f, 0.0f),
@@ -117,7 +117,7 @@ void OpenGLApplication::prepare() {
 	cube->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	/**/
 
-	/** /
+	/**/
 	sref<Model> sponza = RM.getModel("sponza");
 	sponza->prepare();
 	_scene.addModel(sponza);
@@ -131,7 +131,7 @@ void OpenGLApplication::prepare() {
 	_scene.addModel(sibenik);
 	/**/
 
-	/**/
+	/** /
 	sref<Model> Kitana = RM.getModel("Kitana");
 	Kitana->prepare();
 	_scene.addModel(Kitana);
@@ -145,7 +145,7 @@ void OpenGLApplication::prepare() {
 }
 
 void OpenGLApplication::render() { // receive objects and camera args
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	glClearColor(0.1f, 0.1f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	// Upload constant buffers to the GPU
 

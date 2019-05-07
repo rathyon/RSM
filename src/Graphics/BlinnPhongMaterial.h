@@ -23,7 +23,7 @@ namespace rsm {
 		void setSpecular(const vec3& specular);
 		void setSpecularTex(GLuint specTex);
 
-		void setNormalTex(GLuint normalTex);
+		void setNormalMap(GLuint normalMap);
 
 		void setShininess(float shininess);
 
@@ -34,7 +34,7 @@ namespace rsm {
 
 		GLuint diffuseTex() const;
 		GLuint specularTex() const;
-		GLuint normalTex() const;
+		GLuint normalMap() const;
 
 	private:
 		vec3 _ambient;
@@ -44,7 +44,7 @@ namespace rsm {
 
 		GLuint _diffuseTex;
 		GLuint _specularTex;
-		GLuint _normalTex;
+		GLuint _normalMap;
 	};
 
 }

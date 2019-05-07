@@ -14,7 +14,7 @@ namespace rsm {
 		vec3 position;
 		vec3 normal;
 		vec2 uv;
-		//vec3 tangent;
+		vec3 tangent;
 	};
 
 	class Mesh {
@@ -25,8 +25,8 @@ namespace rsm {
 
 		const std::string name() const;
 		const GLuint& VAO() const;
-		const std::vector<Vertex>& vertices() const;
-		const std::vector<int>& indices() const;
+		std::vector<Vertex>& vertices();
+		std::vector<int>& indices();
 		const sref<Material>& material() const;
 
 		void addVertex(const Vertex& vertex);
@@ -40,7 +40,6 @@ namespace rsm {
 
 		void prepare();
 		void draw(glm::mat4& objToWorld, glm::mat3 normalMatrix);
-		//void computeTangents();
 
 	private:
 		std::string _name;

@@ -13,8 +13,8 @@
 // 1600 x 900
 // 800 x 450
 
-#define WND_W 800
-#define WND_H 450
+#define WND_W 1600
+#define WND_H 900
 
 using namespace rsm;
 
@@ -65,54 +65,47 @@ void rsm::init(int argc, char* argv[]) {
 	RM.init();
 
 	/* ===================================================================================
-				Textures
-	=====================================================================================*/
-	/**/
-
-	/** /
-	Image cube_diff;
-	cube_diff.loadFromFile("../../../assets/textures/cube/diffuse.png", IMG_2D);
-	Image cube_spec;
-	cube_spec.loadFromFile("../../../assets/textures/cube/glossiness.png", IMG_2D);
-	sref<Texture> cube_diffTex = make_sref<Texture>(cube_diff);
-	sref<Texture> cube_specTex = make_sref<Texture>(cube_spec);
-
-	cube_diff.freeImage();
-	cube_spec.freeImage();
-	/**/
-
-
-	/**/
-
-	/* ===================================================================================
 				Shaders and Materials
 	=====================================================================================*/
 	/**/
 
-	ShaderSource vShader = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/BlinnPhong.vs");
-	ShaderSource fShader = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/BlinnPhong.fs");
-	vShader.inject("#version 330 core\n");
-	fShader.inject("#version 330 core\n");
-	vShader.compile();
-	fShader.compile();
+	ShaderSource vBP = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/BlinnPhong.vs");
+	ShaderSource fBP = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/BlinnPhong.fs");
+	vBP.inject(std::string("#version 330 core\n") 
+			 + std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";");
+	fBP.inject(std::string("#version 330 core\n"));
+	vBP.compile();
+	fBP.compile();
 
-	sref<Shader> program = make_sref<Shader>("MainProgram");
-	program->addShader(vShader);
-	program->addShader(fShader);
+	ShaderSource vBPTex = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/BlinnPhongTex.vs");
+	ShaderSource fBPTex = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/BlinnPhongTex.fs");
+	vBPTex.inject(std::string("#version 330 core\n")
+		+ std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";");
+	fBPTex.inject(std::string("#version 330 core\n"));
+	vBPTex.compile();
+	fBPTex.compile();
 
-	program->link();
+	sref<Shader> BlinnPhong = make_sref<Shader>("BlinnPhong");
+	BlinnPhong->addShader(vBP);
+	BlinnPhong->addShader(fBP);
+	BlinnPhong->link();
+	RM.addShader("BlinnPhong", BlinnPhong);
+	glApp->addProgram(BlinnPhong->id());
 
-	RM.addShader("MainProgram", program);
+	sref<Shader> BlinnPhongTex = make_sref<Shader>("BlinnPhongTex");
+	BlinnPhongTex->addShader(vBPTex);
+	BlinnPhongTex->addShader(fBPTex);
+	BlinnPhongTex->link();
+	RM.addShader("BlinnPhongTex", BlinnPhongTex);
+	glApp->addProgram(BlinnPhongTex->id());
 
-	glApp->addProgram(program->id());
-
-	/**/
+	/** /
 	sref<BlinnPhongMaterial> bp_test = make_sref<BlinnPhongMaterial>();
 	bp_test->setDiffuse(glm::vec3(1.0f, 0.5f, 0.0f));
 	bp_test->setSpecular(glm::vec3(1.0f));
 	bp_test->setShininess(32.0f);
 
-	bp_test->setProgram(program->id());
+	bp_test->setProgram(BlinnPhong->id());
 	/**/
 
 	/**/
@@ -136,7 +129,7 @@ void rsm::init(int argc, char* argv[]) {
 	//sponza->setMaterial(bp_test);
 	/**/
 
-	/** /
+	/**/
 	sref<Model> sponza = make_sref<Model>("sponza");
 	sponza->loadFromFile("../../../assets/models/crytek sponza/sponza.obj", "../../../assets/models/crytek sponza/");
 	RM.addModel("sponza", sponza);
@@ -148,7 +141,7 @@ void rsm::init(int argc, char* argv[]) {
 	RM.addModel("sibenik", sibenik);
 	/**/
 
-	/**/
+	/** /
 	sref<Model> Kitana = make_sref<Model>("Kitana");
 	Kitana->loadFromFile("../../../assets/models/Kitana/Kitana.obj", "../../../assets/models/Kitana/");
 	RM.addModel("Kitana", Kitana);

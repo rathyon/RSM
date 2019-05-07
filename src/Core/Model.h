@@ -19,7 +19,7 @@ namespace rsm {
 		void loadFromFile(const std::string& filepath, const std::string& matpath);
 		void loadFromMemory(const char* objsource, const char* matsource);
 
-		// temporary solution
+		// set user defined material to all meshes and submeshes
 		void setMaterial(sref<Material> material);
 
 		std::vector<sref<Mesh>>& meshes();

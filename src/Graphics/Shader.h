@@ -18,7 +18,7 @@ namespace rsm {
 		const std::string source() const;
 
 		void compile();
-		void inject(const std::string& str);
+		void inject(std::string& str);
 
 	private:
 		GLuint _id;
