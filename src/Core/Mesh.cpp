@@ -72,8 +72,6 @@ void Mesh::prepare() {
 	glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, (GLsizei)sizeof(Vertex), (const void*)offsetof(Vertex, normal));
 	glEnableVertexAttribArray(UV);
 	glVertexAttribPointer(UV, 2, GL_FLOAT, GL_FALSE, (GLsizei)sizeof(Vertex), (const void*)offsetof(Vertex, uv));
-	glEnableVertexAttribArray(TANGENT);
-	glVertexAttribPointer(TANGENT, 3, GL_FLOAT, GL_FALSE, (GLsizei)sizeof(Vertex), (const void*)offsetof(Vertex, tangent));
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 

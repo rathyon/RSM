@@ -69,8 +69,8 @@
     <None Include="..\..\..\src\Shaders\BlinnPhong.vs">
       <FileType>Document</FileType>
     </None>
-    <None Include="..\..\..\src\Shaders\frag.fs" />
-    <None Include="..\..\..\src\Shaders\vertex.vs" />
+    <None Include="..\..\..\src\Shaders\BlinnPhongTex.fs" />
+    <None Include="..\..\..\src\Shaders\BlinnPhongTex.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

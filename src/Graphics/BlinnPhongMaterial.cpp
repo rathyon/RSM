@@ -18,7 +18,6 @@ BlinnPhongMaterial::BlinnPhongMaterial() {
 void BlinnPhongMaterial::uploadData() {
 	// set shader variables
 	setVec3("ambient", _ambient);
-	setFloat("shininess", _shininess);
 
 	if (_diffuseTex != -1) {
 		glActiveTexture(GL_TEXTURE0);
@@ -29,6 +28,11 @@ void BlinnPhongMaterial::uploadData() {
 		setVec3("diffuse", _diffuse);
 	}
 
+	setVec3("specular", _specular);
+	setFloat("shininess", _shininess);
+
+	// Optional Textures for consideration in the future
+	/** /
 	if (_specularTex != -1) {
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, _specularTex);
@@ -43,6 +47,7 @@ void BlinnPhongMaterial::uploadData() {
 		glBindTexture(GL_TEXTURE_2D, _normalMap);
 		setSampler("normalMap", 2);
 	}
+	/**/
 
 }
 

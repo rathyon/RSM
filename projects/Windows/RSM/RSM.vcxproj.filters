@@ -181,16 +181,16 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\src\Shaders\frag.fs">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="..\..\..\src\Shaders\vertex.vs">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
     <None Include="..\..\..\src\Shaders\BlinnPhong.fs">
       <Filter>Source Files\Shaders</Filter>
     </None>
     <None Include="..\..\..\src\Shaders\BlinnPhong.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\Shaders\BlinnPhongTex.fs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\Shaders\BlinnPhongTex.vs">
       <Filter>Source Files\Shaders</Filter>
     </None>
   </ItemGroup>

@@ -111,12 +111,18 @@ bool Model::loadObj(bool fromFile, const char* objsource, const char* matsource)
 				sref<Texture> diffTex = make_sref<Texture>(diffuse);
 				RM.addTexture(material.diffuse_texname, diffTex);
 				mat->setDiffuseTex(diffTex->id());
+
 			}
 			else {
 				mat->setDiffuse(glm::vec3(material.diffuse[0], material.diffuse[1], material.diffuse[2]));
 			}
 
+			mat->setSpecular(glm::vec3(material.specular[0], material.specular[1], material.specular[2]));
+			mat->setShininess(material.shininess);
+
+			// Optional Textures for consideration in the future
 			// specular values
+			/** /
 			if (material.specular_texname != "") {
 				Image specular;
 				if (fromFile)
@@ -145,6 +151,8 @@ bool Model::loadObj(bool fromFile, const char* objsource, const char* matsource)
 				RM.addTexture(material.bump_texname, normMap);
 				mat->setNormalMap(normMap->id());
 			}
+			/**/
+
 			RM.addMaterial(material.name, mat);
 		}
 	}
@@ -200,7 +208,7 @@ bool Model::loadObj(bool fromFile, const char* objsource, const char* matsource)
 			vcount++;
 		}
 
-
+		/** /
 		// compute tangents
 		// formula from learnopengl.com
 		std::vector<glm::vec3> tangents(mesh->indices().size(), vec3(0.0f));
@@ -240,6 +248,7 @@ bool Model::loadObj(bool fromFile, const char* objsource, const char* matsource)
 			// Calculate handedness ?
 			//tangent[a].w = (Dot(Cross(n, t), tan2[a]) < 0.0F) ? -1.0F : 1.0F;
 		}
+		/**/
 
 		_meshes.push_back(mesh);
 	}

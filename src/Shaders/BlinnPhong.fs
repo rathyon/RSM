@@ -1,10 +1,8 @@
 
-// Passes everything in world coordinates to the fragment shader
 in FragData {
 	vec3 position;
 	vec3 normal; 
 	vec2 texCoords;
-	vec3 tangent;
 } vsIn;
 
 struct Light {
@@ -25,8 +23,6 @@ uniform cameraBlock {
 	mat4 ViewProjMatrix;
 	vec3 ViewPos;
 };
-
-const int NUM_LIGHTS = 1;
 
 uniform Light lights[NUM_LIGHTS];
 
