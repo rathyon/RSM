@@ -82,7 +82,7 @@ namespace rsm {
 	}
 
 	// Injects a string on the first line of the shader source
-	void ShaderSource::inject(std::string& str) {
+	void ShaderSource::inject(std::string str) {
 		_source.insert(0, str);
 	}
 

@@ -3,6 +3,8 @@
 #include <android/asset_manager_jni.h>
 
 #include <time.h>
+#include <sys/types.h>
+#include <dirent.h>
 
 using namespace rsm;
 
@@ -38,69 +40,62 @@ void init() {
 
     ShaderSource bpV = ShaderSource(VERTEX_SHADER, "bpV", getAssetSource("shaders/BlinnPhong.vs"));
     ShaderSource bpF = ShaderSource(FRAGMENT_SHADER, "bpF", getAssetSource("shaders/BlinnPhong.fs"));
+    bpV.inject(std::string("#version 320 es\n") +
+               std::string("#extension GL_EXT_shader_io_blocks : enable\n"));
 
-    bpV.inject("#version 320 es\n"
-               "#extension GL_EXT_shader_io_blocks : enable\n");
-    bpF.inject("#version 320 es\n"
-               "#extension GL_EXT_shader_io_blocks : enable\n"
-               "\n"
-               "precision highp float;");
-
+    bpF.inject(std::string("#version 320 es\n") +
+               std::string("#extension GL_EXT_shader_io_blocks : enable\n") +
+               std::string("precision highp float;\n") +
+               std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n");
     bpV.compile();
     bpF.compile();
 
-    sref<Shader> program = make_sref<Shader>("MainProgram");
-    program->addShader(bpV);
-    program->addShader(bpF);
+    ShaderSource bptV = ShaderSource(VERTEX_SHADER, "bptV", getAssetSource("shaders/BlinnPhongTex.vs"));
+    ShaderSource bptF = ShaderSource(FRAGMENT_SHADER, "bptF", getAssetSource("shaders/BlinnPhongTex.fs"));
+    bptV.inject(std::string("#version 320 es\n") +
+               std::string("#extension GL_EXT_shader_io_blocks : enable\n"));
 
-    program->link();
+    bptF.inject(std::string("#version 320 es\n") +
+               std::string("#extension GL_EXT_shader_io_blocks : enable\n") +
+               std::string("precision highp float;\n") +
+               std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n");
+    bptV.compile();
+    bptF.compile();
 
-    RM.addShader("MainProgram", program);
-    glApp->addProgram(program->id());
+    sref<Shader> BlinnPhong = make_sref<Shader>("BlinnPhong");
+    BlinnPhong->addShader(bpV);
+    BlinnPhong->addShader(bpF);
+    BlinnPhong->link();
+    RM.addShader("BlinnPhong", BlinnPhong);
+    glApp->addProgram(BlinnPhong->id());
 
-    sref<BlinnPhongMaterial> bp_test = make_sref<BlinnPhongMaterial>();
-    bp_test->setDiffuse(glm::vec3(1.0f, 0.5f, 0.2f));
-    bp_test->setSpecular(glm::vec3(1.0f));
-    bp_test->setShininess(32.0f);
-
-    bp_test->setProgram(program->id());
+    sref<Shader> BlinnPhongTex = make_sref<Shader>("BlinnPhongTex");
+    BlinnPhongTex->addShader(bptV);
+    BlinnPhongTex->addShader(bptF);
+    BlinnPhongTex->link();
+    RM.addShader("BlinnPhongTex", BlinnPhongTex);
+    glApp->addProgram(BlinnPhongTex->id());
 
     LOG("Shaders and materials loaded...\n");
+
+    /* ===================================================================================
+            Textures
+    =====================================================================================*/
+    // Read Textures, store them in RM so that loadFromMemory works for Models
+    // TODO: create loadTextures(directory, prefix) that loads all textures in <directory> and prepends the name with <prefix>
+
+
     /* ===================================================================================
 				Meshes and Models
 	=====================================================================================*/
 
-    /** /
-    sref<Mesh> cube_mesh = make_sref<Mesh>("cube", getAssetSource("models/cube.obj"));
-    sref<Model> test_cube = make_sref<Model>(cube_mesh);
-    test_cube->setMaterial(bp_test);
-    RM.addMesh("cube_mesh", cube_mesh);
-    RM.addModel("test_cube", test_cube);
     /**/
-
-    /** /
-	sref<Mesh> bunny_mesh = make_sref<Mesh>("bunny", getAssetSource("models/bunny.obj"));
-	sref<Model> bunny = make_sref<Model>(bunny_mesh);
-	bunny->setMaterial(bp_test);
-	RM.addMesh("bunny_mesh", bunny_mesh);
-	RM.addModel("bunny", bunny);
-	/**/
-
-    /**/
-    sref<Mesh> sponza_mesh = make_sref<Mesh>("sponza", getAssetSource("models/sponza.obj"));
-    sref<Model> sponza = make_sref<Model>(sponza_mesh);
-    sponza->setMaterial(bp_test);
-    RM.addMesh("sponza_mesh", sponza_mesh);
+    sref<Model> sponza = make_sref<Model>("sponza");
+    sponza->loadFromMemory(getAssetSource("models/crytek sponza/sponza.obj"), getAssetSource("models/crytek sponza/sponza.mtl"));
     RM.addModel("sponza", sponza);
     /**/
 
     LOG("Meshes and models loaded...\n");
-    /* ===================================================================================
-				Textures
-	=====================================================================================*/
-
-    // Read files, etc... input stuff
-    // ...
 
     checkOpenGLError("Error during loading and setup!");
     LOG("AndroidApp successfully initialized!\n");
@@ -138,6 +133,17 @@ char* getAssetSource(const char* filepath) {
     filesource[filesize] = '\0';
 
     return filesource;
+}
+
+void loadTextures(std::string directory, std::string prefix){
+    DIR* dirp = opendir(directory.c_str());
+    struct dirent* dp;
+    while((dp = readdir(dirp)) != NULL){
+        std::string entry = dp->d_name;
+
+        // TODO: READ TEXTURE AND STORE IT INTO RESOURCE MANAGER
+    }
+    closedir(dirp);
 }
 
 /*

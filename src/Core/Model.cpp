@@ -106,6 +106,7 @@ bool Model::loadObj(bool fromFile, const char* objsource, const char* matsource)
 				if (fromFile)
 					diffuse.loadFromFile(std::string(matsource) + "/" + material.diffuse_texname, IMG_2D);
 				else
+					// SIMPLY LOAD FROM RESOURCE MANAGER!!!
 					diffuse.loadFromMemory(matsource, IMG_2D);
 
 				sref<Texture> diffTex = make_sref<Texture>(diffuse);
