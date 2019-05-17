@@ -102,17 +102,15 @@ bool Model::loadObj(bool fromFile, const char* objsource, const char* matsource)
 
 			// diffuse values
 			if (material.diffuse_texname != "") {
-				Image diffuse;
-				if (fromFile)
-					diffuse.loadFromFile(std::string(matsource) + "/" + material.diffuse_texname, IMG_2D);
+                Image diffuse;
+                if (fromFile) {
+                    diffuse.loadFromFile(std::string(matsource) + "/" + material.diffuse_texname, IMG_2D);
+                    sref<Texture> diffTex = make_sref<Texture>(diffuse);
+                    RM.addTexture(material.diffuse_texname, diffTex);
+                    mat->setDiffuseTex(diffTex->id());
+                }
 				else
-					// SIMPLY LOAD FROM RESOURCE MANAGER!!!
-					diffuse.loadFromMemory(matsource, IMG_2D);
-
-				sref<Texture> diffTex = make_sref<Texture>(diffuse);
-				RM.addTexture(material.diffuse_texname, diffTex);
-				mat->setDiffuseTex(diffTex->id());
-
+					mat->setDiffuseTex(RM.getTexture(material.diffuse_texname)->id());
 			}
 			else {
 				mat->setDiffuse(glm::vec3(material.diffuse[0], material.diffuse[1], material.diffuse[2]));

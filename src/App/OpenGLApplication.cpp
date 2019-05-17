@@ -102,7 +102,7 @@ void OpenGLApplication::prepare() {
 	/**/
 
 	/**/
-	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(0.0f, -1.0f, -1.0f));
+	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), 0.3f, glm::vec3(0.0f, -1.0f, -1.0f));
 	_scene.addLight(sun);
 	/**/
 

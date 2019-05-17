@@ -66,7 +66,7 @@ void main(void) {
 	vec3 N = vsIn.normal;
 	vec3 L;
 
-	vec3 retColor = vec3(0);
+	vec3 retColor = vec3(0.0);
 
 	for(int i=0; i < NUM_LIGHTS; i++){
 
@@ -89,10 +89,10 @@ void main(void) {
 		float NdotL = max(dot(N, L), 0.0);
 		float NdotH = max(dot(N, H), 0.0);
 
-		vec3 diff = vec3(0);
-		vec3 spec = vec3(0);
+		vec3 diff = vec3(0.0);
+		vec3 spec = vec3(0.0);
 
-		if (NdotL > 0){
+		if (NdotL > 0.0){
 
 			diff = lights[i].emission * lights[i].intensity * ( fetchDiffuse() * NdotL);
 			spec = lights[i].emission * lights[i].intensity * ( specular * pow(NdotH, shininess));
@@ -100,7 +100,7 @@ void main(void) {
 			// if not directional light
 			if (lights[i].type != 0){
 				float distance = length(lights[i].position - vsIn.position);
-				float attenuation = 1.0 / (1.0 + lights[i].linear * distance + lights[i].quadratic * pow(distance, 2));
+				float attenuation = 1.0 / (1.0 + lights[i].linear * distance + lights[i].quadratic * pow(distance, 2.0));
 
 				diff *= attenuation;
 				spec *= attenuation;

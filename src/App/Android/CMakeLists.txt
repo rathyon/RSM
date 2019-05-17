@@ -19,7 +19,8 @@ file (GLOB SOURCE_FILES
         ${SOURCE_DIR}Math/*
         ${SOURCE_DIR}Utils/*
         ${SOURCE_DIR}App/Android/*
-        ${SOURCE_DIR}../ext/tinyobj/*)
+        ${SOURCE_DIR}../ext/tinyobj/*
+        ${SOURCE_DIR}../ext/stb_image/*)
 
 add_library( # Sets the name of the library.
         AndroidRSM-lib

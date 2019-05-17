@@ -34,8 +34,9 @@ const GLenum OpenGLPixelFormats[] = {
 	GL_RGBA
 };
 
+// OpenGL ES 3.2 doesn't support GL_TEXTURE_1D !
 const GLenum OpenGLTexTargets[] = {
-	GL_TEXTURE_1D,
+	0,
 	GL_TEXTURE_2D,
 	GL_TEXTURE_3D,
 	GL_TEXTURE_CUBE_MAP,

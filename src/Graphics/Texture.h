@@ -1,7 +1,7 @@
 #ifndef __RSM_TEXTURE_H__
 #define __RSM_TEXTURE_H__
 
-#include "OpenGL.h"
+#include "Core\OpenGL.h"
 #include "Image.h"
 
 /*

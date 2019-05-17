@@ -15,6 +15,8 @@ long oldTimeSinceStart;
 
 char* getAssetSource(const char* filepath);
 long getCurrentTime();
+bool endsWith (std::string const &fullString, std::string const &ending);
+void loadTextures(std::string directory, std::string extension, std::string prefix);
 
 void init() {
     /**
@@ -35,7 +37,7 @@ void init() {
     LOG("Init successful...\n");
 
     /* ===================================================================================
-				Shaders and Materials
+				Shaders
 	=====================================================================================*/
 
     ShaderSource bpV = ShaderSource(VERTEX_SHADER, "bpV", getAssetSource("shaders/BlinnPhong.vs"));
@@ -76,15 +78,23 @@ void init() {
     RM.addShader("BlinnPhongTex", BlinnPhongTex);
     glApp->addProgram(BlinnPhongTex->id());
 
-    LOG("Shaders and materials loaded...\n");
+    LOG("Shaders loaded...\n");
 
     /* ===================================================================================
             Textures
     =====================================================================================*/
     // Read Textures, store them in RM so that loadFromMemory works for Models
-    // TODO: create loadTextures(directory, prefix) that loads all textures in <directory> and prepends the name with <prefix>
+    // TODO: test loadTextures
+    Image testimg;
+    testimg.loadFromMemory(getAssetSource("models/crytek sponza/textures/background.png"), IMG_2D);
+    sref<Texture> testtex = make_sref<Texture>(testimg);
+    RM.addTexture("testtex", testtex);
 
 
+    loadTextures("models/crytek sponza/textures", "png", "textures\\");
+
+
+    LOG("Textures loaded...\n");
     /* ===================================================================================
 				Meshes and Models
 	=====================================================================================*/
@@ -135,15 +145,29 @@ char* getAssetSource(const char* filepath) {
     return filesource;
 }
 
-void loadTextures(std::string directory, std::string prefix){
-    DIR* dirp = opendir(directory.c_str());
-    struct dirent* dp;
-    while((dp = readdir(dirp)) != NULL){
-        std::string entry = dp->d_name;
-
-        // TODO: READ TEXTURE AND STORE IT INTO RESOURCE MANAGER
+bool endsWith (std::string const &fullString, std::string const &ending) {
+    if (fullString.length() >= ending.length()) {
+        return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
+    } else {
+        return false;
     }
-    closedir(dirp);
+}
+
+void loadTextures(std::string directory, std::string extension, std::string prefix){
+
+    AAssetDir* dir = AAssetManager_openDir(assetManager, directory.c_str());
+    const char* file;
+    while((file = AAssetDir_getNextFileName(dir)) != NULL){
+        std::string filename(file);
+        if(endsWith(filename, extension)){
+            Image img;
+            //img.loadFromMemory(getAssetSource(filename.c_str()), IMG_2D);
+            img.loadFromFile(directory + "/" + filename, IMG_2D);
+            sref<Texture> tex = make_sref<Texture>(img);
+            RM.addTexture(prefix + filename, tex);
+            LOG("Texture added: %s\n", filename.c_str());
+        }
+    }
 }
 
 /*
