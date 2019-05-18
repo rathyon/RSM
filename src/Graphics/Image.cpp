@@ -16,20 +16,18 @@ void Image::loadFromFile(const std::string& filepath, ImageType type) {
 	stbi_set_flip_vertically_on_load(true);
 	_data = stbi_load(filepath.c_str(), &_width, &_height, &_channels, 0);
 
-	LOG("Image stats: w: %d h: %d channels: %d\n", _width, _height, _channels);
-
 	// giving "Corrupt JPEG on PNG loading... wtf
-	//LOGE(stbi_failure_reason());
+	// Android: STB ERROR: Unable to open file
+	//LOGE("STB ERROR: %s\n", stbi_failure_reason());
 
 	_type = type;
 }
 
-void Image::loadFromMemory(const char* data, ImageType type) {
-	// check if static or reinterpret is needed...
+void Image::loadFromMemory(const char* data, size_t length, ImageType type) {
 	stbi_set_flip_vertically_on_load(true);
-	_data = stbi_load_from_memory((unsigned char*)data, sizeof(data), &_width, &_height, &_channels, 0);
+	_data = stbi_load_from_memory((unsigned char*)data, length, &_width, &_height, &_channels, 0);
 
-    LOG("Image stats: w: %d h: %d channels: %d\n", _width, _height, _channels);
+    //LOGE("STB ERROR: %s\n", stbi_failure_reason());
 	_type = type;
 }
 

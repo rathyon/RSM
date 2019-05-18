@@ -17,13 +17,22 @@
 
 #endif
 
-#define NUM_LIGHTS 1
+#define NUM_LIGHTS 3
 
 const GLenum OpenGLShaderType[]{
 	GL_VERTEX_SHADER,
 	GL_FRAGMENT_SHADER,
 	//GL_GEOMETRY_SHADER, // OpenGL ES doesn't have it ?
 	//GL_COMPUTE_SHADER	// OpenGL ES doesn't have it ?
+};
+
+// Exists because of OpenGL ES 3.0's API regarding glTexImage2D
+const GLenum OpenGLInternalPixelFormats[] = {
+		0,
+		GL_R8,
+		GL_RG8,
+		GL_RGB,
+		GL_RGBA
 };
 
 const GLenum OpenGLPixelFormats[] = {

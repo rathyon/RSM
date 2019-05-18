@@ -101,10 +101,17 @@ void OpenGLApplication::prepare() {
 	_scene.addLight(candle);
 	/**/
 
-	/**/
+	/** /
 	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), 0.3f, glm::vec3(0.0f, -1.0f, -1.0f));
 	_scene.addLight(sun);
 	/**/
+
+    sref<Light> candle1 = make_sref<PointLight>(glm::vec3(1.0f, 0.0f, 0.0f), 10.0f, glm::vec3(5.0f, 15.0f, 5.0f));
+    _scene.addLight(candle1);
+    sref<Light> candle2 = make_sref<PointLight>(glm::vec3(0.0f, 1.0f, 0.0f), 10.0f, glm::vec3(5.0f, 15.0f, -5.0f));
+    _scene.addLight(candle2);
+    sref<Light> candle3 = make_sref<PointLight>(glm::vec3(0.0f, 0.0f, 1.0f), 10.0f, glm::vec3(0.0f, 15.0f, 5.0f));
+    _scene.addLight(candle3);
 
 
 	/* Prepare Models here */
@@ -129,14 +136,6 @@ void OpenGLApplication::prepare() {
 	sref<Model> sibenik = RM.getModel("sibenik");
 	sibenik->prepare();
 	_scene.addModel(sibenik);
-	/**/
-
-	/** /
-	sref<Model> Kitana = RM.getModel("Kitana");
-	Kitana->prepare();
-	_scene.addModel(Kitana);
-
-	Kitana->setScale(2.0f, 2.0f, 2.0f);
 	/**/
 
 	// Prepare shared buffers

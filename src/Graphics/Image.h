@@ -24,7 +24,7 @@ namespace rsm {
 		~Image();
 
 		void loadFromFile(const std::string& filepath, ImageType type);
-		void loadFromMemory(const char* data, ImageType type);
+		void loadFromMemory(const char* data, size_t length, ImageType type);
 		void freeImage();
 
 		const int width() const;

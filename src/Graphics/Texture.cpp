@@ -10,23 +10,23 @@ Texture::Texture(Image img) {
 
 	glBindTexture(OpenGLTexTargets[_type], _id);
 
-	//LOG("Number of channels: %d", img.channels());
-
 	if (_type == IMG_1D) {
 
 	}
 	else if (_type == IMG_2D) {
 		glTexImage2D(OpenGLTexTargets[_type],
 			0, 
-			OpenGLPixelFormats[img.channels()], 
+			OpenGLInternalPixelFormats[img.channels()],
 			img.width(), 
 			img.height(),
 			0, 
 			OpenGLPixelFormats[img.channels()], 
 			GL_UNSIGNED_BYTE, 
 			img.data());
+		checkOpenGLError("Error in glTexImage2D");
 
 		glGenerateMipmap(OpenGLTexTargets[_type]);
+		checkOpenGLError("Error in generating mipmaps");
 	}
 	else if (_type == IMG_3D) {
 

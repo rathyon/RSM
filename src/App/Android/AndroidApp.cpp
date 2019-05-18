@@ -14,29 +14,39 @@ AAssetManager* assetManager;
 long oldTimeSinceStart;
 
 char* getAssetSource(const char* filepath);
+size_t getAssetLength(const char* filepath);
 long getCurrentTime();
 bool endsWith (std::string const &fullString, std::string const &ending);
 void loadTextures(std::string directory, std::string extension, std::string prefix);
 
+/** ==================================================================================
+            README™ - A Comprehensive Guide on how not to fuck up!
+=====================================================================================*/
+
+//FIXME: On Reshape/Screen orientation change (Landscape <-> Portrait) "init()" seems to be called everytime!
+
+/**
+ * IMPORTANT: SUPPOSEDLY reshape is always called at least once...
+ * So I'm just using useless values: 1920x1080
+ * UPDATE: So far it seems to be true!
+ */
+
 void init() {
-    /**
-     * IMPORTANT: SUPPOSEDLY reshape is always called at least once...
-     * So I'm just using useless values: 1920x1080
-     * UPDATE: So far it seems to be true!
-     */
+
     glApp = new OpenGLApplication(1920, 1080);
 
     LOG("Initializing AndroidApp...\n");
 
-    /* ===================================================================================
+    /** ==================================================================================
 				Loading and Setup
 	=====================================================================================*/
     glApp->init();
     RM.init();
 
+    checkOpenGLError("Error during engine initialization!");
     LOG("Init successful...\n");
 
-    /* ===================================================================================
+    /** ==================================================================================
 				Shaders
 	=====================================================================================*/
 
@@ -78,25 +88,20 @@ void init() {
     RM.addShader("BlinnPhongTex", BlinnPhongTex);
     glApp->addProgram(BlinnPhongTex->id());
 
+    checkOpenGLError("Error during shader loading and setup!");
     LOG("Shaders loaded...\n");
 
-    /* ===================================================================================
+    /** ==================================================================================
             Textures
     =====================================================================================*/
-    // Read Textures, store them in RM so that loadFromMemory works for Models
-    // TODO: test loadTextures
-    Image testimg;
-    testimg.loadFromMemory(getAssetSource("models/crytek sponza/textures/background.png"), IMG_2D);
-    sref<Texture> testtex = make_sref<Texture>(testimg);
-    RM.addTexture("testtex", testtex);
-
 
     loadTextures("models/crytek sponza/textures", "png", "textures\\");
 
-
+    checkOpenGLError("Error during texture loading!");
     LOG("Textures loaded...\n");
-    /* ===================================================================================
-				Meshes and Models
+
+    /** ==================================================================================
+            Models
 	=====================================================================================*/
 
     /**/
@@ -105,6 +110,7 @@ void init() {
     RM.addModel("sponza", sponza);
     /**/
 
+    checkOpenGLError("Error during model loading!");
     LOG("Meshes and models loaded...\n");
 
     checkOpenGLError("Error during loading and setup!");
@@ -129,6 +135,8 @@ void render() {
     if(dt > 0.25f)
         dt = 0.25f;
 
+    //glApp->getCamera()->updateOrientation(0.0f, dt * 0.1f);
+    //glApp->getCamera()->updateViewMatrix();
     glApp->update(dt);
 
     glApp->render();
@@ -143,6 +151,12 @@ char* getAssetSource(const char* filepath) {
     filesource[filesize] = '\0';
 
     return filesource;
+}
+
+size_t getAssetLength(const char* filepath){
+    AAsset* file = AAssetManager_open(assetManager, filepath, AASSET_MODE_STREAMING);
+    size_t filesize = AAsset_getLength(file);
+    return filesize;
 }
 
 bool endsWith (std::string const &fullString, std::string const &ending) {
@@ -160,12 +174,12 @@ void loadTextures(std::string directory, std::string extension, std::string pref
     while((file = AAssetDir_getNextFileName(dir)) != NULL){
         std::string filename(file);
         if(endsWith(filename, extension)){
+            std::string fullpath = directory + "/" + filename;
             Image img;
-            //img.loadFromMemory(getAssetSource(filename.c_str()), IMG_2D);
-            img.loadFromFile(directory + "/" + filename, IMG_2D);
+            //LOG("Filename: %s\n", filename.c_str());
+            img.loadFromMemory(getAssetSource(fullpath.c_str()), getAssetLength(fullpath.c_str()), IMG_2D);
             sref<Texture> tex = make_sref<Texture>(img);
             RM.addTexture(prefix + filename, tex);
-            LOG("Texture added: %s\n", filename.c_str());
         }
     }
 }
