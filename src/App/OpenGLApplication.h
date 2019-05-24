@@ -38,6 +38,8 @@ namespace rsm {
 		Scene getScene();
 		sref<Camera> getCamera();
 
+		void genShadowMap();
+
 	private:
 		void prepareCameraBuffer();
 
@@ -53,6 +55,10 @@ namespace rsm {
 
 		Scene _scene;
 		sref<Camera> _camera;
+
+		// Shadow Mapping
+		GLuint _depthMapFBO;
+		GLuint _depthMap;
 	};
 }
 

@@ -17,7 +17,7 @@
 
 #endif
 
-#define NUM_LIGHTS 3
+#define NUM_LIGHTS 1
 
 const GLenum OpenGLShaderType[]{
 	GL_VERTEX_SHADER,

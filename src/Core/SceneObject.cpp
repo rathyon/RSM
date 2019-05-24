@@ -2,7 +2,7 @@
 
 using namespace rsm;
 
-// TODO create objToWorld matrix at the get-go
+// TODO create objToWorld matrix from the get-go
 // TODO verify quaternion values
 
 SceneObject::SceneObject() {

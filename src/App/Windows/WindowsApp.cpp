@@ -65,7 +65,7 @@ void rsm::init(int argc, char* argv[]) {
 	RM.init();
 
 	/* ===================================================================================
-				Shaders and Materials
+				Shaders
 	=====================================================================================*/
 	/**/
 
@@ -99,18 +99,32 @@ void rsm::init(int argc, char* argv[]) {
 	RM.addShader("BlinnPhongTex", BlinnPhongTex);
 	glApp->addProgram(BlinnPhongTex->id());
 
-	/** /
-	sref<BlinnPhongMaterial> bp_test = make_sref<BlinnPhongMaterial>();
-	bp_test->setDiffuse(glm::vec3(1.0f, 0.5f, 0.0f));
-	bp_test->setSpecular(glm::vec3(1.0f));
-	bp_test->setShininess(32.0f);
-
-	bp_test->setProgram(BlinnPhong->id());
-	/**/
-
-	/**/
 	/* ===================================================================================
-				Meshes and Models
+				Materials
+	=====================================================================================*/
+
+	/** /
+	sref<BlinnPhongMaterial> bp_red = make_sref<BlinnPhongMaterial>();
+	bp_red->setDiffuse(glm::vec3(1.0f, 0.0f, 0.0f));
+	bp_red->setSpecular(glm::vec3(1.0f));
+	bp_red->setShininess(32.0f);
+	bp_red->setProgram(BlinnPhong->id());
+
+	sref<BlinnPhongMaterial> bp_gray = make_sref<BlinnPhongMaterial>();
+	bp_gray->setDiffuse(glm::vec3(0.7f, 0.7f, 0.7f));
+	bp_gray->setSpecular(glm::vec3(1.0f));
+	bp_gray->setShininess(4.0f);
+	bp_gray->setProgram(BlinnPhong->id());
+
+	sref<BlinnPhongMaterial> bp_green = make_sref<BlinnPhongMaterial>();
+	bp_green->setDiffuse(glm::vec3(0.0f, 1.0f, 0.0f));
+	bp_green->setSpecular(glm::vec3(1.0f));
+	bp_green->setShininess(64.0f);
+	bp_green->setProgram(BlinnPhong->id());
+	/**/
+
+	/* ===================================================================================
+				Models
 	=====================================================================================*/
 	/**/
 
@@ -129,7 +143,7 @@ void rsm::init(int argc, char* argv[]) {
 	//sponza->setMaterial(bp_test);
 	/**/
 
-	/**/
+	/** /
 	sref<Model> sponza = make_sref<Model>("sponza");
 	sponza->loadFromFile("../../../assets/models/crytek sponza/sponza.obj", "../../../assets/models/crytek sponza/");
 	RM.addModel("sponza", sponza);
@@ -141,10 +155,10 @@ void rsm::init(int argc, char* argv[]) {
 	RM.addModel("sibenik", sibenik);
 	/**/
 
-	/** /
-	sref<Model> Kitana = make_sref<Model>("Kitana");
-	Kitana->loadFromFile("../../../assets/models/Kitana/Kitana.obj", "../../../assets/models/Kitana/");
-	RM.addModel("Kitana", Kitana);
+	/**/
+	sref<Model> demo_scene = make_sref<Model>("demo_scene");
+	demo_scene->loadFromFile("../../../assets/models/demo scene closed/demo_scene.obj", "../../../assets/models/demo scene closed/");
+	RM.addModel("demo_scene", demo_scene);
 	/**/
 
 

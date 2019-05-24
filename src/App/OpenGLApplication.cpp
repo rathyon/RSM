@@ -19,7 +19,7 @@ void OpenGLApplication::init() {
 	srand(static_cast <unsigned> (time(0)));
 
 	// Initialize OpenGL state
-	glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 	glDepthMask(GL_TRUE);
@@ -67,10 +67,12 @@ sref<Camera> OpenGLApplication::getCamera() {
 
 void OpenGLApplication::prepare() {
 
-	/* Prepare Camera here */
+	/* ===================================================================================
+			Cameras
+	=====================================================================================*/
 
 	// cube cam
-	/** /
+	/**/
 	_camera = make_sref<Perspective>(_width, _height,
 		vec3(5.0f, 5.0f, 5.0f),
 		vec3(0.0f, 0.0f, 0.0f),
@@ -79,7 +81,7 @@ void OpenGLApplication::prepare() {
 	/**/
 
 	// sponza cam
-	/**/
+	/** /
     _camera = make_sref<Perspective>(_width, _height,
          vec3(0.0f, 15.0f, 0.0f),
          vec3(-15.0f, 15.0f, 0.0f),
@@ -89,15 +91,17 @@ void OpenGLApplication::prepare() {
 
 	_scene.addCamera(_camera);
 
-	/* Prepare Lights here */
+	/* ===================================================================================
+			Lights
+	=====================================================================================*/
 
 	/** /
 	sref<SpotLight> spot = make_sref<SpotLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, 60.0f, glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0, 15.0f, 0));
 	_scene.addLight(spot);
 	/**/
 
-	/** /
-	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 10.0f, glm::vec3(0.0f, 15.0f, 0.0f));
+	/**/
+	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 3.0f, glm::vec3(-3.0f, 4.0f, 3.0f));
 	_scene.addLight(candle);
 	/**/
 
@@ -106,15 +110,9 @@ void OpenGLApplication::prepare() {
 	_scene.addLight(sun);
 	/**/
 
-    sref<Light> candle1 = make_sref<PointLight>(glm::vec3(1.0f, 0.0f, 0.0f), 10.0f, glm::vec3(5.0f, 15.0f, 5.0f));
-    _scene.addLight(candle1);
-    sref<Light> candle2 = make_sref<PointLight>(glm::vec3(0.0f, 1.0f, 0.0f), 10.0f, glm::vec3(5.0f, 15.0f, -5.0f));
-    _scene.addLight(candle2);
-    sref<Light> candle3 = make_sref<PointLight>(glm::vec3(0.0f, 0.0f, 1.0f), 10.0f, glm::vec3(0.0f, 15.0f, 5.0f));
-    _scene.addLight(candle3);
-
-
-	/* Prepare Models here */
+	/* ===================================================================================
+			Models
+	=====================================================================================*/
 
 	/** /
 	sref<Model> cube = RM.getModel("cube");
@@ -124,7 +122,7 @@ void OpenGLApplication::prepare() {
 	cube->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	/**/
 
-	/**/
+	/** /
 	sref<Model> sponza = RM.getModel("sponza");
 	sponza->prepare();
 	_scene.addModel(sponza);
@@ -138,13 +136,53 @@ void OpenGLApplication::prepare() {
 	_scene.addModel(sibenik);
 	/**/
 
+	/**/
+	sref<Model> demo_scene = RM.getModel("demo_scene");
+	demo_scene->prepare();
+	_scene.addModel(demo_scene);
+	/**/
+
 	// Prepare shared buffers
 	prepareCameraBuffer();
 
+	/* ===================================================================================
+			Shadow Mapping
+	=====================================================================================*/
+	// prepare framebuffer and shadow map (texture)
+	glGenFramebuffers(1, &_depthMapFBO);
+
+	glGenTextures(1, &_depthMap);
+	glBindTexture(OpenGLTexTargets[IMG_2D], _depthMap);
+	glTexImage2D(OpenGLTexTargets[IMG_2D], 0, GL_DEPTH_COMPONENT, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(OpenGLTexTargets[IMG_2D], GL_TEXTURE_WRAP_S, OpenGLTexWrapping[REPEAT]);
+	glTexParameteri(OpenGLTexTargets[IMG_2D], GL_TEXTURE_WRAP_T, OpenGLTexWrapping[REPEAT]);
+	glTexParameteri(OpenGLTexTargets[IMG_2D], GL_TEXTURE_MIN_FILTER, OpenGLTexFilters[NEAREST]);
+	glTexParameteri(OpenGLTexTargets[IMG_2D], GL_TEXTURE_MAG_FILTER, OpenGLTexFilters[NEAREST]);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, _depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthMap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+}
+
+void OpenGLApplication::genShadowMap() {
+	glViewport(0, 0, 1024, 1024);
+	glBindFramebuffer(GL_FRAMEBUFFER, _depthMapFBO);
+	glClear(GL_DEPTH_BUFFER_BIT);
+	// do whatever this thing is
+	//ConfigureShaderAndMatrices();
+	_scene.draw();
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void OpenGLApplication::render() { // receive objects and camera args
-	glClearColor(0.1f, 0.1f, 1.0f, 1.0f);
+	// Generate Depth Map
+	genShadowMap();
+	reshape(_width, _height);
+
+	// clear framebuffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	// Upload constant buffers to the GPU
 
