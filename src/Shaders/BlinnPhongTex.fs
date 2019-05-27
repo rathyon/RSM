@@ -3,6 +3,7 @@ in FragData {
 	vec3 position;
 	vec3 normal; 
 	vec2 texCoords;
+	vec4 lightSpacePosition;
 } vsIn;
 
 struct Light {

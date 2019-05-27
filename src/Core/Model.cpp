@@ -49,10 +49,17 @@ void Model::prepare() {
 	}
 }
 
-void Model::draw() {
+void Model::render() {
 	updateMatrix();
 	for (sref<Mesh> mesh : _meshes) {
-		mesh->draw(objToWorld(), normalMatrix());
+		mesh->render(objToWorld(), normalMatrix());
+	}
+}
+
+void Model::draw(sref<Shader> program) {
+	updateMatrix();
+	for (sref<Mesh> mesh : _meshes) {
+		mesh->draw(objToWorld(), program);
 	}
 }
 

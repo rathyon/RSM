@@ -3,6 +3,7 @@ in FragData {
 	vec3 position;
 	vec3 normal; 
 	vec2 texCoords;
+	vec4 lightSpacePosition;
 } vsIn;
 
 struct Light {
@@ -32,14 +33,30 @@ uniform vec3 diffuse;
 uniform vec3 specular;
 uniform float shininess;
 
+uniform sampler2D shadowMap;
+
 /* ==============================================================================
         Stage Outputs
  ============================================================================== */
 
 out vec4 outColor;
 
+float shadowFactor(vec4 lightSpacePosition){
+	// perform perspective divide: clip space-> normalized device coords (done automatically for gl_Position)
+    vec3 projCoords = lightSpacePosition.xyz / lightSpacePosition.w;
+    // bring from [-1,1] to [0,1]
+    projCoords = projCoords * 0.5 + 0.5;
+
+    float closestDepth = texture(shadowMap, projCoords.xy).r;
+    float currentDepth = projCoords.z; 
+
+    float shadow = currentDepth > closestDepth  ? 0.0 : 1.0;
+    return shadow;
+}
+
 void main(void) {
 
+	/**/
 	vec3 V = normalize(ViewPos - vsIn.position);
 	vec3 N = vsIn.normal;
 	vec3 L;
@@ -48,6 +65,7 @@ void main(void) {
 
 	for(int i=0; i < NUM_LIGHTS; i++){
 
+		// Get Light Vector
 		if (lights[i].type == 0){
 			L = normalize(-lights[i].direction);
 		}
@@ -85,8 +103,14 @@ void main(void) {
 			}
 		}
 
-		retColor += diff + spec;
+		retColor += (diff + spec) * shadowFactor(vsIn.lightSpacePosition);
 	}
 
 	outColor = vec4(retColor, 1.0);
+	/**/
+
+	/** /
+	float depth = texture(shadowMap, vsIn.texCoords).r;
+	outColor = vec4(vec3(depth), 1.0);
+	/**/
 }

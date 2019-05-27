@@ -28,10 +28,14 @@ const std::vector<sref<Model>>& Scene::models() const {
 	return _models;
 }
 
-void Scene::draw() {
-
+void Scene::render() {
 	for (sref<Model> model : _models) {
-		model->draw();
+		model->render();
 	}
+}
 
+void Scene::draw(sref<Shader> program) {
+	for (sref<Model> model : _models) {
+		model->draw(program);
+	}
 }

@@ -6,6 +6,7 @@
 #include "Camera.h"
 #include "Lights\Light.h"
 #include "Model.h"
+#include "Graphics\Shader.h"
 
 namespace rsm {
 
@@ -21,7 +22,8 @@ namespace rsm {
 		const std::vector<sref<Light>>& lights() const;
 		const std::vector<sref<Model>>& models() const;
 
-		void draw();
+		void render();
+		void draw(sref<Shader> program);
 
 	private:
 		std::vector<sref<Camera>> _cameras;

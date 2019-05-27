@@ -3,10 +3,10 @@
 using namespace rsm;
 
 // TODO create objToWorld matrix from the get-go
-// TODO verify quaternion values
 
 SceneObject::SceneObject() {
 	_position = glm::vec3(0);
+	_objToWorld = glm::mat4(1);
 	_scale = glm::vec3(1);
 	_rotation = glm::quat();
 	_parent = nullptr;
@@ -14,6 +14,7 @@ SceneObject::SceneObject() {
 
 SceneObject::SceneObject(const glm::vec3& position) {
 	_position = position;
+	_objToWorld = glm::translate(_position);
 	_scale = glm::vec3(1);
 	_rotation = glm::quat();
 	_parent = nullptr;

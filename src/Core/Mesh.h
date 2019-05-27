@@ -4,6 +4,7 @@
 #include "OpenGL.h"
 #include "Math\RSMaths.h"
 #include "Graphics\Material.h"
+#include "Graphics\Shader.h"
 //#include "Resources.h"
 
 using namespace glm;
@@ -39,7 +40,8 @@ namespace rsm {
 		void setMaterial(sref<Material> material);
 
 		void prepare();
-		void draw(glm::mat4& objToWorld, glm::mat3 normalMatrix);
+		void render(glm::mat4& objToWorld, glm::mat3 normalMatrix);
+		void draw(glm::mat4& objToWorld, sref<Shader> program);
 
 	private:
 		std::string _name;

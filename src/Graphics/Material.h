@@ -19,9 +19,6 @@ namespace rsm {
 
 		virtual void uploadData() = 0;
 
-	protected:
-		GLuint _prog;
-
 		void setInt(const std::string& name, int value);
 		void setFloat(const std::string& name, float value);
 		void setVec3(const std::string& name, vec3& vec);
@@ -30,6 +27,9 @@ namespace rsm {
 		void setMat4(const std::string& name, mat4& mat);
 
 		void setSampler(const std::string& name, int id);
+
+	protected:
+		GLuint _prog;
 	};
 
 }

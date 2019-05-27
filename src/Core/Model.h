@@ -28,7 +28,8 @@ namespace rsm {
 		void updateMatrix() override;
 
 		void prepare();
-		void draw();
+		void render();
+		void draw(sref<Shader> program);
 
 	private:
 		std::string _name;

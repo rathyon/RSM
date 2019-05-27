@@ -100,13 +100,13 @@ void OpenGLApplication::prepare() {
 	_scene.addLight(spot);
 	/**/
 
-	/**/
+	/** /
 	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 3.0f, glm::vec3(-3.0f, 4.0f, 3.0f));
 	_scene.addLight(candle);
 	/**/
 
-	/** /
-	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), 0.3f, glm::vec3(0.0f, -1.0f, -1.0f));
+	/**/
+	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(-1.0f, -1.0f, -1.0f));
 	_scene.addLight(sun);
 	/**/
 
@@ -165,22 +165,38 @@ void OpenGLApplication::prepare() {
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+	// each light source should be in charge of this
+	// this means genShadowMap must be called for each light
+	// which means each light must have its own framebuffer, texture, etc?
+	_lightOrtho = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 10000.0f);
+	_lightView = glm::lookAt(glm::vec3(10.0f, 10.0f, 10.0f),
+							 glm::vec3(0.0f, 0.0f, 0.0f),
+							 glm::vec3(0.0f, 1.0f, 0.0f));
+	_lightSpace = _lightOrtho * _lightView;
 }
 
 void OpenGLApplication::genShadowMap() {
+	sref<Shader> SM = RM.getShader("ShadowMap");
+	glUseProgram(SM->id());
+	glUniformMatrix4fv(glGetUniformLocation(SM->id(), "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(_lightSpace));
+
 	glViewport(0, 0, 1024, 1024);
 	glBindFramebuffer(GL_FRAMEBUFFER, _depthMapFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
-	// do whatever this thing is
-	//ConfigureShaderAndMatrices();
-	_scene.draw();
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, _depthMap);
+	_scene.draw(SM);
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glUseProgram(0);
+	// reset viewport
+	reshape(_width, _height);
 }
 
 void OpenGLApplication::render() { // receive objects and camera args
 	// Generate Depth Map
 	genShadowMap();
-	reshape(_width, _height);
 
 	// clear framebuffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -191,8 +207,11 @@ void OpenGLApplication::render() { // receive objects and camera args
 	// upload camera...
 	uploadCameraBuffer();
 
-	// draw objects...
-	_scene.draw();
+	//upload shadow mapping data
+	uploadShadowMappingData();
+
+	// render objects...
+	_scene.render();
 
 	checkOpenGLError("Error in render loop!");
 }
@@ -260,4 +279,11 @@ void OpenGLApplication::uploadLights() {
 		glUseProgram(0);
 	}
 	
+}
+
+void OpenGLApplication::uploadShadowMappingData() {
+	for (GLuint prog : _programs) {
+		glUseProgram(prog);
+		glUniformMatrix4fv(glGetUniformLocation(prog, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(_lightSpace));
+	}
 }

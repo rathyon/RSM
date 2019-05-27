@@ -5,6 +5,7 @@ layout(location = 2) in vec2 TexCoords;
 
 uniform mat4 ModelMatrix;
 uniform mat3 NormalMatrix;
+uniform mat4 lightSpaceMatrix;
 
 uniform cameraBlock {
 	mat4 ViewMatrix;
@@ -18,6 +19,7 @@ out FragData {
 	vec3 position;
 	vec3 normal;
 	vec2 texCoords;
+	vec4 lightSpacePosition;
 } vsOut;
 
 void main()

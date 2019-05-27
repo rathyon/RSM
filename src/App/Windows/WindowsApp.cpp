@@ -85,6 +85,13 @@ void rsm::init(int argc, char* argv[]) {
 	vBPTex.compile();
 	fBPTex.compile();
 
+	ShaderSource vSM = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/ShadowMap.vs");
+	ShaderSource fSM = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/ShadowMap.fs");
+	vSM.inject(std::string("#version 330 core\n"));
+	fSM.inject(std::string("#version 330 core\n"));
+	vSM.compile();
+	fSM.compile();
+
 	sref<Shader> BlinnPhong = make_sref<Shader>("BlinnPhong");
 	BlinnPhong->addShader(vBP);
 	BlinnPhong->addShader(fBP);
@@ -98,6 +105,13 @@ void rsm::init(int argc, char* argv[]) {
 	BlinnPhongTex->link();
 	RM.addShader("BlinnPhongTex", BlinnPhongTex);
 	glApp->addProgram(BlinnPhongTex->id());
+
+	sref<Shader> ShadowMap = make_sref<Shader>("ShadowMap");
+	ShadowMap->addShader(vSM);
+	ShadowMap->addShader(fSM);
+	ShadowMap->link();
+	RM.addShader("ShadowMap", ShadowMap);
+	glApp->addProgram(ShadowMap->id());
 
 	/* ===================================================================================
 				Materials
@@ -157,7 +171,7 @@ void rsm::init(int argc, char* argv[]) {
 
 	/**/
 	sref<Model> demo_scene = make_sref<Model>("demo_scene");
-	demo_scene->loadFromFile("../../../assets/models/demo scene closed/demo_scene.obj", "../../../assets/models/demo scene closed/");
+	demo_scene->loadFromFile("../../../assets/models/demo scene open/demo_scene.obj", "../../../assets/models/demo scene open/");
 	RM.addModel("demo_scene", demo_scene);
 	/**/
 

@@ -44,8 +44,8 @@ namespace rsm {
 		void prepareCameraBuffer();
 
 		void uploadCameraBuffer();
-
 		void uploadLights();
+		void uploadShadowMappingData();
 
 		int _width;
 		int _height;
@@ -59,6 +59,11 @@ namespace rsm {
 		// Shadow Mapping
 		GLuint _depthMapFBO;
 		GLuint _depthMap;
+
+		// dir light
+		glm::mat4 _lightOrtho;
+		glm::mat4 _lightView;
+		glm::mat4 _lightSpace;
 	};
 }
 
