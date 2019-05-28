@@ -50,43 +50,75 @@ void init() {
 				Shaders
 	=====================================================================================*/
 
-    ShaderSource bpV = ShaderSource(VERTEX_SHADER, "bpV", getAssetSource("shaders/BlinnPhong.vs"));
-    ShaderSource bpF = ShaderSource(FRAGMENT_SHADER, "bpF", getAssetSource("shaders/BlinnPhong.fs"));
-    bpV.inject(std::string("#version 320 es\n") +
+    ShaderSource vBP = ShaderSource(VERTEX_SHADER, "vBP", getAssetSource("shaders/BlinnPhong.vs"));
+    ShaderSource fBP = ShaderSource(FRAGMENT_SHADER, "fBP", getAssetSource("shaders/BlinnPhong.fs"));
+    vBP.inject(std::string("#version 320 es\n") +
                std::string("#extension GL_EXT_shader_io_blocks : enable\n"));
 
-    bpF.inject(std::string("#version 320 es\n") +
+    fBP.inject(std::string("#version 320 es\n") +
                std::string("#extension GL_EXT_shader_io_blocks : enable\n") +
                std::string("precision highp float;\n") +
                std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n");
-    bpV.compile();
-    bpF.compile();
+    vBP.compile();
+    fBP.compile();
 
-    ShaderSource bptV = ShaderSource(VERTEX_SHADER, "bptV", getAssetSource("shaders/BlinnPhongTex.vs"));
-    ShaderSource bptF = ShaderSource(FRAGMENT_SHADER, "bptF", getAssetSource("shaders/BlinnPhongTex.fs"));
-    bptV.inject(std::string("#version 320 es\n") +
+    ShaderSource vBPTex = ShaderSource(VERTEX_SHADER, "vBPTex", getAssetSource("shaders/BlinnPhongTex.vs"));
+    ShaderSource fBPTex = ShaderSource(FRAGMENT_SHADER, "fBPTex", getAssetSource("shaders/BlinnPhongTex.fs"));
+    vBPTex.inject(std::string("#version 320 es\n") +
                std::string("#extension GL_EXT_shader_io_blocks : enable\n"));
 
-    bptF.inject(std::string("#version 320 es\n") +
+    fBPTex.inject(std::string("#version 320 es\n") +
                std::string("#extension GL_EXT_shader_io_blocks : enable\n") +
                std::string("precision highp float;\n") +
                std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n");
-    bptV.compile();
-    bptF.compile();
+    vBPTex.compile();
+    fBPTex.compile();
+
+    ShaderSource vSM = ShaderSource(VERTEX_SHADER, "vSM",getAssetSource("shaders/ShadowMap.vs"));
+    ShaderSource fSM = ShaderSource(FRAGMENT_SHADER, "fSM", getAssetSource("shaders/ShadowMap.fs"));
+    vSM.inject(std::string("#version 320 es\n"));
+    fSM.inject(std::string("#version 320 es\n"));
+    vSM.compile();
+    fSM.compile();
+
+    ShaderSource vOSM = ShaderSource(VERTEX_SHADER, "vOSM", getAssetSource("shaders/OmniShadowMap.vs"));
+    ShaderSource gOSM = ShaderSource(GEOMETRY_SHADER, "gOSM", getAssetSource("shaders/OmniShadowMap.gs"));
+    ShaderSource fOSM = ShaderSource(FRAGMENT_SHADER, "fOSM", getAssetSource("shaders/OmniShadowMap.fs"));
+    vOSM.inject(std::string("#version 320 es\n"));
+    gOSM.inject(std::string("#version 320 es\n"));
+    fOSM.inject(std::string("#version 320 es\n") + std::string("precision highp float;\n"));
+    vOSM.compile();
+    gOSM.compile();
+    fOSM.compile();
 
     sref<Shader> BlinnPhong = make_sref<Shader>("BlinnPhong");
-    BlinnPhong->addShader(bpV);
-    BlinnPhong->addShader(bpF);
+    BlinnPhong->addShader(vBP);
+    BlinnPhong->addShader(fBP);
     BlinnPhong->link();
     RM.addShader("BlinnPhong", BlinnPhong);
     glApp->addProgram(BlinnPhong->id());
 
     sref<Shader> BlinnPhongTex = make_sref<Shader>("BlinnPhongTex");
-    BlinnPhongTex->addShader(bptV);
-    BlinnPhongTex->addShader(bptF);
+    BlinnPhongTex->addShader(vBPTex);
+    BlinnPhongTex->addShader(fBPTex);
     BlinnPhongTex->link();
     RM.addShader("BlinnPhongTex", BlinnPhongTex);
     glApp->addProgram(BlinnPhongTex->id());
+
+    sref<Shader> ShadowMap = make_sref<Shader>("ShadowMap");
+    ShadowMap->addShader(vSM);
+    ShadowMap->addShader(fSM);
+    ShadowMap->link();
+    RM.addShader("ShadowMap", ShadowMap);
+    //glApp->addProgram(ShadowMap->id());
+
+    sref<Shader> OmniShadowMap = make_sref<Shader>("OmniShadowMap");
+    OmniShadowMap->addShader(vOSM);
+    OmniShadowMap->addShader(gOSM);
+    OmniShadowMap->addShader(fOSM);
+    OmniShadowMap->link();
+    RM.addShader("OmniShadowMap", OmniShadowMap);
+    //glApp->addProgram(OmniShadowMap->id());
 
     checkOpenGLError("Error during shader loading and setup!");
     LOG("Shaders loaded...\n");
@@ -95,7 +127,9 @@ void init() {
             Textures
     =====================================================================================*/
 
+    /** /
     loadTextures("models/crytek sponza/textures", "png", "textures\\");
+    /**/
 
     checkOpenGLError("Error during texture loading!");
     LOG("Textures loaded...\n");
@@ -104,7 +138,11 @@ void init() {
             Models
 	=====================================================================================*/
 
-    /**/
+    sref<Model> demo_scene = make_sref<Model>("demo_scene");
+    demo_scene->loadFromMemory(getAssetSource("models/demo scene open/demo_scene.obj"), getAssetSource("models/demo scene open/demo_scene.mtl"));
+    RM.addModel("demo_scene", demo_scene);
+
+    /** /
     sref<Model> sponza = make_sref<Model>("sponza");
     sponza->loadFromMemory(getAssetSource("models/crytek sponza/sponza.obj"), getAssetSource("models/crytek sponza/sponza.mtl"));
     RM.addModel("sponza", sponza);

@@ -77,6 +77,12 @@ float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
 
 out vec4 outColor;
 
+float LinearizeDepth(float depth)
+{
+    float z = depth * 2.0 - 1.0; // Back to NDC 
+    return (2.0 * 0.1 * 1000.0) / (1000.0 + 0.1 - z * (1000.0 - 0.1));
+}
+
 void main(void) {
 
 	/**/
@@ -107,6 +113,7 @@ void main(void) {
 			if(theta <= lights[i].cutoff){
 				continue;
 			}
+			shadow = shadowFactor(vsIn.lightSpacePosition, N, L);
 		}
 
 		vec3 H = normalize(L + V);

@@ -2,6 +2,7 @@
 #define __RSM_SPOTLIGHT_H__
 
 #include "Light.h"
+#include "Graphics\Texture.h"
 
 namespace rsm {
 
@@ -18,6 +19,12 @@ namespace rsm {
 
 		void toData(LightData& data) const override;
 
+		// shadow mapping
+		GLenum depthMapType() override;
+		void prepare(int resolution) override;
+		void uploadSpatialData(GLuint program) override;
+		void uploadShadowMapData(GLuint program) override;
+
 	private:
 		float _linearAttenuation;
 		float _quadraticAttenuation;
@@ -26,6 +33,10 @@ namespace rsm {
 		// cutoff is passed in constructor in degrees
 		// but it is stored as cosine(cutoff)
 		float _cutoff;
+
+		// shadow mapping
+		glm::mat4 _viewMatrix;
+		glm::mat4 _viewProjMatrix;
 	};
 
 }

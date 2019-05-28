@@ -3,6 +3,7 @@ in FragData {
 	vec3 position;
 	vec3 normal; 
 	vec2 texCoords;
+	vec4 lightSpacePosition;
 } vsIn;
 
 struct Light {
@@ -32,27 +33,79 @@ uniform vec3 diffuse;
 uniform vec3 specular;
 uniform float shininess;
 
+// shadow mapping
+uniform sampler2D shadowMap;
+uniform samplerCube shadowCubeMap;
+
+uniform float far;
+
+float shadowFactor(vec3 fragPos, vec3 lightPos){
+	vec3 fragToLight = fragPos - lightPos;
+	float closestDepth = texture(shadowCubeMap, fragToLight).r;
+	closestDepth *= far;
+	float currentDepth = length(fragToLight);
+
+	float shadow = currentDepth > closestDepth  ? 0.0 : 1.0;
+    return shadow;
+}
+
+float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
+	// perform perspective divide: clip space-> normalized device coords (done automatically for gl_Position)
+    vec3 projCoords = lightSpacePosition.xyz / lightSpacePosition.w;
+    // bring from [-1,1] to [0,1]
+    projCoords = projCoords * 0.5 + 0.5;
+
+    if(projCoords.z > 1.0)
+        return 1.0;
+
+    float closestDepth = texture(shadowMap, projCoords.xy).r;
+    float currentDepth = projCoords.z; 
+
+    // shadow bias to reduce shadow acne -> for some reason shadows don't appear?
+    /** /
+    float bias = max(0.005 * (1.0 - dot(N,L)), 0.0005);
+    float shadow = currentDepth - bias > closestDepth  ? 0.0 : 1.0;
+    /**/
+
+    float shadow = currentDepth > closestDepth  ? 0.0 : 1.0;
+    return shadow;
+}
+
 /* ==============================================================================
         Stage Outputs
  ============================================================================== */
 
 out vec4 outColor;
 
+float LinearizeDepth(float depth)
+{
+    float z = depth * 2.0 - 1.0; // Back to NDC 
+    return (2.0 * 0.1 * 1000.0) / (1000.0 + 0.1 - z * (1000.0 - 0.1));
+}
+
 void main(void) {
 
+	/**/
 	vec3 V = normalize(ViewPos - vsIn.position);
 	vec3 N = vsIn.normal;
 	vec3 L;
+
+	float shadow = 1.0;
 
 	vec3 retColor = vec3(0.0);
 
 	for(int i=0; i < NUM_LIGHTS; i++){
 
+		// Get Light Vector
 		if (lights[i].type == 0){
 			L = normalize(-lights[i].direction);
+
+			shadow = shadowFactor(vsIn.lightSpacePosition, N, L);
 		}
 		else {
 			L = normalize(lights[i].position - vsIn.position);
+
+			shadow = shadowFactor(vsIn.position, lights[i].position);
 		}
 
 		if (lights[i].type == 2){
@@ -60,6 +113,7 @@ void main(void) {
 			if(theta <= lights[i].cutoff){
 				continue;
 			}
+			shadow = shadowFactor(vsIn.lightSpacePosition, N, L);
 		}
 
 		vec3 H = normalize(L + V);
@@ -85,8 +139,17 @@ void main(void) {
 			}
 		}
 
-		retColor += diff + spec;
+		retColor += (diff + spec) * shadow;
 	}
 
 	outColor = vec4(retColor, 1.0);
+	/**/
+
+	/** /
+	vec3 fragToLight = vsIn.position - lights[0].position;
+	float closestDepth = texture(shadowCubeMap, fragToLight).r;
+	closestDepth *= far;
+
+	outColor = vec4(vec3(closestDepth / far), 1.0);
+	/**/
 }

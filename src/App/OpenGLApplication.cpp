@@ -74,7 +74,7 @@ void OpenGLApplication::prepare() {
 	// cube cam
 	/**/
 	_camera = make_sref<Perspective>(_width, _height,
-		vec3(5.0f, 5.0f, 5.0f),
+		vec3(-5.0f, 5.0f, 5.0f),
 		vec3(0.0f, 0.0f, 0.0f),
 		vec3(0.0f, 1.0f, 0.0f),
 		0.1f, 1000000.0f, 60.0f);
@@ -96,8 +96,9 @@ void OpenGLApplication::prepare() {
 	=====================================================================================*/
 
 	/** /
-	sref<SpotLight> spot = make_sref<SpotLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, 60.0f, glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0, 15.0f, 0));
+	sref<SpotLight> spot = make_sref<SpotLight>(glm::vec3(1.0f, 1.0f, 1.0f), 3.0f, 30.0f, glm::vec3(-0.5f, -1.0f, -0.5f), glm::vec3(2.0f, 8.0f, 2.0f));
 	_scene.addLight(spot);
+	spot->prepare(1024);
 	/**/
 
 	/**/
@@ -158,7 +159,7 @@ void OpenGLApplication::genDepthMaps() {
 	GLuint OSM = RM.getShader("OmniShadowMap")->id();
 	GLuint prog;
 
-	glCullFace(GL_FRONT);
+	//glCullFace(GL_FRONT);
 
 	const std::vector<sref<Light>>& lights = _scene.lights();
 	for (int l = 0; l < NUM_LIGHTS; l++) {
@@ -181,7 +182,7 @@ void OpenGLApplication::genDepthMaps() {
 		_scene.draw(prog);
 	}
 
-	glCullFace(GL_BACK);
+	//glCullFace(GL_BACK);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glUseProgram(0);
@@ -192,6 +193,7 @@ void OpenGLApplication::genDepthMaps() {
 void OpenGLApplication::render() { // receive objects and camera args
 	// Generate Depth Map
 	genDepthMaps();
+    checkOpenGLError("Error generating depth maps!");
 
 	// clear framebuffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -199,11 +201,14 @@ void OpenGLApplication::render() { // receive objects and camera args
 
 	// upload lights...
 	uploadLights();
+    checkOpenGLError("Error uploading lights data!");
 	// upload camera...
 	uploadCameraBuffer();
+    checkOpenGLError("Error uploading camera data!");
 
 	//upload shadow mapping data
 	uploadShadowMappingData();
+    checkOpenGLError("Error uploading shadow mapping data!");
 
 	// render objects...
 	_scene.render();

@@ -24,6 +24,8 @@ namespace rsm {
 
 	private:
 		glm::vec3 _direction;
+
+		// shadow mapping
 		glm::mat4 _viewMatrix;
 		glm::mat4 _viewProjMatrix;
 	};

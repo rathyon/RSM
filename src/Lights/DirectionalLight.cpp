@@ -45,7 +45,7 @@ void DirectionalLight::prepare(int resolution) {
 
 	glGenTextures(1, &_depthMap);
 	glBindTexture(OpenGLTexTargets[IMG_2D], _depthMap);
-	glTexImage2D(OpenGLTexTargets[IMG_2D], 0, GL_DEPTH_COMPONENT, _resolution, _resolution, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(OpenGLTexTargets[IMG_2D], 0, GL_DEPTH_COMPONENT32F, _resolution, _resolution, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(OpenGLTexTargets[IMG_2D], GL_TEXTURE_WRAP_S, OpenGLTexWrapping[CLAMP_BORDER]);
 	glTexParameteri(OpenGLTexTargets[IMG_2D], GL_TEXTURE_WRAP_T, OpenGLTexWrapping[CLAMP_BORDER]);
 	glTexParameteri(OpenGLTexTargets[IMG_2D], GL_TEXTURE_MIN_FILTER, OpenGLTexFilters[NEAREST]);
@@ -57,7 +57,7 @@ void DirectionalLight::prepare(int resolution) {
 
 	glBindFramebuffer(GL_FRAMEBUFFER, _depthMapFBO);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthMap, 0);
-	glDrawBuffer(GL_NONE);
+	glDrawBuffers(0, GL_NONE);
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

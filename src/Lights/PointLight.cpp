@@ -39,6 +39,7 @@ GLenum PointLight::depthMapType() {
 	return OpenGLTexTargets[IMG_CUBE];
 }
 
+// TODO: add far as argument/parameter
 void PointLight::prepare(int resolution) {
 	_resolution = resolution;
 	_far = 100.0f;
@@ -50,8 +51,9 @@ void PointLight::prepare(int resolution) {
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, _depthMap);
 	for (int i = 0; i < 6; i++) {
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, _resolution, _resolution, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT32F, _resolution, _resolution, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	}
+
 	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -60,7 +62,7 @@ void PointLight::prepare(int resolution) {
 
 	glBindFramebuffer(GL_FRAMEBUFFER, _depthMapFBO);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, _depthMap, 0);
-	glDrawBuffer(GL_NONE);
+	glDrawBuffers(0, GL_NONE);
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	
