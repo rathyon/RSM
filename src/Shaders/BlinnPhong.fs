@@ -35,24 +35,33 @@ uniform float shininess;
 
 uniform sampler2D shadowMap;
 
-/* ==============================================================================
-        Stage Outputs
- ============================================================================== */
-
-out vec4 outColor;
-
-float shadowFactor(vec4 lightSpacePosition){
+float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
 	// perform perspective divide: clip space-> normalized device coords (done automatically for gl_Position)
     vec3 projCoords = lightSpacePosition.xyz / lightSpacePosition.w;
     // bring from [-1,1] to [0,1]
     projCoords = projCoords * 0.5 + 0.5;
 
+    if(projCoords.z > 1.0)
+        return 1.0;
+
     float closestDepth = texture(shadowMap, projCoords.xy).r;
     float currentDepth = projCoords.z; 
+
+    // shadow bias to reduce shadow acne -> for some reason shadows don't appear?
+    /** /
+    float bias = max(0.005 * (1.0 - dot(N,L)), 0.0005);
+    float shadow = currentDepth - bias > closestDepth  ? 0.0 : 1.0;
+    /**/
 
     float shadow = currentDepth > closestDepth  ? 0.0 : 1.0;
     return shadow;
 }
+
+/* ==============================================================================
+        Stage Outputs
+ ============================================================================== */
+
+out vec4 outColor;
 
 void main(void) {
 
@@ -103,7 +112,7 @@ void main(void) {
 			}
 		}
 
-		retColor += (diff + spec) * shadowFactor(vsIn.lightSpacePosition);
+		retColor += (diff + spec) * shadowFactor(vsIn.lightSpacePosition, N, L);
 	}
 
 	outColor = vec4(retColor, 1.0);

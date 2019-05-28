@@ -24,10 +24,13 @@ out FragData {
 
 void main()
 {
-	// Everything in world coordinates
+	// These in world coordinates
 	vsOut.position  = vec3(ModelMatrix * vec4(Position, 1.0));
 	vsOut.normal    = normalize(NormalMatrix * Normal);
 	vsOut.texCoords = TexCoords;
+
+	// These in light coordinates
+	vsOut.lightSpacePosition = lightSpaceMatrix * vec4(vsOut.position, 1.0);
 
 	// Return position in MVP coordinates
     gl_Position = ViewProjMatrix * vec4(vsOut.position, 1.0);

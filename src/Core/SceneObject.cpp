@@ -2,8 +2,6 @@
 
 using namespace rsm;
 
-// TODO create objToWorld matrix from the get-go
-
 SceneObject::SceneObject() {
 	_position = glm::vec3(0);
 	_objToWorld = glm::mat4(1);

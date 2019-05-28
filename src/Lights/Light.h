@@ -1,6 +1,7 @@
 #ifndef __RSM_LIGHT_H__
 #define __RSM_LIGHT_H__
 
+#include "Core\OpenGL.h"
 #include "Core\SceneObject.h"
 
 namespace rsm {
@@ -45,11 +46,31 @@ namespace rsm {
 
 		virtual void toData(LightData& data) const = 0;
 
+		// shadow mapping
+		glm::mat4 projMatrix() const;
+		glm::mat4 viewMatrix() const;
+		glm::mat4 viewProjMatrix() const;
+
+		int resolution() const;
+		GLuint depthMapFBO() const;
+		GLuint depthMap() const;
+
+		virtual void prepare(int resolution) = 0;
+
 	protected:
 		bool _on;
 		bool _shadows;
 		float _intensity;
 		glm::vec3 _emission;
+
+		// shadow mapping
+		int _resolution;
+		GLuint _depthMapFBO;
+		GLuint _depthMap;
+
+		glm::mat4 _projMatrix;
+		glm::mat4 _viewMatrix;
+		//glm::mat4 _viewProjMatrix; 
 	};
 
 }

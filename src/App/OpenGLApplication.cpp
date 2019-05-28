@@ -145,48 +145,38 @@ void OpenGLApplication::prepare() {
 	// Prepare shared buffers
 	prepareCameraBuffer();
 
-	/* ===================================================================================
-			Shadow Mapping
-	=====================================================================================*/
-	// prepare framebuffer and shadow map (texture)
-	glGenFramebuffers(1, &_depthMapFBO);
-
-	glGenTextures(1, &_depthMap);
-	glBindTexture(OpenGLTexTargets[IMG_2D], _depthMap);
-	glTexImage2D(OpenGLTexTargets[IMG_2D], 0, GL_DEPTH_COMPONENT, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glTexParameteri(OpenGLTexTargets[IMG_2D], GL_TEXTURE_WRAP_S, OpenGLTexWrapping[REPEAT]);
-	glTexParameteri(OpenGLTexTargets[IMG_2D], GL_TEXTURE_WRAP_T, OpenGLTexWrapping[REPEAT]);
-	glTexParameteri(OpenGLTexTargets[IMG_2D], GL_TEXTURE_MIN_FILTER, OpenGLTexFilters[NEAREST]);
-	glTexParameteri(OpenGLTexTargets[IMG_2D], GL_TEXTURE_MAG_FILTER, OpenGLTexFilters[NEAREST]);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, _depthMapFBO);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthMap, 0);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// each light source should be in charge of this
 	// this means genShadowMap must be called for each light
 	// which means each light must have its own framebuffer, texture, etc?
-	_lightOrtho = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 10000.0f);
-	_lightView = glm::lookAt(glm::vec3(10.0f, 10.0f, 10.0f),
-							 glm::vec3(0.0f, 0.0f, 0.0f),
-							 glm::vec3(0.0f, 1.0f, 0.0f));
-	_lightSpace = _lightOrtho * _lightView;
+
+	/* ===================================================================================
+			Shadow Mapping
+	=====================================================================================*/
+	// prepare framebuffer and shadow map (texture)
+	sun->prepare(1024);
 }
 
-void OpenGLApplication::genShadowMap() {
+void OpenGLApplication::genDepthMaps() {
 	sref<Shader> SM = RM.getShader("ShadowMap");
 	glUseProgram(SM->id());
-	glUniformMatrix4fv(glGetUniformLocation(SM->id(), "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(_lightSpace));
 
-	glViewport(0, 0, 1024, 1024);
-	glBindFramebuffer(GL_FRAMEBUFFER, _depthMapFBO);
-	glClear(GL_DEPTH_BUFFER_BIT);
+	glCullFace(GL_FRONT);
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, _depthMap);
-	_scene.draw(SM);
+	const std::vector<sref<Light>>& lights = _scene.lights();
+	for (int l = 0; l < NUM_LIGHTS; l++) {
+		glUniformMatrix4fv(glGetUniformLocation(SM->id(), "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lights[l]->viewProjMatrix()));
+
+		glViewport(0, 0, lights[l]->resolution(), lights[l]->resolution());
+		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->depthMapFBO());
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, lights[l]->depthMap());
+		_scene.draw(SM);
+	}
+
+	glCullFace(GL_BACK);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glUseProgram(0);
@@ -196,7 +186,7 @@ void OpenGLApplication::genShadowMap() {
 
 void OpenGLApplication::render() { // receive objects and camera args
 	// Generate Depth Map
-	genShadowMap();
+	genDepthMaps();
 
 	// clear framebuffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -282,8 +272,12 @@ void OpenGLApplication::uploadLights() {
 }
 
 void OpenGLApplication::uploadShadowMappingData() {
+	const std::vector<sref<Light>>& lights = _scene.lights();
+
 	for (GLuint prog : _programs) {
 		glUseProgram(prog);
-		glUniformMatrix4fv(glGetUniformLocation(prog, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(_lightSpace));
+		for (int l = 0; l < NUM_LIGHTS; l++) {
+			glUniformMatrix4fv(glGetUniformLocation(prog, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lights[l]->viewProjMatrix()));
+		}
 	}
 }
