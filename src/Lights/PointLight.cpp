@@ -34,3 +34,65 @@ void PointLight::toData(LightData& data) const {
 	data.state = _on;
 	data.cutoff = 0.0f;
 }
+
+GLenum PointLight::depthMapType() {
+	return OpenGLTexTargets[IMG_CUBE];
+}
+
+void PointLight::prepare(int resolution) {
+	_resolution = resolution;
+	_far = 100.0f;
+	// prepare framebuffer and shadow cubemap (texture)
+	glGenFramebuffers(1, &_depthMapFBO);
+
+	// IMPORTANT: depthMap is a CUBEMAP!
+	glGenTextures(1, &_depthMap);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, _depthMap);
+	for (int i = 0; i < 6; i++) {
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, _resolution, _resolution, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	}
+	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, _depthMapFBO);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, _depthMap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	
+	// aspect is 1.0f: Width == Height
+	// 90 degree FOV is important to properly align each face of the cubemap
+	_projMatrix = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, _far);
+
+	_viewProjMatrices.push_back(_projMatrix * 
+		glm::lookAt(_position, _position + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+	_viewProjMatrices.push_back(_projMatrix *
+		glm::lookAt(_position, _position + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+	_viewProjMatrices.push_back(_projMatrix *
+		glm::lookAt(_position, _position + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
+	_viewProjMatrices.push_back(_projMatrix *
+		glm::lookAt(_position, _position + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
+	_viewProjMatrices.push_back(_projMatrix *
+		glm::lookAt(_position, _position + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+	_viewProjMatrices.push_back(_projMatrix *
+		glm::lookAt(_position, _position + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+}
+
+void PointLight::uploadSpatialData(GLuint program) {
+
+	glUniform3fv(glGetUniformLocation(program, "lightPos"), 1, glm::value_ptr(_position));
+	glUniform1f(glGetUniformLocation(program, "far"), _far);
+
+	for (int i = 0; i < 6; i++) {
+		std::string name = "lightSpaceMatrices[" + std::to_string(i) + "]";
+		glUniformMatrix4fv(glGetUniformLocation(program, name.c_str()), 1, GL_FALSE, glm::value_ptr(_viewProjMatrices[i]));
+	}
+}
+
+void PointLight::uploadShadowMapData(GLuint program) {
+	glUniform1f(glGetUniformLocation(program, "far"), _far);
+}

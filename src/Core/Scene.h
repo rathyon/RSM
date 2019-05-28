@@ -23,7 +23,7 @@ namespace rsm {
 		const std::vector<sref<Model>>& models() const;
 
 		void render();
-		void draw(sref<Shader> program);
+		void draw(GLuint program);
 
 	private:
 		std::vector<sref<Camera>> _cameras;

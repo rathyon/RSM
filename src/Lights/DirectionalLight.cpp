@@ -26,8 +26,20 @@ void DirectionalLight::toData(LightData& data) const {
 	data.cutoff = 0.0f;
 }
 
+GLenum DirectionalLight::depthMapType() {
+	return OpenGLTexTargets[IMG_2D];
+}
+
 void DirectionalLight::prepare(int resolution) {
 	_resolution = resolution;
+
+	// shadow mapping for directional lights is weird, they need a "position" for generating the depth map...
+	_projMatrix = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 100000.0f);
+	_viewMatrix = glm::lookAt(_direction * -100.0f,
+		glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3(0.0f, 1.0f, 0.0f));
+	_viewProjMatrix = _projMatrix * _viewMatrix;
+
 	// prepare framebuffer and shadow map (texture)
 	glGenFramebuffers(1, &_depthMapFBO);
 
@@ -49,12 +61,13 @@ void DirectionalLight::prepare(int resolution) {
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	// shadow mapping for directional lights is weird, they need a "position" for generating the depth map...
-	_projMatrix = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 100000.0f);
-	_viewMatrix = glm::lookAt(_direction * -100.0f,
-		glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3(0.0f, 1.0f, 0.0f));
-	//_viewProjMatrix = _projMatrix * _viewMatrix;
-
 	checkOpenGLError("Error in preparing light source!");
+}
+
+void DirectionalLight::uploadSpatialData(GLuint program) {
+	glUniformMatrix4fv(glGetUniformLocation(program, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(_viewProjMatrix));
+}
+
+void DirectionalLight::uploadShadowMapData(GLuint program) {
+	uploadSpatialData(program);
 }

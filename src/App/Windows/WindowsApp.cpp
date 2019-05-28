@@ -92,6 +92,16 @@ void rsm::init(int argc, char* argv[]) {
 	vSM.compile();
 	fSM.compile();
 
+	ShaderSource vOSM = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/OmniShadowMap.vs");
+	ShaderSource gOSM = ShaderSource(GEOMETRY_SHADER, "../../../src/Shaders/OmniShadowMap.gs");
+	ShaderSource fOSM = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/OmniShadowMap.fs");
+	vOSM.inject(std::string("#version 330 core\n"));
+	gOSM.inject(std::string("#version 330 core\n"));
+	fOSM.inject(std::string("#version 330 core\n"));
+	vOSM.compile();
+	gOSM.compile();
+	fOSM.compile();
+
 	sref<Shader> BlinnPhong = make_sref<Shader>("BlinnPhong");
 	BlinnPhong->addShader(vBP);
 	BlinnPhong->addShader(fBP);
@@ -111,7 +121,15 @@ void rsm::init(int argc, char* argv[]) {
 	ShadowMap->addShader(fSM);
 	ShadowMap->link();
 	RM.addShader("ShadowMap", ShadowMap);
-	glApp->addProgram(ShadowMap->id());
+	//glApp->addProgram(ShadowMap->id());
+
+	sref<Shader> OmniShadowMap = make_sref<Shader>("OmniShadowMap");
+	OmniShadowMap->addShader(vOSM);
+	OmniShadowMap->addShader(gOSM);
+	OmniShadowMap->addShader(fOSM);
+	OmniShadowMap->link();
+	RM.addShader("OmniShadowMap", OmniShadowMap);
+	//glApp->addProgram(OmniShadowMap->id());
 
 	/* ===================================================================================
 				Materials

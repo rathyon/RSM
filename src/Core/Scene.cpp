@@ -34,7 +34,7 @@ void Scene::render() {
 	}
 }
 
-void Scene::draw(sref<Shader> program) {
+void Scene::draw(GLuint program) {
 	for (sref<Model> model : _models) {
 		model->draw(program);
 	}

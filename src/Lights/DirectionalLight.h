@@ -17,10 +17,15 @@ namespace rsm {
 		void toData(LightData& data) const override;
 
 		// shadow mapping
+		GLenum depthMapType() override;
 		void prepare(int resolution) override;
+		void uploadSpatialData(GLuint program) override;
+		void uploadShadowMapData(GLuint program) override;
 
 	private:
 		glm::vec3 _direction;
+		glm::mat4 _viewMatrix;
+		glm::mat4 _viewProjMatrix;
 	};
 
 }

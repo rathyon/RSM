@@ -100,14 +100,16 @@ void OpenGLApplication::prepare() {
 	_scene.addLight(spot);
 	/**/
 
-	/** /
-	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 3.0f, glm::vec3(-3.0f, 4.0f, 3.0f));
+	/**/
+	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 3.0f, glm::vec3(1.0f, 6.0f, 3.0f));
 	_scene.addLight(candle);
+	candle->prepare(1024);
 	/**/
 
-	/**/
+	/** /
 	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(-1.0f, -1.0f, -1.0f));
 	_scene.addLight(sun);
+	sun->prepare(1024);
 	/**/
 
 	/* ===================================================================================
@@ -149,31 +151,34 @@ void OpenGLApplication::prepare() {
 	// each light source should be in charge of this
 	// this means genShadowMap must be called for each light
 	// which means each light must have its own framebuffer, texture, etc?
-
-	/* ===================================================================================
-			Shadow Mapping
-	=====================================================================================*/
-	// prepare framebuffer and shadow map (texture)
-	sun->prepare(1024);
 }
 
 void OpenGLApplication::genDepthMaps() {
-	sref<Shader> SM = RM.getShader("ShadowMap");
-	glUseProgram(SM->id());
+	GLuint SM = RM.getShader("ShadowMap")->id();
+	GLuint OSM = RM.getShader("OmniShadowMap")->id();
+	GLuint prog;
 
 	glCullFace(GL_FRONT);
 
 	const std::vector<sref<Light>>& lights = _scene.lights();
 	for (int l = 0; l < NUM_LIGHTS; l++) {
-		glUniformMatrix4fv(glGetUniformLocation(SM->id(), "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lights[l]->viewProjMatrix()));
+		// if directional light or spotlight
+		if (lights[l]->depthMapType() == OpenGLTexTargets[IMG_2D]) {
+			prog = SM;
+		}
+		else {
+			prog = OSM;
+		}
+
+		glUseProgram(prog);
+
+		lights[l]->uploadSpatialData(prog);
 
 		glViewport(0, 0, lights[l]->resolution(), lights[l]->resolution());
 		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->depthMapFBO());
 		glClear(GL_DEPTH_BUFFER_BIT);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, lights[l]->depthMap());
-		_scene.draw(SM);
+		_scene.draw(prog);
 	}
 
 	glCullFace(GL_BACK);
@@ -277,7 +282,21 @@ void OpenGLApplication::uploadShadowMappingData() {
 	for (GLuint prog : _programs) {
 		glUseProgram(prog);
 		for (int l = 0; l < NUM_LIGHTS; l++) {
-			glUniformMatrix4fv(glGetUniformLocation(prog, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lights[l]->viewProjMatrix()));
+			lights[l]->uploadShadowMapData(prog);
+
+			// TODO: define Tex Unit number for depth maps
+			if (lights[l]->depthMapType() == OpenGLTexTargets[IMG_2D]) {
+
+				glActiveTexture(GL_TEXTURE1);
+				glBindTexture(lights[l]->depthMapType(), lights[l]->depthMap());
+				glUniform1i(glGetUniformLocation(prog, "shadowMap"), 1);
+			}
+			else {
+				glActiveTexture(GL_TEXTURE2);
+				glBindTexture(lights[l]->depthMapType(), lights[l]->depthMap());
+				glUniform1i(glGetUniformLocation(prog, "shadowCubeMap"), 2);
+			}
+
 		}
 	}
 }

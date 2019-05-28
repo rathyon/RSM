@@ -33,7 +33,21 @@ uniform vec3 diffuse;
 uniform vec3 specular;
 uniform float shininess;
 
+// shadow mapping
 uniform sampler2D shadowMap;
+uniform samplerCube shadowCubeMap;
+
+uniform float far;
+
+float shadowFactor(vec3 fragPos, vec3 lightPos){
+	vec3 fragToLight = fragPos - lightPos;
+	float closestDepth = texture(shadowCubeMap, fragToLight).r;
+	closestDepth *= far;
+	float currentDepth = length(fragToLight);
+
+	float shadow = currentDepth > closestDepth  ? 0.0 : 1.0;
+    return shadow;
+}
 
 float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
 	// perform perspective divide: clip space-> normalized device coords (done automatically for gl_Position)
@@ -70,6 +84,8 @@ void main(void) {
 	vec3 N = vsIn.normal;
 	vec3 L;
 
+	float shadow = 1.0;
+
 	vec3 retColor = vec3(0.0);
 
 	for(int i=0; i < NUM_LIGHTS; i++){
@@ -77,9 +93,13 @@ void main(void) {
 		// Get Light Vector
 		if (lights[i].type == 0){
 			L = normalize(-lights[i].direction);
+
+			shadow = shadowFactor(vsIn.lightSpacePosition, N, L);
 		}
 		else {
 			L = normalize(lights[i].position - vsIn.position);
+
+			shadow = shadowFactor(vsIn.position, lights[i].position);
 		}
 
 		if (lights[i].type == 2){
@@ -112,14 +132,17 @@ void main(void) {
 			}
 		}
 
-		retColor += (diff + spec) * shadowFactor(vsIn.lightSpacePosition, N, L);
+		retColor += (diff + spec) * shadow;
 	}
 
 	outColor = vec4(retColor, 1.0);
 	/**/
 
 	/** /
-	float depth = texture(shadowMap, vsIn.texCoords).r;
-	outColor = vec4(vec3(depth), 1.0);
+	vec3 fragToLight = vsIn.position - lights[0].position;
+	float closestDepth = texture(shadowCubeMap, fragToLight).r;
+	closestDepth *= far;
+
+	outColor = vec4(vec3(closestDepth / far), 1.0);
 	/**/
 }

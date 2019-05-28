@@ -29,7 +29,7 @@ namespace rsm {
 
 		void prepare();
 		void render();
-		void draw(sref<Shader> program);
+		void draw(GLuint program);
 
 	private:
 		std::string _name;

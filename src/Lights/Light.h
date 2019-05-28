@@ -48,14 +48,15 @@ namespace rsm {
 
 		// shadow mapping
 		glm::mat4 projMatrix() const;
-		glm::mat4 viewMatrix() const;
-		glm::mat4 viewProjMatrix() const;
 
 		int resolution() const;
 		GLuint depthMapFBO() const;
 		GLuint depthMap() const;
 
+		virtual GLenum depthMapType() = 0;
 		virtual void prepare(int resolution) = 0;
+		virtual void uploadSpatialData(GLuint program) = 0;
+		virtual void uploadShadowMapData(GLuint program) = 0;
 
 	protected:
 		bool _on;
@@ -69,8 +70,6 @@ namespace rsm {
 		GLuint _depthMap;
 
 		glm::mat4 _projMatrix;
-		glm::mat4 _viewMatrix;
-		//glm::mat4 _viewProjMatrix; 
 	};
 
 }

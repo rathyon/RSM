@@ -45,12 +45,6 @@ void Light::setEmission(glm::vec3& emission) {
 glm::mat4 Light::projMatrix() const {
 	return _projMatrix;
 }
-glm::mat4 Light::viewMatrix() const {
-	return _viewMatrix;
-}
-glm::mat4 Light::viewProjMatrix() const {
-	return projMatrix() * viewMatrix();
-}
 
 int Light::resolution() const {
 	return _resolution;

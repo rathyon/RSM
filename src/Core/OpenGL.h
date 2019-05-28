@@ -22,7 +22,7 @@
 const GLenum OpenGLShaderType[]{
 	GL_VERTEX_SHADER,
 	GL_FRAGMENT_SHADER,
-	//GL_GEOMETRY_SHADER, // OpenGL ES doesn't have it ?
+	GL_GEOMETRY_SHADER,
 	//GL_COMPUTE_SHADER	// OpenGL ES doesn't have it ?
 };
 

@@ -2,6 +2,7 @@
 #define __RSM_POINTLIGHT_H__
 
 #include "Light.h"
+#include "Graphics\Image.h"
 
 namespace rsm {
 
@@ -13,10 +14,21 @@ namespace rsm {
 		PointLight(const glm::vec3& emission, float intensity, const glm::vec3& position, float linearAttenuation, float quadraticAttenuation);
 
 		void toData(LightData& data) const override;
+
+		// shadow mapping
+		GLenum depthMapType() override;
+		void prepare(int resolution) override;
+		void uploadSpatialData(GLuint program) override;
+		void uploadShadowMapData(GLuint program) override;
+
 	private:
 		float _linearAttenuation;
 		float _quadraticAttenuation;
-	
+
+		// shadow mapping
+		float _far;
+		// precomputed V * P matrices
+		std::vector<glm::mat4> _viewProjMatrices;
 	};
 
 }

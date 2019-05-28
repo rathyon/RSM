@@ -98,9 +98,9 @@ void Mesh::render(glm::mat4& objToWorld, glm::mat3 normalMatrix) {
 	glUseProgram(0);
 }
 
-void Mesh::draw(glm::mat4& objToWorld, sref<Shader> program) {
+void Mesh::draw(glm::mat4& objToWorld, GLuint program) {
 
-	glUniformMatrix4fv(glGetUniformLocation(program->id(), "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(objToWorld));
+	glUniformMatrix4fv(glGetUniformLocation(program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(objToWorld));
 	glBindVertexArray(_VAO);
 	glDrawArrays(GL_TRIANGLES, 0, _vertices.size());
 	glBindVertexArray(0);
