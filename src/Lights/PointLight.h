@@ -21,6 +21,8 @@ namespace rsm {
 		void uploadSpatialData(GLuint program) override;
 		void uploadShadowMapData(GLuint program) override;
 
+		void updateMatrix() override;
+
 	private:
 		float _linearAttenuation;
 		float _quadraticAttenuation;

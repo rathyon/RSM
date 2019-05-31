@@ -110,3 +110,11 @@ void SpotLight::uploadSpatialData(GLuint program) {
 void SpotLight::uploadShadowMapData(GLuint program) {
 	uploadSpatialData(program);
 }
+
+void SpotLight::updateMatrix() {
+	_projMatrix = glm::perspective(glm::acos(_cutoff), 1.0f, 0.1f, 1000.0f);
+	_viewMatrix = glm::lookAt(_position,
+		_position + _direction,
+		glm::vec3(0.0f, 1.0f, 0.0f));
+	_viewProjMatrix = _projMatrix * _viewMatrix;
+}

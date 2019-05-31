@@ -23,7 +23,7 @@ const GLenum OpenGLShaderType[]{
 	GL_VERTEX_SHADER,
 	GL_FRAGMENT_SHADER,
 	GL_GEOMETRY_SHADER,
-	//GL_COMPUTE_SHADER	// OpenGL ES doesn't have it ?
+	GL_COMPUTE_SHADER
 };
 
 // Exists because of OpenGL ES 3.0's API regarding glTexImage2D

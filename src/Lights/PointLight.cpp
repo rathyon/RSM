@@ -51,7 +51,7 @@ void PointLight::prepare(int resolution) {
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, _depthMap);
 	for (int i = 0; i < 6; i++) {
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT32F, _resolution, _resolution, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT24, _resolution, _resolution, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
 	}
 
 	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -59,6 +59,8 @@ void PointLight::prepare(int resolution) {
 	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	//glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+	//glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, _depthMapFBO);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, _depthMap, 0);
@@ -97,4 +99,21 @@ void PointLight::uploadSpatialData(GLuint program) {
 
 void PointLight::uploadShadowMapData(GLuint program) {
 	glUniform1f(glGetUniformLocation(program, "far"), _far);
+}
+
+void PointLight::updateMatrix() {
+	_viewProjMatrices.clear();
+
+	_viewProjMatrices.push_back(_projMatrix *
+		glm::lookAt(_position, _position + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+	_viewProjMatrices.push_back(_projMatrix *
+		glm::lookAt(_position, _position + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+	_viewProjMatrices.push_back(_projMatrix *
+		glm::lookAt(_position, _position + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
+	_viewProjMatrices.push_back(_projMatrix *
+		glm::lookAt(_position, _position + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
+	_viewProjMatrices.push_back(_projMatrix *
+		glm::lookAt(_position, _position + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+	_viewProjMatrices.push_back(_projMatrix *
+		glm::lookAt(_position, _position + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
 }

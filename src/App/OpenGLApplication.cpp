@@ -74,10 +74,10 @@ void OpenGLApplication::prepare() {
 	// cube cam
 	/**/
 	_camera = make_sref<Perspective>(_width, _height,
-		vec3(-5.0f, 5.0f, 5.0f),
+		vec3(5.0f, 5.0f, 5.0f),
 		vec3(0.0f, 0.0f, 0.0f),
 		vec3(0.0f, 1.0f, 0.0f),
-		0.1f, 1000000.0f, 60.0f);
+		0.1f, 1000.0f, 60.0f);
 	/**/
 
 	// sponza cam
@@ -86,7 +86,7 @@ void OpenGLApplication::prepare() {
          vec3(0.0f, 15.0f, 0.0f),
          vec3(-15.0f, 15.0f, 0.0f),
          vec3(0.0f, 1.0f, 0.0f),
-         0.1f, 1000000.0f, 60.0f);
+         0.1f, 100000.0f, 60.0f);
 	/**/
 
 	_scene.addCamera(_camera);
@@ -102,13 +102,13 @@ void OpenGLApplication::prepare() {
 	/**/
 
 	/**/
-	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 3.0f, glm::vec3(1.0f, 6.0f, 3.0f));
+	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 5.0f, glm::vec3(0.0f, 5.0f, 0.0f));
 	_scene.addLight(candle);
 	candle->prepare(1024);
 	/**/
 
 	/** /
-	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(-1.0f, -1.0f, -1.0f));
+	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(1.0f, -1.0f, -1.0f));
 	_scene.addLight(sun);
 	sun->prepare(1024);
 	/**/
@@ -159,7 +159,7 @@ void OpenGLApplication::genDepthMaps() {
 	GLuint OSM = RM.getShader("OmniShadowMap")->id();
 	GLuint prog;
 
-	//glCullFace(GL_FRONT);
+	glCullFace(GL_FRONT);
 
 	const std::vector<sref<Light>>& lights = _scene.lights();
 	for (int l = 0; l < NUM_LIGHTS; l++) {
@@ -182,7 +182,7 @@ void OpenGLApplication::genDepthMaps() {
 		_scene.draw(prog);
 	}
 
-	//glCullFace(GL_BACK);
+	glCullFace(GL_BACK);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glUseProgram(0);

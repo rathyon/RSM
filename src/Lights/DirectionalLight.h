@@ -22,6 +22,8 @@ namespace rsm {
 		void uploadSpatialData(GLuint program) override;
 		void uploadShadowMapData(GLuint program) override;
 
+		void updateMatrix() override;
+
 	private:
 		glm::vec3 _direction;
 

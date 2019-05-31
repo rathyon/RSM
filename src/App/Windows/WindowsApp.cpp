@@ -102,6 +102,13 @@ void rsm::init(int argc, char* argv[]) {
 	gOSM.compile();
 	fOSM.compile();
 
+	ShaderSource vFBOD = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/FBODebugger.vs");
+	ShaderSource fFBOD = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/FBODebugger.fs");
+	vFBOD.inject(std::string("#version 330 core\n"));
+	fFBOD.inject(std::string("#version 330 core\n"));
+	vFBOD.compile();
+	fFBOD.compile();
+
 	sref<Shader> BlinnPhong = make_sref<Shader>("BlinnPhong");
 	BlinnPhong->addShader(vBP);
 	BlinnPhong->addShader(fBP);
@@ -130,6 +137,12 @@ void rsm::init(int argc, char* argv[]) {
 	OmniShadowMap->link();
 	RM.addShader("OmniShadowMap", OmniShadowMap);
 	//glApp->addProgram(OmniShadowMap->id());
+
+	sref<Shader> FBODebugger = make_sref<Shader>("FBODebugger");
+	FBODebugger->addShader(vFBOD);
+	FBODebugger->addShader(fFBOD);
+	FBODebugger->link();
+	RM.addShader("FBODebugger", FBODebugger);
 
 	/* ===================================================================================
 				Materials
@@ -167,14 +180,6 @@ void rsm::init(int argc, char* argv[]) {
 	cube->setMaterial(bp_test);
 	/**/
 
-	// NOTE: for some reason this sponza doesn't behave well...
-	/** /
-	sref<Model> sponza = make_sref<Model>("sponza");
-	sponza->loadFromFile("../../../assets/models/sponza/sponza.obj", "../../../assets/models/sponza");
-	RM.addModel("sponza", sponza);
-	//sponza->setMaterial(bp_test);
-	/**/
-
 	/** /
 	sref<Model> sponza = make_sref<Model>("sponza");
 	sponza->loadFromFile("../../../assets/models/crytek sponza/sponza.obj", "../../../assets/models/crytek sponza/");
@@ -193,6 +198,11 @@ void rsm::init(int argc, char* argv[]) {
 	RM.addModel("demo_scene", demo_scene);
 	/**/
 
+	/** /
+	sref<Model> demo_scene = make_sref<Model>("demo_scene");
+	demo_scene->loadFromFile("../../../assets/models/demo scene closed/demo_scene.obj", "../../../assets/models/demo scene closed/");
+	RM.addModel("demo_scene", demo_scene);
+	/**/
 
 	/**/
 
@@ -230,6 +240,24 @@ void rsm::update() {
 		glApp->getCamera()->setPosition(glApp->getCamera()->position() + glm::normalize(moveDir) * dt * 10.0f);
 		glApp->getCamera()->updateViewMatrix();
 	}
+
+	/**/
+
+	// debug for point light
+	/** /
+	sref<Light> light = glApp->getScene().lights()[0];
+	if (keys['i'])
+		light->setPosition(light->position() + glm::vec3(0.0f, 0.0f, 0.05f));
+	else if (keys['k'])
+		light->setPosition(light->position() + glm::vec3(0.0f, 0.0f, -0.05f));
+
+	if (keys['j'])
+		light->setPosition(light->position() + glm::vec3(-0.05f, 0.0f, 0.0f));
+	else if (keys['l'])
+		light->setPosition(light->position() + glm::vec3(0.05f, 0.0f, 0.0f));
+
+	light->updateMatrix();
+	/**/
 
 	glApp->update(dt);
 }
