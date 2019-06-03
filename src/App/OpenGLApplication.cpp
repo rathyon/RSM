@@ -104,13 +104,13 @@ void OpenGLApplication::prepare() {
 	/**/
 	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 5.0f, glm::vec3(0.0f, 5.0f, 0.0f));
 	_scene.addLight(candle);
-	candle->prepare(1024);
+	candle->prepare(2048);
 	/**/
 
 	/** /
 	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(1.0f, -1.0f, -1.0f));
 	_scene.addLight(sun);
-	sun->prepare(1024);
+	sun->prepare(2048);
 	/**/
 
 	/* ===================================================================================

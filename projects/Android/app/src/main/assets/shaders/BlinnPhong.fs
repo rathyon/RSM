@@ -103,7 +103,7 @@ float LinearizeDepth(float depth)
 
 void main(void) {
 
-	/**/
+	/** /
 	vec3 V = normalize(ViewPos - vsIn.position);
 	vec3 N = vsIn.normal;
 	vec3 L;
@@ -171,7 +171,7 @@ void main(void) {
 	/**/
 
 	// Debug for PointLight shadow mapping
-	/** /
+	/**/
 	outColor = vec4(vec3(debugShadowFactor(vsIn.position, lights[0].position)), 1.0);
 	/**/
 }

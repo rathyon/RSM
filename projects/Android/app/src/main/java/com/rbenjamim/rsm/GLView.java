@@ -20,6 +20,7 @@ public class GLView extends GLSurfaceView {
         super(context);
         assetManager = aMgr;
 
+        setEGLConfigChooser(true);
         setEGLConfigChooser(RED_BITS, GREEN_BITS, BLUE_BITS, ALPHA_BITS, DEPTH_BITS, STENCIL_BITS);
         //setEGLConfigChooser(new ConfigChooser());
         setEGLContextClientVersion(EGL_VERSION);
@@ -44,15 +45,28 @@ public class GLView extends GLSurfaceView {
         }
     }
 
+    protected class ConfigChooser implements GLSurfaceView.EGLConfigChooser
+    {
+        public EGLConfig chooseConfig(EGL10 egl, EGLDisplay display)
+        {
+            int configAttributes[] = {EGL10.EGL_RED_SIZE, RED_BITS,
+                    EGL10.EGL_GREEN_SIZE, GREEN_BITS,
+                    EGL10.EGL_BLUE_SIZE, BLUE_BITS,
+                    EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+                    EGL10.EGL_SAMPLES, SAMPLE_BITS,
+                    EGL10.EGL_DEPTH_SIZE, DEPTH_BITS,
+                    EGL10.EGL_STENCIL_SIZE, STENCIL_BITS,
+                    EGL10.EGL_NONE};
+            int num_config[] = new int[1];
 
-    // TODO Implement Config Chooser for OpenGL ES settings
-/** /
-    private static class ConfigChooser implements  GLSurfaceView.EGLConfigChooser {
+            egl.eglChooseConfig(display, configAttributes, null, 0, num_config);
 
-        @Override
-        public EGLConfig chooseConfig(EGL10 gl, EGLDisplay display) {
+            int       numConfigs = num_config[0];
+            EGLConfig configs[]  = new EGLConfig[numConfigs];
 
+            egl.eglChooseConfig(display, configAttributes, configs, numConfigs, num_config);
+
+            return configs[0];
         }
     }
-    /**/
 }
