@@ -24,6 +24,7 @@ uniform cameraBlock {
 	mat4 ViewProjMatrix;
 	vec3 ViewPos;
 };
+uniform float far;
 
 uniform Light lights[NUM_LIGHTS];
 
@@ -34,14 +35,14 @@ uniform vec3 specular;
 uniform float shininess;
 
 // shadow mapping
-uniform sampler2D shadowMap;
-uniform samplerCube shadowCubeMap;
-
-uniform float far;
+uniform sampler2D depthMap;
+uniform samplerCube depthCubeMap;
+// reflective shadow mapping
+uniform sampler2D WSCMap;
 
 float debugShadowFactor(vec3 fragPos, vec3 lightPos){
 	vec3 fragToLight = fragPos - lightPos;
-	float closestDepth = texture(shadowCubeMap, fragToLight).r;
+	float closestDepth = texture(depthCubeMap, fragToLight).r;
 	return closestDepth;
 }
 
@@ -52,14 +53,14 @@ float debugShadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
     // bring from [-1,1] to [0,1]
     projCoords = projCoords * 0.5 + 0.5;
 
-    float closestDepth = texture(shadowMap, projCoords.xy).r;
+    float closestDepth = texture(depthMap, projCoords.xy).r;
     return closestDepth;
 }
 
 
 float shadowFactor(vec3 fragPos, vec3 lightPos){
 	vec3 fragToLight = fragPos - lightPos;
-	float closestDepth = texture(shadowCubeMap, fragToLight).r;
+	float closestDepth = texture(depthCubeMap, fragToLight).r;
 	closestDepth *= far;
 	float currentDepth = length(fragToLight);
 
@@ -76,7 +77,7 @@ float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
     if(projCoords.z > 1.0)
         return 1.0;
 
-    float closestDepth = texture(shadowMap, projCoords.xy).r;
+    float closestDepth = texture(depthMap, projCoords.xy).r;
     float currentDepth = projCoords.z; 
 
     // shadow bias to reduce shadow acne -> for some reason shadows don't appear?
@@ -174,4 +175,14 @@ void main(void) {
 	/** /
 	outColor = vec4(vec3(debugShadowFactor(vsIn.position, lights[0].position)), 1.0);
 	/**/
+
+	// Debug for WSCMap
+	/** /
+	vec3 projCoords = vsIn.lightSpacePosition.xyz / vsIn.lightSpacePosition.w;
+    // bring from [-1,1] to [0,1]
+    projCoords = projCoords * 0.5 + 0.5;
+
+    vec3 wsc = texture(WSCMap, projCoords.xy).rgb;
+    outColor = vec4(wsc, 1.0);
+    /**/
 }

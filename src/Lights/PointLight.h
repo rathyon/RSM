@@ -2,7 +2,7 @@
 #define __RSM_POINTLIGHT_H__
 
 #include "Light.h"
-#include "Graphics\Image.h"
+#include "Graphics/Image.h"
 
 namespace rsm {
 

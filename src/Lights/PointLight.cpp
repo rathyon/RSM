@@ -44,7 +44,7 @@ void PointLight::prepare(int resolution) {
 	_resolution = resolution;
 	_far = 100.0f;
 	// prepare framebuffer and shadow cubemap (texture)
-	glGenFramebuffers(1, &_depthMapFBO);
+	glGenFramebuffers(1, &_FBO);
 
 	// IMPORTANT: depthMap is a CUBEMAP!
 	glGenTextures(1, &_depthMap);
@@ -62,7 +62,7 @@ void PointLight::prepare(int resolution) {
 	//glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 	//glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, _depthMapFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, _FBO);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, _depthMap, 0);
 	glDrawBuffers(0, GL_NONE);
 	glReadBuffer(GL_NONE);

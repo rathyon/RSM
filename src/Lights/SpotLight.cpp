@@ -80,7 +80,7 @@ void SpotLight::prepare(int resolution) {
 	_viewProjMatrix = _projMatrix * _viewMatrix;
 
 	// prepare framebuffer and shadow map (texture)
-	glGenFramebuffers(1, &_depthMapFBO);
+	glGenFramebuffers(1, &_FBO);
 
 	glGenTextures(1, &_depthMap);
 	glBindTexture(OpenGLTexTargets[IMG_2D], _depthMap);
@@ -94,7 +94,7 @@ void SpotLight::prepare(int resolution) {
 	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, _depthMapFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, _FBO);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthMap, 0);
 	glDrawBuffers(0, GL_NONE);
 	glReadBuffer(GL_NONE);

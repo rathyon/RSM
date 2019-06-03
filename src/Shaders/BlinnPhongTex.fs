@@ -36,8 +36,8 @@ uniform float shininess;
 uniform sampler2D diffuseTex;
 
 // shadow mapping
-uniform sampler2D shadowMap;
-uniform samplerCube shadowCubeMap;
+uniform sampler2D depthMap;
+uniform samplerCube depthCubeMap;
 
 uniform float far;
 
@@ -62,7 +62,7 @@ vec3 fetchDiffuse(){
 
 float debugShadowFactor(vec3 fragPos, vec3 lightPos){
 	vec3 fragToLight = fragPos - lightPos;
-	float closestDepth = texture(shadowCubeMap, fragToLight).r;
+	float closestDepth = texture(depthCubeMap, fragToLight).r;
 	return closestDepth;
 }
 
@@ -73,13 +73,13 @@ float debugShadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
     // bring from [-1,1] to [0,1]
     projCoords = projCoords * 0.5 + 0.5;
 
-    float closestDepth = texture(shadowMap, projCoords.xy).r;
+    float closestDepth = texture(depthMap, projCoords.xy).r;
     return closestDepth;
 }
 
 float shadowFactor(vec3 fragPos, vec3 lightPos){
 	vec3 fragToLight = fragPos - lightPos;
-	float closestDepth = texture(shadowCubeMap, fragToLight).r;
+	float closestDepth = texture(depthCubeMap, fragToLight).r;
 	closestDepth *= far;
 	float currentDepth = length(fragToLight);
 
@@ -96,7 +96,7 @@ float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
     if(projCoords.z > 1.0)
         return 1.0;
 
-    float closestDepth = texture(shadowMap, projCoords.xy).r;
+    float closestDepth = texture(depthMap, projCoords.xy).r;
     float currentDepth = projCoords.z; 
 
     // shadow bias to reduce shadow acne -> for some reason shadows don't appear?

@@ -50,9 +50,23 @@ int Light::resolution() const {
 	return _resolution;
 }
 
-GLuint Light::depthMapFBO() const {
-	return _depthMapFBO;
+GLuint Light::FBO() const {
+	return _FBO;
 }
+
 GLuint Light::depthMap() const {
 	return _depthMap;
+}
+
+
+GLuint Light::WSCMap() const {
+	return _WSCMap;
+}
+
+GLuint Light::normalMap() const {
+	return _normalMap;
+}
+
+GLuint Light::fluxMap() const {
+	return _fluxMap;
 }

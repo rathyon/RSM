@@ -4,9 +4,9 @@
 #include <RSM.h>
 
 #include "Camera.h"
-#include "Lights\Light.h"
+#include "Lights/Light.h"
 #include "Model.h"
-#include "Graphics\Shader.h"
+#include "Graphics/Shader.h"
 
 namespace rsm {
 

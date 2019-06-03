@@ -2,7 +2,7 @@
 #define __RSM_DIRECTIONALLIGHT_H__
 
 #include "Light.h"
-#include "Graphics\Texture.h"
+#include "Graphics/Texture.h"
 
 namespace rsm {
 

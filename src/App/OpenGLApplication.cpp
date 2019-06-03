@@ -154,9 +154,11 @@ void OpenGLApplication::prepare() {
 	// which means each light must have its own framebuffer, texture, etc?
 }
 
-void OpenGLApplication::genDepthMaps() {
-	GLuint SM = RM.getShader("ShadowMap")->id();
-	GLuint OSM = RM.getShader("OmniShadowMap")->id();
+void OpenGLApplication::genRSMaps() {
+	GLuint DM = RM.getShader("DepthMap")->id();
+	GLuint ODM = RM.getShader("OmniDepthMap")->id();
+	GLuint WSCM = RM.getShader("WSCMap")->id();
+
 	GLuint prog;
 
 	glCullFace(GL_FRONT);
@@ -165,20 +167,18 @@ void OpenGLApplication::genDepthMaps() {
 	for (int l = 0; l < NUM_LIGHTS; l++) {
 		// if directional light or spotlight
 		if (lights[l]->depthMapType() == OpenGLTexTargets[IMG_2D]) {
-			prog = SM;
+			prog = DM;
 		}
 		else {
-			prog = OSM;
+			prog = ODM;
 		}
 
-		glUseProgram(prog);
-
-		lights[l]->uploadSpatialData(prog);
-
 		glViewport(0, 0, lights[l]->resolution(), lights[l]->resolution());
-		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->depthMapFBO());
-		glClear(GL_DEPTH_BUFFER_BIT);
 
+		glUseProgram(prog);
+		lights[l]->uploadSpatialData(prog);
+		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->FBO());
+		glClear(GL_DEPTH_BUFFER_BIT);
 		_scene.draw(prog);
 	}
 
@@ -192,7 +192,7 @@ void OpenGLApplication::genDepthMaps() {
 
 void OpenGLApplication::render() { // receive objects and camera args
 	// Generate Depth Map
-	genDepthMaps();
+	genRSMaps();
     checkOpenGLError("Error generating depth maps!");
 
 	// clear framebuffer
@@ -294,13 +294,19 @@ void OpenGLApplication::uploadShadowMappingData() {
 
 				glActiveTexture(GL_TEXTURE1);
 				glBindTexture(lights[l]->depthMapType(), lights[l]->depthMap());
-				glUniform1i(glGetUniformLocation(prog, "shadowMap"), 1);
+				glUniform1i(glGetUniformLocation(prog, "depthMap"), 1);
 			}
 			else {
 				glActiveTexture(GL_TEXTURE2);
 				glBindTexture(lights[l]->depthMapType(), lights[l]->depthMap());
-				glUniform1i(glGetUniformLocation(prog, "shadowCubeMap"), 2);
+				glUniform1i(glGetUniformLocation(prog, "depthCubeMap"), 2);
 			}
+
+			/** /
+			glActiveTexture(GL_TEXTURE3);
+			glBindTexture(OpenGLTexTargets[IMG_2D], lights[l]->WSCMap());
+			glUniform1i(glGetUniformLocation(prog, "WSCMap"), 3);
+			/**/
 
 		}
 	}

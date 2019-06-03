@@ -1,8 +1,8 @@
 #ifndef __RSM_LIGHT_H__
 #define __RSM_LIGHT_H__
 
-#include "Core\OpenGL.h"
-#include "Core\SceneObject.h"
+#include "Core/OpenGL.h"
+#include "Core/SceneObject.h"
 
 namespace rsm {
 
@@ -50,8 +50,14 @@ namespace rsm {
 		glm::mat4 projMatrix() const;
 
 		int resolution() const;
-		GLuint depthMapFBO() const;
+		GLuint FBO() const;
 		GLuint depthMap() const;
+
+		// reflective shadow mapping
+		GLuint WSCMap() const;
+		GLuint normalMap() const;
+		GLuint fluxMap() const;
+
 
 		virtual GLenum depthMapType() = 0;
 		virtual void prepare(int resolution) = 0;
@@ -66,8 +72,13 @@ namespace rsm {
 
 		// shadow mapping
 		int _resolution;
-		GLuint _depthMapFBO;
+		GLuint _FBO;
 		GLuint _depthMap;
+
+		// reflective shadow mapping
+		GLuint _WSCMap;
+		GLuint _normalMap;
+		GLuint _fluxMap;
 
 		glm::mat4 _projMatrix;
 	};

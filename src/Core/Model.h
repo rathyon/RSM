@@ -3,8 +3,8 @@
 
 #include "SceneObject.h"
 #include "Mesh.h"
-#include "Graphics\BlinnPhongMaterial.h"
-#include "Graphics\Texture.h"
+#include "Graphics/BlinnPhongMaterial.h"
+#include "Graphics/Texture.h"
 
 namespace rsm {
 

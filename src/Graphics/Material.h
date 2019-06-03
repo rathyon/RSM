@@ -2,8 +2,8 @@
 #define __RSM_MATERIAL_H__
 
 #include "RSM.h"
-#include "Core\OpenGL.h"
-#include "Math\RSMaths.h"
+#include "Core/OpenGL.h"
+#include "Math/RSMaths.h"
 
 using namespace glm;
 

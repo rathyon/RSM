@@ -1,19 +1,19 @@
 #ifndef __RSM_OGLAPP_H__
 #define __RSM_OGLAPP_H__
 
-#include "Core\OpenGL.h"
-#include "Core\Resources.h"
-#include "Core\Scene.h"
-#include "Core\Perspective.h"
-#include "Core\Model.h"
+#include "Core/OpenGL.h"
+#include "Core/Resources.h"
+#include "Core/Scene.h"
+#include "Core/Perspective.h"
+#include "Core/Model.h"
 
-#include "Lights\DirectionalLight.h"
-#include "Lights\PointLight.h"
-#include "Lights\SpotLight.h"
+#include "Lights/DirectionalLight.h"
+#include "Lights/PointLight.h"
+#include "Lights/SpotLight.h"
 
-#include "Graphics\Shader.h"
-#include "Graphics\BlinnPhongMaterial.h"
-#include "Graphics\Texture.h"
+#include "Graphics/Shader.h"
+#include "Graphics/BlinnPhongMaterial.h"
+#include "Graphics/Texture.h"
 
 namespace rsm {
 
@@ -38,7 +38,7 @@ namespace rsm {
 		Scene getScene();
 		sref<Camera> getCamera();
 
-		void genDepthMaps();
+		void genRSMaps();
 
 	private:
 		void prepareCameraBuffer();

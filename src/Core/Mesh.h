@@ -2,8 +2,8 @@
 #define __RSM_MESH_H__
 
 #include "OpenGL.h"
-#include "Math\RSMaths.h"
-#include "Graphics\Material.h"
+#include "Math/RSMaths.h"
+#include "Graphics/Material.h"
 //#include "Resources.h"
 
 using namespace glm;

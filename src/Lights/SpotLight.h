@@ -2,7 +2,7 @@
 #define __RSM_SPOTLIGHT_H__
 
 #include "Light.h"
-#include "Graphics\Texture.h"
+#include "Graphics/Texture.h"
 
 namespace rsm {
 

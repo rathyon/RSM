@@ -85,22 +85,29 @@ void rsm::init(int argc, char* argv[]) {
 	vBPTex.compile();
 	fBPTex.compile();
 
-	ShaderSource vSM = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/ShadowMap.vs");
-	ShaderSource fSM = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/ShadowMap.fs");
-	vSM.inject(std::string("#version 330 core\n"));
-	fSM.inject(std::string("#version 330 core\n"));
-	vSM.compile();
-	fSM.compile();
+	ShaderSource vDM = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/DepthMap.vs");
+	ShaderSource fDM = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/DepthMap.fs");
+	vDM.inject(std::string("#version 330 core\n"));
+	fDM.inject(std::string("#version 330 core\n"));
+	vDM.compile();
+	fDM.compile();
 
-	ShaderSource vOSM = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/OmniShadowMap.vs");
-	ShaderSource gOSM = ShaderSource(GEOMETRY_SHADER, "../../../src/Shaders/OmniShadowMap.gs");
-	ShaderSource fOSM = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/OmniShadowMap.fs");
-	vOSM.inject(std::string("#version 330 core\n"));
-	gOSM.inject(std::string("#version 330 core\n"));
-	fOSM.inject(std::string("#version 330 core\n"));
-	vOSM.compile();
-	gOSM.compile();
-	fOSM.compile();
+	ShaderSource vODM = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/OmniDepthMap.vs");
+	ShaderSource gODM = ShaderSource(GEOMETRY_SHADER, "../../../src/Shaders/OmniDepthMap.gs");
+	ShaderSource fODM = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/OmniDepthMap.fs");
+	vODM.inject(std::string("#version 330 core\n"));
+	gODM.inject(std::string("#version 330 core\n"));
+	fODM.inject(std::string("#version 330 core\n"));
+	vODM.compile();
+	gODM.compile();
+	fODM.compile();
+
+	ShaderSource vWSCM = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/WSCMap.vs");
+	ShaderSource fWSCM = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/WSCMap.fs");
+	vWSCM.inject(std::string("#version 330 core\n"));
+	fWSCM.inject(std::string("#version 330 core\n"));
+	vWSCM.compile();
+	fWSCM.compile();
 
 	ShaderSource vFBOD = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/FBODebugger.vs");
 	ShaderSource fFBOD = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/FBODebugger.fs");
@@ -123,20 +130,24 @@ void rsm::init(int argc, char* argv[]) {
 	RM.addShader("BlinnPhongTex", BlinnPhongTex);
 	glApp->addProgram(BlinnPhongTex->id());
 
-	sref<Shader> ShadowMap = make_sref<Shader>("ShadowMap");
-	ShadowMap->addShader(vSM);
-	ShadowMap->addShader(fSM);
-	ShadowMap->link();
-	RM.addShader("ShadowMap", ShadowMap);
-	//glApp->addProgram(ShadowMap->id());
+	sref<Shader> DepthMap = make_sref<Shader>("DepthMap");
+	DepthMap->addShader(vDM);
+	DepthMap->addShader(fDM);
+	DepthMap->link();
+	RM.addShader("DepthMap", DepthMap);
 
-	sref<Shader> OmniShadowMap = make_sref<Shader>("OmniShadowMap");
-	OmniShadowMap->addShader(vOSM);
-	OmniShadowMap->addShader(gOSM);
-	OmniShadowMap->addShader(fOSM);
-	OmniShadowMap->link();
-	RM.addShader("OmniShadowMap", OmniShadowMap);
-	//glApp->addProgram(OmniShadowMap->id());
+	sref<Shader> OmniDepthMap = make_sref<Shader>("OmniDepthMap");
+	OmniDepthMap->addShader(vODM);
+	OmniDepthMap->addShader(gODM);
+	OmniDepthMap->addShader(fODM);
+	OmniDepthMap->link();
+	RM.addShader("OmniDepthMap", OmniDepthMap);
+
+	sref<Shader> WSCMap = make_sref<Shader>("WSCMap");
+	WSCMap->addShader(vWSCM);
+	WSCMap->addShader(fWSCM);
+	WSCMap->link();
+	RM.addShader("WSCMap", WSCMap);
 
 	sref<Shader> FBODebugger = make_sref<Shader>("FBODebugger");
 	FBODebugger->addShader(vFBOD);
