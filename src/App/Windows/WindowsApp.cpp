@@ -13,8 +13,8 @@
 // 1600 x 900
 // 800 x 450
 
-#define WND_W 1600
-#define WND_H 900
+#define WND_W 800
+#define WND_H 450
 
 using namespace rsm;
 
@@ -165,11 +165,11 @@ void rsm::init(int argc, char* argv[]) {
 	cube->setMaterial(bp_test);
 	/**/
 
-	/**/
+	/** /
 	sref<Model> sponza = make_sref<Model>("sponza");
 	sponza->loadFromFile("../../../assets/models/crytek sponza/sponza.obj", "../../../assets/models/crytek sponza/");
 	RM.addModel("sponza", sponza);
-	sponza->setMaterial(bp_gray);
+	sponza->setMaterial(bp_green);
 	/**/
 
 	/** /
@@ -178,7 +178,7 @@ void rsm::init(int argc, char* argv[]) {
 	RM.addModel("sibenik", sibenik);
 	/**/
 
-	/** /
+	/**/
 	sref<Model> demo_scene = make_sref<Model>("demo_scene");
 	demo_scene->loadFromFile("../../../assets/models/demo scene open/demo_scene.obj", "../../../assets/models/demo scene open/");
 	RM.addModel("demo_scene", demo_scene);

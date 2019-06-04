@@ -102,6 +102,7 @@ void Mesh::draw(glm::mat4& objToWorld, glm::mat3 normalMatrix, GLuint program) {
 
 	glUniformMatrix4fv(glGetUniformLocation(program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(objToWorld));
 	glUniformMatrix3fv(glGetUniformLocation(program, "NormalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMatrix));
+
 	glBindVertexArray(_VAO);
 	glDrawArrays(GL_TRIANGLES, 0, _vertices.size());
 	glBindVertexArray(0);

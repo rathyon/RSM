@@ -72,7 +72,7 @@ void OpenGLApplication::prepare() {
 	=====================================================================================*/
 
 	// cube cam
-	/** /
+	/**/
 	_camera = make_sref<Perspective>(_width, _height,
 		vec3(5.0f, 5.0f, 5.0f),
 		vec3(0.0f, 0.0f, 0.0f),
@@ -81,7 +81,7 @@ void OpenGLApplication::prepare() {
 	/**/
 
 	// sponza cam
-	/**/
+	/** /
     _camera = make_sref<Perspective>(_width, _height,
          vec3(0.0f, 15.0f, 0.0f),
          vec3(-15.0f, 15.0f, 0.0f),
@@ -125,7 +125,7 @@ void OpenGLApplication::prepare() {
 	cube->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	/**/
 
-	/**/
+	/** /
 	sref<Model> sponza = RM.getModel("sponza");
 	sponza->prepare();
 	_scene.addModel(sponza);
@@ -139,7 +139,7 @@ void OpenGLApplication::prepare() {
 	_scene.addModel(sibenik);
 	/**/
 
-	/** /
+	/**/
 	sref<Model> demo_scene = RM.getModel("demo_scene");
 	demo_scene->prepare();
 	_scene.addModel(demo_scene);
@@ -170,7 +170,7 @@ void OpenGLApplication::genRSMaps() {
 		}
 
 		glViewport(0, 0, lights[l]->gBufferWidth(), lights[l]->gBufferHeight());
-
+;
 		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->gBuffer());
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glUseProgram(prog);
@@ -180,8 +180,8 @@ void OpenGLApplication::genRSMaps() {
 
 	//glCullFace(GL_BACK);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glUseProgram(0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	// reset viewport
 	reshape(_width, _height);
 }
@@ -193,7 +193,6 @@ void OpenGLApplication::render() { // receive objects and camera args
 
 	// clear framebuffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	// Upload constant buffers to the GPU
 
 	// upload lights...
 	uploadLights();

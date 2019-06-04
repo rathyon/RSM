@@ -193,5 +193,5 @@ void main(void) {
 	outColor = vec4(vec3(debugShadowFactor(vsIn.position, lights[0].position)), 1.0);
 	/**/
 
-	outColor = vec4(texture(normalMap, vsIn.texCoords).rgb, 1.0);
+	outColor = vec4(texture(positionMap, vsIn.texCoords).rgb, 1.0);
 }
