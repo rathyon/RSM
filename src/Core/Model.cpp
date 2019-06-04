@@ -59,7 +59,7 @@ void Model::render() {
 void Model::draw(GLuint program) {
 	updateMatrix();
 	for (sref<Mesh> mesh : _meshes) {
-		mesh->draw(objToWorld(), program);
+		mesh->draw(objToWorld(), normalMatrix(), program);
 	}
 }
 

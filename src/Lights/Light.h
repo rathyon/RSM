@@ -49,18 +49,20 @@ namespace rsm {
 		// shadow mapping
 		glm::mat4 projMatrix() const;
 
-		int resolution() const;
-		GLuint FBO() const;
+		int gBufferWidth() const;
+		int gBufferHeight() const;
+		GLuint gBuffer() const;
+
 		GLuint depthMap() const;
 
 		// reflective shadow mapping
-		GLuint WSCMap() const;
+		GLuint positionMap() const;
 		GLuint normalMap() const;
 		GLuint fluxMap() const;
 
 
 		virtual GLenum depthMapType() = 0;
-		virtual void prepare(int resolution) = 0;
+		virtual void prepare(int width, int height) = 0;
 		virtual void uploadSpatialData(GLuint program) = 0;
 		virtual void uploadShadowMapData(GLuint program) = 0;
 
@@ -71,12 +73,12 @@ namespace rsm {
 		glm::vec3 _emission;
 
 		// shadow mapping
-		int _resolution;
-		GLuint _FBO;
+		int _gBufferWidth, _gBufferHeight;
+		GLuint _gBuffer;
 		GLuint _depthMap;
 
 		// reflective shadow mapping
-		GLuint _WSCMap;
+		GLuint _positionMap;
 		GLuint _normalMap;
 		GLuint _fluxMap;
 

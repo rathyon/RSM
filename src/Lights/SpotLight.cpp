@@ -70,8 +70,9 @@ GLenum SpotLight::depthMapType() {
 	return OpenGLTexTargets[IMG_2D];
 }
 
-void SpotLight::prepare(int resolution) {
-	_resolution = resolution;
+void SpotLight::prepare(int width, int height) {
+	_gBufferWidth = width;
+	_gBufferHeight = height;
 
 	_projMatrix = glm::perspective(glm::acos(_cutoff), 1.0f, 0.1f, 1000.0f);
 	_viewMatrix = glm::lookAt(_position,
@@ -80,11 +81,11 @@ void SpotLight::prepare(int resolution) {
 	_viewProjMatrix = _projMatrix * _viewMatrix;
 
 	// prepare framebuffer and shadow map (texture)
-	glGenFramebuffers(1, &_FBO);
+	glGenFramebuffers(1, &_gBuffer);
 
 	glGenTextures(1, &_depthMap);
 	glBindTexture(OpenGLTexTargets[IMG_2D], _depthMap);
-	glTexImage2D(OpenGLTexTargets[IMG_2D], 0, GL_DEPTH_COMPONENT32F, _resolution, _resolution, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(OpenGLTexTargets[IMG_2D], 0, GL_DEPTH_COMPONENT32F, _gBufferWidth, _gBufferHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(OpenGLTexTargets[IMG_2D], GL_TEXTURE_WRAP_S, OpenGLTexWrapping[CLAMP_BORDER]);
 	glTexParameteri(OpenGLTexTargets[IMG_2D], GL_TEXTURE_WRAP_T, OpenGLTexWrapping[CLAMP_BORDER]);
 	glTexParameteri(OpenGLTexTargets[IMG_2D], GL_TEXTURE_MIN_FILTER, OpenGLTexFilters[NEAREST]);
@@ -94,7 +95,7 @@ void SpotLight::prepare(int resolution) {
 	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, _FBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, _gBuffer);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthMap, 0);
 	glDrawBuffers(0, GL_NONE);
 	glReadBuffer(GL_NONE);

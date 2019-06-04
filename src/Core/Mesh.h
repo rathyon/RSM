@@ -40,7 +40,7 @@ namespace rsm {
 
 		void prepare();
 		void render(glm::mat4& objToWorld, glm::mat3 normalMatrix);
-		void draw(glm::mat4& objToWorld, GLuint program);
+		void draw(glm::mat4& objToWorld, glm::mat3 normalMatrix, GLuint program);
 
 	private:
 		std::string _name;

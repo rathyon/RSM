@@ -30,8 +30,9 @@ GLenum DirectionalLight::depthMapType() {
 	return OpenGLTexTargets[IMG_2D];
 }
 
-void DirectionalLight::prepare(int resolution) {
-	_resolution = resolution;
+void DirectionalLight::prepare(int width, int height) {
+	_gBufferWidth = width;
+	_gBufferHeight = height;
 
 	// shadow mapping for directional lights is weird, they need a "position" for generating the depth map...
 	_projMatrix = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 1000.0f);
@@ -40,48 +41,50 @@ void DirectionalLight::prepare(int resolution) {
 		glm::vec3(0.0f, 1.0f, 0.0f));
 	_viewProjMatrix = _projMatrix * _viewMatrix;
 
-	// prepare framebuffer and depth map (texture)
-	glGenFramebuffers(1, &_FBO);
-	glBindFramebuffer(GL_FRAMEBUFFER, _FBO);
-	//GLenum bufs[] = { GL_NONE, GL_COLOR_ATTACHMENT0 };
-	//glDrawBuffers(2, bufs);
+	// prepare gbuffer framebuffer object
+	glGenFramebuffers(1, &_gBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, _gBuffer);
 
+	// depth buffer
 	glGenTextures(1, &_depthMap);
-	glBindTexture(OpenGLTexTargets[IMG_2D], _depthMap);
-
-	glTexImage2D(OpenGLTexTargets[IMG_2D], 0, GL_DEPTH_COMPONENT24, _resolution, _resolution, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
-
-	glTexParameteri(OpenGLTexTargets[IMG_2D], GL_TEXTURE_WRAP_S, OpenGLTexWrapping[CLAMP_BORDER]);
-	glTexParameteri(OpenGLTexTargets[IMG_2D], GL_TEXTURE_WRAP_T, OpenGLTexWrapping[CLAMP_BORDER]);
-	glTexParameteri(OpenGLTexTargets[IMG_2D], GL_TEXTURE_MIN_FILTER, OpenGLTexFilters[NEAREST]);
-	glTexParameteri(OpenGLTexTargets[IMG_2D], GL_TEXTURE_MAG_FILTER, OpenGLTexFilters[NEAREST]);
-
-	//glTexParameteri(OpenGLTexTargets[IMG_2D], GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-	//glTexParameteri(OpenGLTexTargets[IMG_2D], GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-
+	glBindTexture(GL_TEXTURE_2D, _depthMap);
+	/** /
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, _gBufferWidth, _gBufferHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	// guarantee borders are white (zones outside of frustrum must not be in shadow)
 	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	glTexParameterfv(OpenGLTexTargets[IMG_2D], GL_TEXTURE_BORDER_COLOR, borderColor);
-
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthMap, 0);
-	glDrawBuffers(0, GL_NONE); // TODO: INVESTIGATE USAGE WITH OTHER MAPS
-	glReadBuffer(GL_NONE); // TODO: INVESTIGATE USAGE WITH OTHER MAPS
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	// prepare world space coordinates map
-	/** /
-	glGenTextures(1, &_WSCMap);
-	glBindTexture(OpenGLTexTargets[IMG_2D], _WSCMap);
-	glTexImage2D(OpenGLTexTargets[IMG_2D], 0, GL_RGB, _resolution, _resolution, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(OpenGLTexTargets[IMG_2D], GL_TEXTURE_WRAP_S, OpenGLTexWrapping[CLAMP_BORDER]);
-	glTexParameteri(OpenGLTexTargets[IMG_2D], GL_TEXTURE_WRAP_T, OpenGLTexWrapping[CLAMP_BORDER]);
-	glTexParameteri(OpenGLTexTargets[IMG_2D], GL_TEXTURE_MIN_FILTER, OpenGLTexFilters[NEAREST]);
-	glTexParameteri(OpenGLTexTargets[IMG_2D], GL_TEXTURE_MAG_FILTER, OpenGLTexFilters[NEAREST]);
-	//glBindFramebuffer(GL_FRAMEBUFFER, _FBO);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _WSCMap, 0);
 	/**/
 
+	// world space coordinates / position buffer
+	glGenTextures(1, &_positionMap);
+	glBindTexture(GL_TEXTURE_2D, _positionMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _positionMap, 0);
 
+	// normals buffer
+	glGenTextures(1, &_normalMap);
+	glBindTexture(GL_TEXTURE_2D, _normalMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, _normalMap, 0);
+
+	GLenum attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+	glDrawBuffers(2, attachments);
+	//glReadBuffer(GL_NONE);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	checkOpenGLError("Error in preparing light source!");
 }

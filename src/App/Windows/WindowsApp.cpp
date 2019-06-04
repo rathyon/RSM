@@ -102,20 +102,6 @@ void rsm::init(int argc, char* argv[]) {
 	gODM.compile();
 	fODM.compile();
 
-	ShaderSource vWSCM = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/WSCMap.vs");
-	ShaderSource fWSCM = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/WSCMap.fs");
-	vWSCM.inject(std::string("#version 330 core\n"));
-	fWSCM.inject(std::string("#version 330 core\n"));
-	vWSCM.compile();
-	fWSCM.compile();
-
-	ShaderSource vFBOD = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/FBODebugger.vs");
-	ShaderSource fFBOD = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/FBODebugger.fs");
-	vFBOD.inject(std::string("#version 330 core\n"));
-	fFBOD.inject(std::string("#version 330 core\n"));
-	vFBOD.compile();
-	fFBOD.compile();
-
 	sref<Shader> BlinnPhong = make_sref<Shader>("BlinnPhong");
 	BlinnPhong->addShader(vBP);
 	BlinnPhong->addShader(fBP);
@@ -143,23 +129,11 @@ void rsm::init(int argc, char* argv[]) {
 	OmniDepthMap->link();
 	RM.addShader("OmniDepthMap", OmniDepthMap);
 
-	sref<Shader> WSCMap = make_sref<Shader>("WSCMap");
-	WSCMap->addShader(vWSCM);
-	WSCMap->addShader(fWSCM);
-	WSCMap->link();
-	RM.addShader("WSCMap", WSCMap);
-
-	sref<Shader> FBODebugger = make_sref<Shader>("FBODebugger");
-	FBODebugger->addShader(vFBOD);
-	FBODebugger->addShader(fFBOD);
-	FBODebugger->link();
-	RM.addShader("FBODebugger", FBODebugger);
-
 	/* ===================================================================================
 				Materials
 	=====================================================================================*/
 
-	/** /
+	/**/
 	sref<BlinnPhongMaterial> bp_red = make_sref<BlinnPhongMaterial>();
 	bp_red->setDiffuse(glm::vec3(1.0f, 0.0f, 0.0f));
 	bp_red->setSpecular(glm::vec3(1.0f));
@@ -191,10 +165,11 @@ void rsm::init(int argc, char* argv[]) {
 	cube->setMaterial(bp_test);
 	/**/
 
-	/** /
+	/**/
 	sref<Model> sponza = make_sref<Model>("sponza");
 	sponza->loadFromFile("../../../assets/models/crytek sponza/sponza.obj", "../../../assets/models/crytek sponza/");
 	RM.addModel("sponza", sponza);
+	sponza->setMaterial(bp_gray);
 	/**/
 
 	/** /
@@ -203,7 +178,7 @@ void rsm::init(int argc, char* argv[]) {
 	RM.addModel("sibenik", sibenik);
 	/**/
 
-	/**/
+	/** /
 	sref<Model> demo_scene = make_sref<Model>("demo_scene");
 	demo_scene->loadFromFile("../../../assets/models/demo scene open/demo_scene.obj", "../../../assets/models/demo scene open/");
 	RM.addModel("demo_scene", demo_scene);

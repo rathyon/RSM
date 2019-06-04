@@ -40,18 +40,20 @@ GLenum PointLight::depthMapType() {
 }
 
 // TODO: add far as argument/parameter
-void PointLight::prepare(int resolution) {
-	_resolution = resolution;
+void PointLight::prepare(int width, int height) {
+	_gBufferWidth = width;
+	_gBufferHeight = height;
 	_far = 100.0f;
+
 	// prepare framebuffer and shadow cubemap (texture)
-	glGenFramebuffers(1, &_FBO);
+	glGenFramebuffers(1, &_gBuffer);
 
 	// IMPORTANT: depthMap is a CUBEMAP!
 	glGenTextures(1, &_depthMap);
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, _depthMap);
 	for (int i = 0; i < 6; i++) {
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT24, _resolution, _resolution, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT24, _gBufferWidth, _gBufferHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
 	}
 
 	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -62,7 +64,7 @@ void PointLight::prepare(int resolution) {
 	//glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 	//glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, _FBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, _gBuffer);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, _depthMap, 0);
 	glDrawBuffers(0, GL_NONE);
 	glReadBuffer(GL_NONE);

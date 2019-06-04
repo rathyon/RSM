@@ -34,17 +34,13 @@ uniform vec3 diffuse;
 uniform vec3 specular;
 uniform float shininess;
 
-// shadow mapping
-uniform sampler2D depthMap;
-uniform samplerCube depthCubeMap;
-// reflective shadow mapping
-uniform sampler2D WSCMap;
 
-float debugShadowFactor(vec3 fragPos, vec3 lightPos){
-	vec3 fragToLight = fragPos - lightPos;
-	float closestDepth = texture(depthCubeMap, fragToLight).r;
-	return closestDepth;
-}
+/* ==============================================================================
+        Directional / Spot Lights
+ ============================================================================== */
+uniform sampler2D depthMap;
+uniform sampler2D positionMap;
+uniform sampler2D normalMap;
 
 // TODO: Use Bias matrix in vertex shader instead of doing this here, in the frag shader
 float debugShadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
@@ -55,17 +51,6 @@ float debugShadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
 
     float closestDepth = texture(depthMap, projCoords.xy).r;
     return closestDepth;
-}
-
-
-float shadowFactor(vec3 fragPos, vec3 lightPos){
-	vec3 fragToLight = fragPos - lightPos;
-	float closestDepth = texture(depthCubeMap, fragToLight).r;
-	closestDepth *= far;
-	float currentDepth = length(fragToLight);
-
-	float shadow = currentDepth > closestDepth  ? 0.0 : 1.0;
-    return shadow;
 }
 
 float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
@@ -90,6 +75,37 @@ float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
     return shadow;
 }
 
+vec3 debugNormalMap(vec4 lightSpacePosition, vec3 N, vec3 L) {
+    vec3 projCoords = lightSpacePosition.xyz / lightSpacePosition.w;
+    projCoords = projCoords * 0.5 + 0.5;
+
+    vec3 normal = texture(normalMap, projCoords.xy).rgb;
+    return normal;
+}
+
+/* ==============================================================================
+        Point Lights
+ ============================================================================== */
+
+uniform samplerCube depthCubeMap;
+
+float shadowFactor(vec3 fragPos, vec3 lightPos){
+	vec3 fragToLight = fragPos - lightPos;
+	float closestDepth = texture(depthCubeMap, fragToLight).r;
+	closestDepth *= far;
+	float currentDepth = length(fragToLight);
+
+	float shadow = currentDepth > closestDepth  ? 0.0 : 1.0;
+    return shadow;
+}
+
+float debugShadowFactor(vec3 fragPos, vec3 lightPos){
+	vec3 fragToLight = fragPos - lightPos;
+	float closestDepth = texture(depthCubeMap, fragToLight).r;
+	return closestDepth;
+}
+
+
 /* ==============================================================================
         Stage Outputs
  ============================================================================== */
@@ -104,7 +120,7 @@ float LinearizeDepth(float depth)
 
 void main(void) {
 
-	/**/
+	/** /
 	vec3 V = normalize(ViewPos - vsIn.position);
 	vec3 N = vsIn.normal;
 	vec3 L;
@@ -169,6 +185,7 @@ void main(void) {
 	vec3 L = normalize(-lights[0].direction);
 	vec3 N = vsIn.normal;
 	outColor = vec4(vec3(debugShadowFactor(vsIn.lightSpacePosition, N, L)), 1.0);
+	//outColor = vec4(debugNormalMap(vsIn.lightSpacePosition, N, L), 1.0);
 	/**/
 
 	// Debug for PointLight shadow mapping
@@ -176,13 +193,5 @@ void main(void) {
 	outColor = vec4(vec3(debugShadowFactor(vsIn.position, lights[0].position)), 1.0);
 	/**/
 
-	// Debug for WSCMap
-	/** /
-	vec3 projCoords = vsIn.lightSpacePosition.xyz / vsIn.lightSpacePosition.w;
-    // bring from [-1,1] to [0,1]
-    projCoords = projCoords * 0.5 + 0.5;
-
-    vec3 wsc = texture(WSCMap, projCoords.xy).rgb;
-    outColor = vec4(wsc, 1.0);
-    /**/
+	outColor = vec4(texture(normalMap, vsIn.texCoords).rgb, 1.0);
 }

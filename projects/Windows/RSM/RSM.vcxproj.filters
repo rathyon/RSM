@@ -193,5 +193,20 @@
     <None Include="..\..\..\src\Shaders\BlinnPhongTex.vs">
       <Filter>Source Files\Shaders</Filter>
     </None>
+    <None Include="..\..\..\src\Shaders\OmniDepthMap.fs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\Shaders\OmniDepthMap.gs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\Shaders\OmniDepthMap.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\Shaders\DepthMap.fs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\Shaders\DepthMap.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

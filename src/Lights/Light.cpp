@@ -46,21 +46,24 @@ glm::mat4 Light::projMatrix() const {
 	return _projMatrix;
 }
 
-int Light::resolution() const {
-	return _resolution;
+int Light::gBufferWidth() const {
+	return _gBufferWidth;
 }
 
-GLuint Light::FBO() const {
-	return _FBO;
+int Light::gBufferHeight() const {
+	return _gBufferHeight;
+}
+
+GLuint Light::gBuffer() const {
+	return _gBuffer;
 }
 
 GLuint Light::depthMap() const {
 	return _depthMap;
 }
 
-
-GLuint Light::WSCMap() const {
-	return _WSCMap;
+GLuint Light::positionMap() const {
+	return _positionMap;
 }
 
 GLuint Light::normalMap() const {

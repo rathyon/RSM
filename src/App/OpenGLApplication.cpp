@@ -72,7 +72,7 @@ void OpenGLApplication::prepare() {
 	=====================================================================================*/
 
 	// cube cam
-	/**/
+	/** /
 	_camera = make_sref<Perspective>(_width, _height,
 		vec3(5.0f, 5.0f, 5.0f),
 		vec3(0.0f, 0.0f, 0.0f),
@@ -81,7 +81,7 @@ void OpenGLApplication::prepare() {
 	/**/
 
 	// sponza cam
-	/** /
+	/**/
     _camera = make_sref<Perspective>(_width, _height,
          vec3(0.0f, 15.0f, 0.0f),
          vec3(-15.0f, 15.0f, 0.0f),
@@ -101,16 +101,16 @@ void OpenGLApplication::prepare() {
 	spot->prepare(1024);
 	/**/
 
-	/**/
-	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 5.0f, glm::vec3(0.0f, 5.0f, 0.0f));
+	/** /
+	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 5.0f, glm::vec3(0.0f, 7.0f, 0.0f));
 	_scene.addLight(candle);
-	candle->prepare(2048);
+	candle->prepare(_width, _height);
 	/**/
 
-	/** /
+	/**/
 	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(1.0f, -1.0f, -1.0f));
 	_scene.addLight(sun);
-	sun->prepare(2048);
+	sun->prepare(_width, _height);
 	/**/
 
 	/* ===================================================================================
@@ -125,7 +125,7 @@ void OpenGLApplication::prepare() {
 	cube->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	/**/
 
-	/** /
+	/**/
 	sref<Model> sponza = RM.getModel("sponza");
 	sponza->prepare();
 	_scene.addModel(sponza);
@@ -139,7 +139,7 @@ void OpenGLApplication::prepare() {
 	_scene.addModel(sibenik);
 	/**/
 
-	/**/
+	/** /
 	sref<Model> demo_scene = RM.getModel("demo_scene");
 	demo_scene->prepare();
 	_scene.addModel(demo_scene);
@@ -148,20 +148,16 @@ void OpenGLApplication::prepare() {
 	// Prepare shared buffers
 	prepareCameraBuffer();
 
-
-	// each light source should be in charge of this
-	// this means genShadowMap must be called for each light
-	// which means each light must have its own framebuffer, texture, etc?
+	checkOpenGLError("Error preparing OpenGL Application!");
 }
 
 void OpenGLApplication::genRSMaps() {
 	GLuint DM = RM.getShader("DepthMap")->id();
 	GLuint ODM = RM.getShader("OmniDepthMap")->id();
-	GLuint WSCM = RM.getShader("WSCMap")->id();
 
 	GLuint prog;
 
-	glCullFace(GL_FRONT);
+	//glCullFace(GL_FRONT);
 
 	const std::vector<sref<Light>>& lights = _scene.lights();
 	for (int l = 0; l < NUM_LIGHTS; l++) {
@@ -173,16 +169,16 @@ void OpenGLApplication::genRSMaps() {
 			prog = ODM;
 		}
 
-		glViewport(0, 0, lights[l]->resolution(), lights[l]->resolution());
+		glViewport(0, 0, lights[l]->gBufferWidth(), lights[l]->gBufferHeight());
 
+		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->gBuffer());
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glUseProgram(prog);
 		lights[l]->uploadSpatialData(prog);
-		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->FBO());
-		glClear(GL_DEPTH_BUFFER_BIT);
 		_scene.draw(prog);
 	}
 
-	glCullFace(GL_BACK);
+	//glCullFace(GL_BACK);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glUseProgram(0);
@@ -290,23 +286,26 @@ void OpenGLApplication::uploadShadowMappingData() {
 			lights[l]->uploadShadowMapData(prog);
 
 			// TODO: define Tex Unit number for depth maps
-			if (lights[l]->depthMapType() == OpenGLTexTargets[IMG_2D]) {
+			GLenum type = lights[l]->depthMapType();
+			if (type == OpenGLTexTargets[IMG_2D]) {
 
 				glActiveTexture(GL_TEXTURE1);
-				glBindTexture(lights[l]->depthMapType(), lights[l]->depthMap());
+				glBindTexture(type, lights[l]->depthMap());
 				glUniform1i(glGetUniformLocation(prog, "depthMap"), 1);
+
+				glActiveTexture(GL_TEXTURE3);
+				glBindTexture(type, lights[l]->positionMap());
+				glUniform1i(glGetUniformLocation(prog, "positionMap"), 3);
+
+				glActiveTexture(GL_TEXTURE4);
+				glBindTexture(type, lights[l]->normalMap());
+				glUniform1i(glGetUniformLocation(prog, "normalMap"), 4);
 			}
 			else {
 				glActiveTexture(GL_TEXTURE2);
-				glBindTexture(lights[l]->depthMapType(), lights[l]->depthMap());
+				glBindTexture(type, lights[l]->depthMap());
 				glUniform1i(glGetUniformLocation(prog, "depthCubeMap"), 2);
 			}
-
-			/** /
-			glActiveTexture(GL_TEXTURE3);
-			glBindTexture(OpenGLTexTargets[IMG_2D], lights[l]->WSCMap());
-			glUniform1i(glGetUniformLocation(prog, "WSCMap"), 3);
-			/**/
 
 		}
 	}
