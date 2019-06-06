@@ -92,6 +92,13 @@ void rsm::init(int argc, char* argv[]) {
 	vDM.compile();
 	fDM.compile();
 
+	ShaderSource vGT = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/GBufferTest.vs");
+	ShaderSource fGT = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/GBufferTest.fs");
+	vGT.inject(std::string("#version 330 core\n"));
+	fGT.inject(std::string("#version 330 core\n"));
+	vGT.compile();
+	fGT.compile();
+
 	ShaderSource vODM = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/OmniDepthMap.vs");
 	ShaderSource gODM = ShaderSource(GEOMETRY_SHADER, "../../../src/Shaders/OmniDepthMap.gs");
 	ShaderSource fODM = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/OmniDepthMap.fs");
@@ -121,6 +128,12 @@ void rsm::init(int argc, char* argv[]) {
 	DepthMap->addShader(fDM);
 	DepthMap->link();
 	RM.addShader("DepthMap", DepthMap);
+
+	sref<Shader> GBufferTest = make_sref<Shader>("GBufferTest");
+	GBufferTest->addShader(vGT);
+	GBufferTest->addShader(fGT);
+	GBufferTest->link();
+	RM.addShader("GBufferTest", GBufferTest);
 
 	sref<Shader> OmniDepthMap = make_sref<Shader>("OmniDepthMap");
 	OmniDepthMap->addShader(vODM);

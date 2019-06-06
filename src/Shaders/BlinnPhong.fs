@@ -75,6 +75,14 @@ float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
     return shadow;
 }
 
+vec3 debugPositionMap(vec4 lightSpacePosition, vec3 N, vec3 L) {
+    vec3 projCoords = lightSpacePosition.xyz / lightSpacePosition.w;
+    projCoords = projCoords * 0.5 + 0.5;
+
+    vec3 normal = texture(positionMap, projCoords.xy).rgb;
+    return normal;
+}
+
 vec3 debugNormalMap(vec4 lightSpacePosition, vec3 N, vec3 L) {
     vec3 projCoords = lightSpacePosition.xyz / lightSpacePosition.w;
     projCoords = projCoords * 0.5 + 0.5;
@@ -181,11 +189,11 @@ void main(void) {
 	/**/
 
 	// Debug for DirectionalLight shadow mapping
-	/** /
+	/**/
 	vec3 L = normalize(-lights[0].direction);
 	vec3 N = vsIn.normal;
-	outColor = vec4(vec3(debugShadowFactor(vsIn.lightSpacePosition, N, L)), 1.0);
-	//outColor = vec4(debugNormalMap(vsIn.lightSpacePosition, N, L), 1.0);
+	//outColor = vec4(vec3(debugShadowFactor(vsIn.lightSpacePosition, N, L)), 1.0);
+	outColor = vec4(debugPositionMap(vsIn.lightSpacePosition, N, L), 1.0);
 	/**/
 
 	// Debug for PointLight shadow mapping
@@ -193,5 +201,5 @@ void main(void) {
 	outColor = vec4(vec3(debugShadowFactor(vsIn.position, lights[0].position)), 1.0);
 	/**/
 
-	outColor = vec4(texture(positionMap, vsIn.texCoords).rgb, 1.0);
+	//outColor = vec4(texture(positionMap, vsIn.texCoords).rgb, 1.0);
 }

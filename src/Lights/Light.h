@@ -60,6 +60,10 @@ namespace rsm {
 		GLuint normalMap() const;
 		GLuint fluxMap() const;
 
+		// noob RSM
+		GLuint _positionFBO;
+		GLuint _normalFBO;
+
 
 		virtual GLenum depthMapType() = 0;
 		virtual void prepare(int width, int height) = 0;

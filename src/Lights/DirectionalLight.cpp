@@ -48,7 +48,7 @@ void DirectionalLight::prepare(int width, int height) {
 	// depth buffer
 	glGenTextures(1, &_depthMap);
 	glBindTexture(GL_TEXTURE_2D, _depthMap);
-	/** /
+	/**/
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, _gBufferWidth, _gBufferHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
@@ -60,6 +60,7 @@ void DirectionalLight::prepare(int width, int height) {
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthMap, 0);
 	/**/
 
+	/** /
 	// world space coordinates / position buffer
 	glGenTextures(1, &_positionMap);
 	glBindTexture(GL_TEXTURE_2D, _positionMap);
@@ -83,6 +84,40 @@ void DirectionalLight::prepare(int width, int height) {
 	GLenum attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 	glDrawBuffers(2, attachments);
 	//glReadBuffer(GL_NONE);
+
+	/**/
+
+	glDrawBuffers(0, GL_NONE);
+	glReadBuffer(GL_NONE);
+
+	glGenFramebuffers(1, &_positionFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, _positionFBO);
+
+	glGenTextures(1, &_positionMap);
+	glBindTexture(GL_TEXTURE_2D, _positionMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _positionMap, 0);
+	GLenum attachments[] = { GL_COLOR_ATTACHMENT0 };
+	glDrawBuffers(1, attachments);
+
+	glGenFramebuffers(1, &_normalFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, _normalFBO);
+
+	glGenTextures(1, &_normalMap);
+	glBindTexture(GL_TEXTURE_2D, _normalMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, _normalMap, 0);
+	GLenum attachments2[] = { GL_COLOR_ATTACHMENT0 };
+	glDrawBuffers(1, attachments2);
+
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);

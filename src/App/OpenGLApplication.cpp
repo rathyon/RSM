@@ -154,10 +154,11 @@ void OpenGLApplication::prepare() {
 void OpenGLApplication::genRSMaps() {
 	GLuint DM = RM.getShader("DepthMap")->id();
 	GLuint ODM = RM.getShader("OmniDepthMap")->id();
+	GLuint GT = RM.getShader("GBufferTest")->id();
 
 	GLuint prog;
 
-	//glCullFace(GL_FRONT);
+	glCullFace(GL_FRONT);
 
 	const std::vector<sref<Light>>& lights = _scene.lights();
 	for (int l = 0; l < NUM_LIGHTS; l++) {
@@ -176,9 +177,25 @@ void OpenGLApplication::genRSMaps() {
 		glUseProgram(prog);
 		lights[l]->uploadSpatialData(prog);
 		_scene.draw(prog);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->_positionFBO);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glUseProgram(GT);
+		glUniform1i(glGetUniformLocation(GT, "mode"), 0);
+		lights[l]->uploadSpatialData(GT);
+		_scene.draw(GT);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->_normalFBO);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glUseProgram(GT);
+		glUniform1i(glGetUniformLocation(GT, "mode"), 1);
+		lights[l]->uploadSpatialData(GT);
+		_scene.draw(GT);
+
+
 	}
 
-	//glCullFace(GL_BACK);
+	glCullFace(GL_BACK);
 
 	glUseProgram(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
