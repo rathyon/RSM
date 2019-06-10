@@ -194,12 +194,12 @@ void main(void) {
 	vec3 N = vsIn.normal;
 	//outColor = vec4(vec3(debugShadowFactor(vsIn.lightSpacePosition, N, L)), 1.0);
 	outColor = vec4(debugPositionMap(vsIn.lightSpacePosition, N, L), 1.0);
+	//outColor = vec4(texture(positionMap, vsIn.texCoords).rgb, 1.0);
 	/**/
 
 	// Debug for PointLight shadow mapping
 	/** /
 	outColor = vec4(vec3(debugShadowFactor(vsIn.position, lights[0].position)), 1.0);
 	/**/
-
-	//outColor = vec4(texture(positionMap, vsIn.texCoords).rgb, 1.0);
+	
 }

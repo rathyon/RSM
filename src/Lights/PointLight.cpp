@@ -72,7 +72,7 @@ void PointLight::prepare(int width, int height) {
 	
 	// aspect is 1.0f: Width == Height
 	// 90 degree FOV is important to properly align each face of the cubemap
-	_projMatrix = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, _far);
+	_projMatrix = glm::perspective(glm::radians(90.0f), 1.0f, 1.0f, _far);
 
 	_viewProjMatrices.push_back(_projMatrix * 
 		glm::lookAt(_position, _position + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));

@@ -104,11 +104,11 @@ void OpenGLApplication::prepare() {
 	/** /
 	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 5.0f, glm::vec3(0.0f, 7.0f, 0.0f));
 	_scene.addLight(candle);
-	candle->prepare(_width, _height);
+	candle->prepare(1024, 1024);
 	/**/
 
 	/**/
-	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(1.0f, -1.0f, -1.0f));
+	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(-1.0f, -1.0f, -1.0f));
 	_scene.addLight(sun);
 	sun->prepare(_width, _height);
 	/**/
@@ -139,10 +139,16 @@ void OpenGLApplication::prepare() {
 	_scene.addModel(sibenik);
 	/**/
 
-	/**/
+	/** /
 	sref<Model> demo_scene = RM.getModel("demo_scene");
 	demo_scene->prepare();
 	_scene.addModel(demo_scene);
+	/**/
+
+	/**/
+	sref<Model> Lucy = RM.getModel("Lucy");
+	Lucy->prepare();
+	_scene.addModel(Lucy);
 	/**/
 
 	// Prepare shared buffers
@@ -158,7 +164,7 @@ void OpenGLApplication::genRSMaps() {
 
 	GLuint prog;
 
-	//glCullFace(GL_FRONT);
+	glCullFace(GL_FRONT);
 
 	const std::vector<sref<Light>>& lights = _scene.lights();
 	for (int l = 0; l < NUM_LIGHTS; l++) {
@@ -181,6 +187,7 @@ void OpenGLApplication::genRSMaps() {
 		lights[l]->uploadSpatialData(prog);
 		_scene.draw(prog);
 
+		/**/
 		// turn off front face culling for this part
 		glCullFace(GL_BACK);
 		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->_positionFBO);
@@ -196,11 +203,11 @@ void OpenGLApplication::genRSMaps() {
 		glUniform1i(glGetUniformLocation(GT, "mode"), 1);
 		lights[l]->uploadSpatialData(GT);
 		_scene.draw(GT);
-
+		/**/
 
 	}
 
-	//glCullFace(GL_BACK);
+	glCullFace(GL_BACK);
 
 	glUseProgram(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
