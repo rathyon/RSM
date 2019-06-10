@@ -63,6 +63,7 @@ namespace rsm {
 		// noob RSM
 		GLuint _positionFBO;
 		GLuint _normalFBO;
+		GLuint _fluxFBO;
 
 
 		virtual GLenum depthMapType() = 0;

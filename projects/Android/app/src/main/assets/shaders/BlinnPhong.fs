@@ -24,6 +24,7 @@ uniform cameraBlock {
 	mat4 ViewProjMatrix;
 	vec3 ViewPos;
 };
+uniform float far;
 
 uniform Light lights[NUM_LIGHTS];
 
@@ -33,17 +34,13 @@ uniform vec3 diffuse;
 uniform vec3 specular;
 uniform float shininess;
 
-// shadow mapping
-uniform sampler2D shadowMap;
-uniform samplerCube shadowCubeMap;
 
-uniform float far;
-
-float debugShadowFactor(vec3 fragPos, vec3 lightPos){
-	vec3 fragToLight = fragPos - lightPos;
-	float closestDepth = texture(shadowCubeMap, fragToLight).r;
-	return closestDepth;
-}
+/* ==============================================================================
+        Directional / Spot Lights
+ ============================================================================== */
+uniform sampler2D depthMap;
+uniform sampler2D positionMap;
+uniform sampler2D normalMap;
 
 // TODO: Use Bias matrix in vertex shader instead of doing this here, in the frag shader
 float debugShadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
@@ -52,19 +49,8 @@ float debugShadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
     // bring from [-1,1] to [0,1]
     projCoords = projCoords * 0.5 + 0.5;
 
-    float closestDepth = texture(shadowMap, projCoords.xy).r;
+    float closestDepth = texture(depthMap, projCoords.xy).r;
     return closestDepth;
-}
-
-
-float shadowFactor(vec3 fragPos, vec3 lightPos){
-	vec3 fragToLight = fragPos - lightPos;
-	float closestDepth = texture(shadowCubeMap, fragToLight).r;
-	closestDepth *= far;
-	float currentDepth = length(fragToLight);
-
-	float shadow = currentDepth > closestDepth  ? 0.0 : 1.0;
-    return shadow;
 }
 
 float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
@@ -76,7 +62,7 @@ float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
     if(projCoords.z > 1.0)
         return 1.0;
 
-    float closestDepth = texture(shadowMap, projCoords.xy).r;
+    float closestDepth = texture(depthMap, projCoords.xy).r;
     float currentDepth = projCoords.z; 
 
     // shadow bias to reduce shadow acne -> for some reason shadows don't appear?
@@ -88,6 +74,45 @@ float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
     float shadow = currentDepth > closestDepth  ? 0.0 : 1.0;
     return shadow;
 }
+
+vec3 debugPositionMap(vec4 lightSpacePosition, vec3 N, vec3 L) {
+    vec3 projCoords = lightSpacePosition.xyz / lightSpacePosition.w;
+    projCoords = projCoords * 0.5 + 0.5;
+
+    vec3 normal = texture(positionMap, projCoords.xy).rgb;
+    return normal;
+}
+
+vec3 debugNormalMap(vec4 lightSpacePosition, vec3 N, vec3 L) {
+    vec3 projCoords = lightSpacePosition.xyz / lightSpacePosition.w;
+    projCoords = projCoords * 0.5 + 0.5;
+
+    vec3 normal = texture(normalMap, projCoords.xy).rgb;
+    return normal;
+}
+
+/* ==============================================================================
+        Point Lights
+ ============================================================================== */
+
+uniform samplerCube depthCubeMap;
+
+float shadowFactor(vec3 fragPos, vec3 lightPos){
+	vec3 fragToLight = fragPos - lightPos;
+	float closestDepth = texture(depthCubeMap, fragToLight).r;
+	closestDepth *= far;
+	float currentDepth = length(fragToLight);
+
+	float shadow = currentDepth > closestDepth  ? 0.0 : 1.0;
+    return shadow;
+}
+
+float debugShadowFactor(vec3 fragPos, vec3 lightPos){
+	vec3 fragToLight = fragPos - lightPos;
+	float closestDepth = texture(depthCubeMap, fragToLight).r;
+	return closestDepth;
+}
+
 
 /* ==============================================================================
         Stage Outputs
@@ -164,14 +189,17 @@ void main(void) {
 	/**/
 
 	// Debug for DirectionalLight shadow mapping
-	/** /
+	/**/
 	vec3 L = normalize(-lights[0].direction);
 	vec3 N = vsIn.normal;
-	outColor = vec4(vec3(debugShadowFactor(vsIn.lightSpacePosition, N, L)), 1.0);
+	//outColor = vec4(vec3(debugShadowFactor(vsIn.lightSpacePosition, N, L)), 1.0);
+	outColor = vec4(debugPositionMap(vsIn.lightSpacePosition, N, L), 1.0);
 	/**/
 
 	// Debug for PointLight shadow mapping
-	/**/
+	/** /
 	outColor = vec4(vec3(debugShadowFactor(vsIn.position, lights[0].position)), 1.0);
 	/**/
+
+	//outColor = vec4(texture(positionMap, vsIn.texCoords).rgb, 1.0);
 }

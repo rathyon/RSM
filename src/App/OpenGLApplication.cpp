@@ -158,10 +158,12 @@ void OpenGLApplication::genRSMaps() {
 
 	GLuint prog;
 
-	glCullFace(GL_FRONT);
+	//glCullFace(GL_FRONT);
 
 	const std::vector<sref<Light>>& lights = _scene.lights();
 	for (int l = 0; l < NUM_LIGHTS; l++) {
+		glCullFace(GL_FRONT);
+
 		// if directional light or spotlight
 		if (lights[l]->depthMapType() == OpenGLTexTargets[IMG_2D]) {
 			prog = DM;
@@ -172,12 +174,15 @@ void OpenGLApplication::genRSMaps() {
 
 		glViewport(0, 0, lights[l]->gBufferWidth(), lights[l]->gBufferHeight());
 ;
+		// depth
 		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->gBuffer());
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glUseProgram(prog);
 		lights[l]->uploadSpatialData(prog);
 		_scene.draw(prog);
 
+		// turn off front face culling for this part
+		glCullFace(GL_BACK);
 		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->_positionFBO);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glUseProgram(GT);
@@ -195,7 +200,7 @@ void OpenGLApplication::genRSMaps() {
 
 	}
 
-	glCullFace(GL_BACK);
+	//glCullFace(GL_BACK);
 
 	glUseProgram(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
