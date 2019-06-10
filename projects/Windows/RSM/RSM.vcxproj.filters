@@ -208,5 +208,11 @@
     <None Include="..\..\..\src\Shaders\DepthMap.vs">
       <Filter>Source Files\Shaders</Filter>
     </None>
+    <None Include="..\..\..\src\Shaders\GBufferTest.fs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\Shaders\GBufferTest.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

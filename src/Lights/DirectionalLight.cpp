@@ -35,7 +35,7 @@ void DirectionalLight::prepare(int width, int height) {
 	_gBufferHeight = height;
 
 	// shadow mapping for directional lights is weird, they need a "position" for generating the depth map...
-	_projMatrix = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 1000.0f);
+	_projMatrix = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 1.0f, 1000.0f);
 	_viewMatrix = glm::lookAt(_direction * -100.0f,
 		glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3(0.0f, 1.0f, 0.0f));
@@ -114,7 +114,7 @@ void DirectionalLight::prepare(int width, int height) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, _normalMap, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _normalMap, 0);
 	GLenum attachments2[] = { GL_COLOR_ATTACHMENT0 };
 	glDrawBuffers(1, attachments2);
 
