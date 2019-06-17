@@ -82,24 +82,24 @@ void init() {
     fDM.compile();
 
     ShaderSource vODM = ShaderSource(VERTEX_SHADER, "vODM", getAssetSource("shaders/OmniDepthMap.vs"));
-    ShaderSource gODM = ShaderSource(GEOMETRY_SHADER, "gODM", getAssetSource("shaders/OmniDepthMap.gs"));
+    //ShaderSource gODM = ShaderSource(GEOMETRY_SHADER, "gODM", getAssetSource("shaders/OmniDepthMap.gs"));
     ShaderSource fODM = ShaderSource(FRAGMENT_SHADER, "fODM", getAssetSource("shaders/OmniDepthMap.fs"));
     vODM.inject(std::string("#version 320 es\n"));
-    gODM.inject(std::string("#version 320 es\n"));
+    //gODM.inject(std::string("#version 320 es\n"));
     fODM.inject(std::string("#version 320 es\n") + std::string("precision highp float;\n"));
     vODM.compile();
-    gODM.compile();
+    //gODM.compile();
     fODM.compile();
 
-    ShaderSource vGT = ShaderSource(VERTEX_SHADER, "vGT",getAssetSource("shaders/GBufferTest.vs"));
-    ShaderSource fGT = ShaderSource(FRAGMENT_SHADER, "fGT", getAssetSource("shaders/GBufferTest.fs"));
-    vGT.inject(std::string("#version 320 es\n") +
+    ShaderSource vGB = ShaderSource(VERTEX_SHADER, "vGB",getAssetSource("shaders/GBuffer.vs"));
+    ShaderSource fGB = ShaderSource(FRAGMENT_SHADER, "fGB", getAssetSource("shaders/GBuffer.fs"));
+    vGB.inject(std::string("#version 320 es\n") +
                std::string("#extension GL_EXT_shader_io_blocks : enable\n"));
-    fGT.inject(std::string("#version 320 es\n") +
+    fGB.inject(std::string("#version 320 es\n") +
                std::string("#extension GL_EXT_shader_io_blocks : enable\n") +
                std::string("precision highp float;\n"));
-    vGT.compile();
-    fGT.compile();
+    vGB.compile();
+    fGB.compile();
 
     sref<Shader> BlinnPhong = make_sref<Shader>("BlinnPhong");
     BlinnPhong->addShader(vBP);
@@ -124,17 +124,17 @@ void init() {
 
     sref<Shader> OmniShadowMap = make_sref<Shader>("OmniDepthMap");
     OmniShadowMap->addShader(vODM);
-    OmniShadowMap->addShader(gODM);
+    //OmniShadowMap->addShader(gODM);
     OmniShadowMap->addShader(fODM);
     OmniShadowMap->link();
     RM.addShader("OmniDepthMap", OmniShadowMap);
     //glApp->addProgram(OmniShadowMap->id());
 
-    sref<Shader> GBufferTest = make_sref<Shader>("GBufferTest");
-    GBufferTest->addShader(vGT);
-    GBufferTest->addShader(fGT);
-    GBufferTest->link();
-    RM.addShader("GBufferTest", GBufferTest);
+    sref<Shader> GBuffer = make_sref<Shader>("GBuffer");
+    GBuffer->addShader(vGB);
+    GBuffer->addShader(fGB);
+    GBuffer->link();
+    RM.addShader("GBuffer", GBuffer);
 
     checkOpenGLError("Error during shader loading and setup!");
     LOG("Shaders loaded...\n");
@@ -154,9 +154,17 @@ void init() {
             Models
 	=====================================================================================*/
 
+    /**/
+    sref<Model> Lucy = make_sref<Model>("Lucy");
+    Lucy->loadFromMemory(getAssetSource("models/Lucy/Lucy.obj"), getAssetSource("models/Lucy/Lucy.mtl"));
+    RM.addModel("Lucy", Lucy);
+    /**/
+
+    /** /
     sref<Model> demo_scene = make_sref<Model>("demo_scene");
     demo_scene->loadFromMemory(getAssetSource("models/demo scene closed/demo_scene.obj"), getAssetSource("models/demo scene closed/demo_scene.mtl"));
     RM.addModel("demo_scene", demo_scene);
+    /**/
 
     /** /
     sref<Model> sponza = make_sref<Model>("sponza");

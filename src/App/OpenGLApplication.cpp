@@ -74,8 +74,8 @@ void OpenGLApplication::prepare() {
 	// cube cam
 	/**/
 	_camera = make_sref<Perspective>(_width, _height,
-		vec3(5.0f, 5.0f, 5.0f),
-		vec3(0.0f, 0.0f, 0.0f),
+		vec3(10.0f, 10.0f, 10.0f),
+		vec3(0.0f, 5.0f, 0.0f),
 		vec3(0.0f, 1.0f, 0.0f),
 		0.1f, 1000.0f, 60.0f);
 	/**/
@@ -101,13 +101,13 @@ void OpenGLApplication::prepare() {
 	spot->prepare(1024);
 	/**/
 
-	/** /
+	/**/
 	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 5.0f, glm::vec3(0.0f, 7.0f, 0.0f));
 	_scene.addLight(candle);
 	candle->prepare(1024, 1024);
 	/**/
 
-	/**/
+	/** /
 	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(-1.0f, -1.0f, -1.0f));
 	_scene.addLight(sun);
 	sun->prepare(_width, _height);
@@ -160,54 +160,72 @@ void OpenGLApplication::prepare() {
 void OpenGLApplication::genRSMaps() {
 	GLuint DM = RM.getShader("DepthMap")->id();
 	GLuint ODM = RM.getShader("OmniDepthMap")->id();
-	GLuint GT = RM.getShader("GBufferTest")->id();
+	GLuint GB = RM.getShader("GBuffer")->id();
 
 	GLuint prog;
-
-	glCullFace(GL_FRONT);
 
 	const std::vector<sref<Light>>& lights = _scene.lights();
 	for (int l = 0; l < NUM_LIGHTS; l++) {
 		glCullFace(GL_FRONT);
 
-		// if directional light or spotlight
+		glViewport(0, 0, lights[l]->gBufferWidth(), lights[l]->gBufferHeight());
+
+		// if directional light/spotlight
 		if (lights[l]->depthMapType() == OpenGLTexTargets[IMG_2D]) {
 			prog = DM;
+			glUseProgram(prog);
+
+			// depth
+			glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->gBuffer());
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+			lights[l]->uploadSpatialData(prog);
+			_scene.draw(prog);
+
 		}
+		// if point light
 		else {
 			prog = ODM;
+			glUseProgram(prog);
+	
+			lights[l]->uploadSpatialData(prog);
+
+			glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->gBuffer());
+			glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			for (int face = 0; face < 6; face++) {
+
+				glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, lights[l]->depthMap(), 0);
+				glUniform1i(glGetUniformLocation(prog, "face"), face);
+
+				_scene.draw(prog);
+			}
+
+            glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, lights[l]->depthMap(), 0);
 		}
 
-		glViewport(0, 0, lights[l]->gBufferWidth(), lights[l]->gBufferHeight());
-;
-		// depth
-		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->gBuffer());
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glUseProgram(prog);
-		lights[l]->uploadSpatialData(prog);
-		_scene.draw(prog);
-
-		/**/
+		/** /
 		// turn off front face culling for this part
 		glCullFace(GL_BACK);
 		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->_positionFBO);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glUseProgram(GT);
-		glUniform1i(glGetUniformLocation(GT, "mode"), 0);
-		lights[l]->uploadSpatialData(GT);
-		_scene.draw(GT);
+		glUseProgram(GB);
+		glUniform1i(glGetUniformLocation(GB, "mode"), 0);
+		lights[l]->uploadSpatialData(GB);
+		_scene.draw(GB);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->_normalFBO);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glUseProgram(GT);
-		glUniform1i(glGetUniformLocation(GT, "mode"), 1);
-		lights[l]->uploadSpatialData(GT);
-		_scene.draw(GT);
+		glUseProgram(GB);
+		glUniform1i(glGetUniformLocation(GB, "mode"), 1);
+		lights[l]->uploadSpatialData(GB);
+		_scene.draw(GB);
 		/**/
 
 	}
 
 	glCullFace(GL_BACK);
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
 	glUseProgram(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -321,6 +339,7 @@ void OpenGLApplication::uploadShadowMappingData() {
 				glBindTexture(type, lights[l]->depthMap());
 				glUniform1i(glGetUniformLocation(prog, "depthMap"), 1);
 
+				/** /
 				glActiveTexture(GL_TEXTURE3);
 				glBindTexture(type, lights[l]->positionMap());
 				glUniform1i(glGetUniformLocation(prog, "positionMap"), 3);
@@ -328,6 +347,7 @@ void OpenGLApplication::uploadShadowMappingData() {
 				glActiveTexture(GL_TEXTURE4);
 				glBindTexture(type, lights[l]->normalMap());
 				glUniform1i(glGetUniformLocation(prog, "normalMap"), 4);
+				/**/
 			}
 			else {
 				glActiveTexture(GL_TEXTURE2);

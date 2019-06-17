@@ -13,7 +13,7 @@
 // 1600 x 900
 // 800 x 450
 
-#define WND_W 800
+#define WND_W 800	
 #define WND_H 450
 
 using namespace rsm;
@@ -92,21 +92,21 @@ void rsm::init(int argc, char* argv[]) {
 	vDM.compile();
 	fDM.compile();
 
-	ShaderSource vGT = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/GBufferTest.vs");
-	ShaderSource fGT = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/GBufferTest.fs");
-	vGT.inject(std::string("#version 330 core\n"));
-	fGT.inject(std::string("#version 330 core\n"));
-	vGT.compile();
-	fGT.compile();
+	ShaderSource vGB = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/GBuffer.vs");
+	ShaderSource fGB = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/GBuffer.fs");
+	vGB.inject(std::string("#version 330 core\n"));
+	fGB.inject(std::string("#version 330 core\n"));
+	vGB.compile();
+	fGB.compile();
 
 	ShaderSource vODM = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/OmniDepthMap.vs");
-	ShaderSource gODM = ShaderSource(GEOMETRY_SHADER, "../../../src/Shaders/OmniDepthMap.gs");
+	//ShaderSource gODM = ShaderSource(GEOMETRY_SHADER, "../../../src/Shaders/OmniDepthMap.gs");
 	ShaderSource fODM = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/OmniDepthMap.fs");
 	vODM.inject(std::string("#version 330 core\n"));
-	gODM.inject(std::string("#version 330 core\n"));
+	//gODM.inject(std::string("#version 330 core\n"));
 	fODM.inject(std::string("#version 330 core\n"));
 	vODM.compile();
-	gODM.compile();
+	//gODM.compile();
 	fODM.compile();
 
 	sref<Shader> BlinnPhong = make_sref<Shader>("BlinnPhong");
@@ -129,15 +129,15 @@ void rsm::init(int argc, char* argv[]) {
 	DepthMap->link();
 	RM.addShader("DepthMap", DepthMap);
 
-	sref<Shader> GBufferTest = make_sref<Shader>("GBufferTest");
-	GBufferTest->addShader(vGT);
-	GBufferTest->addShader(fGT);
-	GBufferTest->link();
-	RM.addShader("GBufferTest", GBufferTest);
+	sref<Shader> GBuffer = make_sref<Shader>("GBuffer");
+	GBuffer->addShader(vGB);
+	GBuffer->addShader(fGB);
+	GBuffer->link();
+	RM.addShader("GBuffer", GBuffer);
 
 	sref<Shader> OmniDepthMap = make_sref<Shader>("OmniDepthMap");
 	OmniDepthMap->addShader(vODM);
-	OmniDepthMap->addShader(gODM);
+	//OmniDepthMap->addShader(gODM);
 	OmniDepthMap->addShader(fODM);
 	OmniDepthMap->link();
 	RM.addShader("OmniDepthMap", OmniDepthMap);
@@ -175,7 +175,7 @@ void rsm::init(int argc, char* argv[]) {
 	sref<Model> cube = make_sref<Model>("Cube");
 	cube->loadFromFile("../../../assets/models/cube/cube.obj", "../../../assets/models/cube");
 	RM.addModel("cube", cube);
-	cube->setMaterial(bp_test);
+	cube->setMaterial(bp_red);
 	/**/
 
 	/** /

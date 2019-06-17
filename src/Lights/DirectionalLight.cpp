@@ -35,7 +35,7 @@ void DirectionalLight::prepare(int width, int height) {
 	_gBufferHeight = height;
 
 	// shadow mapping for directional lights is weird, they need a "position" for generating the depth map...
-	_projMatrix = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 1000.0f);
+	_projMatrix = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 1000.0f);
 	_viewMatrix = glm::lookAt(_direction * -100.0f,
 		glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3(0.0f, 1.0f, 0.0f));
@@ -48,8 +48,7 @@ void DirectionalLight::prepare(int width, int height) {
 	// depth buffer
 	glGenTextures(1, &_depthMap);
 	glBindTexture(GL_TEXTURE_2D, _depthMap);
-	/**/
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, _gBufferWidth, _gBufferHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, _gBufferWidth, _gBufferHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -57,8 +56,10 @@ void DirectionalLight::prepare(int width, int height) {
 	// guarantee borders are white (zones outside of frustrum must not be in shadow)
 	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	glTexParameterfv(OpenGLTexTargets[IMG_2D], GL_TEXTURE_BORDER_COLOR, borderColor);
+
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthMap, 0);
-	/**/
+	glDrawBuffers(0, GL_NONE);
+	glReadBuffer(GL_NONE);
 
 	/** /
 	// world space coordinates / position buffer
@@ -87,6 +88,7 @@ void DirectionalLight::prepare(int width, int height) {
 
 	/**/
 
+	/** /
 	glDrawBuffers(0, GL_NONE);
 	glReadBuffer(GL_NONE);
 
@@ -101,8 +103,8 @@ void DirectionalLight::prepare(int width, int height) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _positionMap, 0);
-	GLenum attachments[] = { GL_COLOR_ATTACHMENT0 };
-	glDrawBuffers(1, attachments);
+	GLenum attachments2[] = { GL_COLOR_ATTACHMENT0 };
+	glDrawBuffers(1, attachments2);
 
 	glGenFramebuffers(1, &_normalFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, _normalFBO);
@@ -115,8 +117,10 @@ void DirectionalLight::prepare(int width, int height) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _normalMap, 0);
-	GLenum attachments2[] = { GL_COLOR_ATTACHMENT0 };
-	glDrawBuffers(1, attachments2);
+	GLenum attachments3[] = { GL_COLOR_ATTACHMENT0 };
+	glDrawBuffers(1, attachments3);
+
+	/**/
 
 
 	glBindTexture(GL_TEXTURE_2D, 0);
