@@ -74,7 +74,7 @@ void OpenGLApplication::prepare() {
 	// cube cam
 	/**/
 	_camera = make_sref<Perspective>(_width, _height,
-		vec3(10.0f, 10.0f, 10.0f),
+		vec3(0.0f, 10.0f, 10.0f),
 		vec3(0.0f, 5.0f, 0.0f),
 		vec3(0.0f, 1.0f, 0.0f),
 		0.1f, 1000.0f, 60.0f);

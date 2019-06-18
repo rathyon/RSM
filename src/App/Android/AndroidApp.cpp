@@ -97,7 +97,8 @@ void init() {
                std::string("#extension GL_EXT_shader_io_blocks : enable\n"));
     fGB.inject(std::string("#version 320 es\n") +
                std::string("#extension GL_EXT_shader_io_blocks : enable\n") +
-               std::string("precision highp float;\n"));
+               std::string("precision highp float;\n") +
+               std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n");
     vGB.compile();
     fGB.compile();
 

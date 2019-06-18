@@ -201,7 +201,7 @@ void main(void) {
 	/**/
 	vec3 L = normalize(-lights[0].direction);
 	vec3 N = vsIn.normal;
-	outColor = vec4(vec3(debugFluxMap(vsIn.lightSpacePosition, N, L)), 1.0);
+	outColor = vec4(vec3(debugNormalMap(vsIn.lightSpacePosition, N, L)), 1.0);
 	//outColor = vec4(debugNormalMap(vsIn.lightSpacePosition, N, L), 1.0);
 	//outColor = vec4(texture(positionMap, vsIn.texCoords).rgb, 1.0);
 	/**/

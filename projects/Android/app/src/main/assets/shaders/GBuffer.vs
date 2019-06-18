@@ -17,7 +17,6 @@ void main()
 	// These in world coordinates
 	vsOut.position  = vec3(ModelMatrix * vec4(Position, 1.0));
 	vsOut.normal    = normalize(NormalMatrix * Normal);
-	//vsOut.normal = Normal;
 	
 	// Return position in Light MVP coordinates
     gl_Position = lightSpaceMatrix * vec4(vsOut.position, 1.0);
