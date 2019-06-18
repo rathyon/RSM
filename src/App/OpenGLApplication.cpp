@@ -101,13 +101,13 @@ void OpenGLApplication::prepare() {
 	spot->prepare(1024);
 	/**/
 
-	/**/
+	/** /
 	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 5.0f, glm::vec3(0.0f, 7.0f, 0.0f));
 	_scene.addLight(candle);
 	candle->prepare(1024, 1024);
 	/**/
 
-	/** /
+	/**/
 	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(-1.0f, -1.0f, -1.0f));
 	_scene.addLight(sun);
 	sun->prepare(_width, _height);
@@ -166,21 +166,23 @@ void OpenGLApplication::genRSMaps() {
 
 	const std::vector<sref<Light>>& lights = _scene.lights();
 	for (int l = 0; l < NUM_LIGHTS; l++) {
-		glCullFace(GL_FRONT);
 
 		glViewport(0, 0, lights[l]->gBufferWidth(), lights[l]->gBufferHeight());
 
 		// if directional light/spotlight
 		if (lights[l]->depthMapType() == OpenGLTexTargets[IMG_2D]) {
-			prog = DM;
-			glUseProgram(prog);
+			uploadLights(GB);
+
+			glUseProgram(GB);
+			glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->gBuffer());
 
 			// depth
-			glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->gBuffer());
+			//glCullFace(GL_FRONT);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-			lights[l]->uploadSpatialData(prog);
-			_scene.draw(prog);
+			lights[l]->uploadSpatialData(GB);
+
+			glUseProgram(GB);
+			_scene.draw(GB);
 
 		}
 		// if point light
@@ -191,7 +193,7 @@ void OpenGLApplication::genRSMaps() {
 			lights[l]->uploadSpatialData(prog);
 
 			glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->gBuffer());
-			glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+			//glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			for (int face = 0; face < 6; face++) {
 
@@ -225,7 +227,7 @@ void OpenGLApplication::genRSMaps() {
 	}
 
 	glCullFace(GL_BACK);
-	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	//glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
 	glUseProgram(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -233,7 +235,7 @@ void OpenGLApplication::genRSMaps() {
 	reshape(_width, _height);
 }
 
-void OpenGLApplication::render() { // receive objects and camera args
+void OpenGLApplication::render() { 
 	// Generate Depth Map
 	genRSMaps();
     checkOpenGLError("Error generating depth maps!");
@@ -242,8 +244,11 @@ void OpenGLApplication::render() { // receive objects and camera args
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// upload lights...
-	uploadLights();
+	for (GLuint prog : _programs) {
+		uploadLights(prog);
+	}
     checkOpenGLError("Error uploading lights data!");
+
 	// upload camera...
 	uploadCameraBuffer();
     checkOpenGLError("Error uploading camera data!");
@@ -276,51 +281,48 @@ void OpenGLApplication::uploadCameraBuffer() {
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-void OpenGLApplication::uploadLights() {
+void OpenGLApplication::uploadLights(GLuint prog) {
 	const std::vector<sref<Light>>& lights = _scene.lights();
 	LightData data;
 	std::string name;
 	std::string prefix;
 
-	for (GLuint prog : _programs) {
-		glUseProgram(prog);
+	glUseProgram(prog);
 
-		// I'll be assuming NUM_LIGHTS is always the actual number of lights in the scene at all times
-		for (int l = 0; l < NUM_LIGHTS; l++) {
-			lights[l]->toData(data);
+	// I'll be assuming NUM_LIGHTS is always the actual number of lights in the scene at all times
+	for (int l = 0; l < NUM_LIGHTS; l++) {
+		lights[l]->toData(data);
 
-			prefix = "lights[" + std::to_string(l) + "].";
+		prefix = "lights[" + std::to_string(l) + "].";
 
-			name = prefix + "position";
-			glUniform3fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(data.position));
+		name = prefix + "position";
+		glUniform3fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(data.position));
 
-			name = prefix + "direction";
-			glUniform3fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(data.direction));
+		name = prefix + "direction";
+		glUniform3fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(data.direction));
 
-			name = prefix + "emission";
-			glUniform3fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(data.emission));
+		name = prefix + "emission";
+		glUniform3fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(data.emission));
 
-			name = prefix + "intensity";
-			glUniform1f(glGetUniformLocation(prog, name.c_str()), data.intensity);
+		name = prefix + "intensity";
+		glUniform1f(glGetUniformLocation(prog, name.c_str()), data.intensity);
 
-			name = prefix + "linear";
-			glUniform1f(glGetUniformLocation(prog, name.c_str()), data.linear);
+		name = prefix + "linear";
+		glUniform1f(glGetUniformLocation(prog, name.c_str()), data.linear);
 
-			name = prefix + "quadratic";
-			glUniform1f(glGetUniformLocation(prog, name.c_str()), data.quadratic);
+		name = prefix + "quadratic";
+		glUniform1f(glGetUniformLocation(prog, name.c_str()), data.quadratic);
 
-			name = prefix + "type";
-			glUniform1i(glGetUniformLocation(prog, name.c_str()), data.type);
+		name = prefix + "type";
+		glUniform1i(glGetUniformLocation(prog, name.c_str()), data.type);
 
-			name = prefix + "state";
-			glUniform1i(glGetUniformLocation(prog, name.c_str()), data.state);
+		name = prefix + "state";
+		glUniform1i(glGetUniformLocation(prog, name.c_str()), data.state);
 
-			name = prefix + "cutoff";
-			glUniform1f(glGetUniformLocation(prog, name.c_str()), data.cutoff);
-		}
-		glUseProgram(0);
+		name = prefix + "cutoff";
+		glUniform1f(glGetUniformLocation(prog, name.c_str()), data.cutoff);
 	}
-	
+	glUseProgram(0);
 }
 
 void OpenGLApplication::uploadShadowMappingData() {
@@ -339,7 +341,7 @@ void OpenGLApplication::uploadShadowMappingData() {
 				glBindTexture(type, lights[l]->depthMap());
 				glUniform1i(glGetUniformLocation(prog, "depthMap"), 1);
 
-				/** /
+				/**/
 				glActiveTexture(GL_TEXTURE3);
 				glBindTexture(type, lights[l]->positionMap());
 				glUniform1i(glGetUniformLocation(prog, "positionMap"), 3);
@@ -347,6 +349,10 @@ void OpenGLApplication::uploadShadowMappingData() {
 				glActiveTexture(GL_TEXTURE4);
 				glBindTexture(type, lights[l]->normalMap());
 				glUniform1i(glGetUniformLocation(prog, "normalMap"), 4);
+
+				glActiveTexture(GL_TEXTURE5);
+				glBindTexture(type, lights[l]->fluxMap());
+				glUniform1i(glGetUniformLocation(prog, "fluxMap"), 5);
 				/**/
 			}
 			else {

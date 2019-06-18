@@ -44,7 +44,7 @@ namespace rsm {
 		void prepareCameraBuffer();
 
 		void uploadCameraBuffer();
-		void uploadLights();
+		void uploadLights(GLuint prog);
 		void uploadShadowMappingData();
 
 		int _width;

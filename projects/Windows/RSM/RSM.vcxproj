@@ -73,8 +73,8 @@
     <None Include="..\..\..\src\Shaders\BlinnPhongTex.vs" />
     <None Include="..\..\..\src\Shaders\DepthMap.fs" />
     <None Include="..\..\..\src\Shaders\DepthMap.vs" />
-    <None Include="..\..\..\src\Shaders\GBufferTest.fs" />
-    <None Include="..\..\..\src\Shaders\GBufferTest.vs" />
+    <None Include="..\..\..\src\Shaders\GBuffer.fs" />
+    <None Include="..\..\..\src\Shaders\GBuffer.vs" />
     <None Include="..\..\..\src\Shaders\OmniDepthMap.fs" />
     <None Include="..\..\..\src\Shaders\OmniDepthMap.gs" />
     <None Include="..\..\..\src\Shaders\OmniDepthMap.vs" />

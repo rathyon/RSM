@@ -95,7 +95,8 @@ void rsm::init(int argc, char* argv[]) {
 	ShaderSource vGB = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/GBuffer.vs");
 	ShaderSource fGB = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/GBuffer.fs");
 	vGB.inject(std::string("#version 330 core\n"));
-	fGB.inject(std::string("#version 330 core\n"));
+	fGB.inject(std::string("#version 330 core\n") +
+				std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n");
 	vGB.compile();
 	fGB.compile();
 

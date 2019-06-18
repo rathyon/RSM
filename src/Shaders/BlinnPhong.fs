@@ -41,6 +41,7 @@ uniform float shininess;
 uniform sampler2D depthMap;
 uniform sampler2D positionMap;
 uniform sampler2D normalMap;
+uniform sampler2D fluxMap;
 
 // TODO: Use Bias matrix in vertex shader instead of doing this here, in the frag shader
 float debugShadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
@@ -79,8 +80,8 @@ vec3 debugPositionMap(vec4 lightSpacePosition, vec3 N, vec3 L) {
     vec3 projCoords = lightSpacePosition.xyz / lightSpacePosition.w;
     projCoords = projCoords * 0.5 + 0.5;
 
-    vec3 normal = texture(positionMap, projCoords.xy).rgb;
-    return normal;
+    vec3 position = texture(positionMap, projCoords.xy).rgb;
+    return position;
 }
 
 vec3 debugNormalMap(vec4 lightSpacePosition, vec3 N, vec3 L) {
@@ -89,6 +90,14 @@ vec3 debugNormalMap(vec4 lightSpacePosition, vec3 N, vec3 L) {
 
     vec3 normal = texture(normalMap, projCoords.xy).rgb;
     return normal;
+}
+
+vec3 debugFluxMap(vec4 lightSpacePosition, vec3 N, vec3 L) {
+    vec3 projCoords = lightSpacePosition.xyz / lightSpacePosition.w;
+    projCoords = projCoords * 0.5 + 0.5;
+
+    vec3 flux = texture(fluxMap, projCoords.xy).rgb;
+    return flux;
 }
 
 /* ==============================================================================
@@ -128,7 +137,7 @@ float LinearizeDepth(float depth)
 
 void main(void) {
 
-	/**/
+	/** /
 	vec3 V = normalize(ViewPos - vsIn.position);
 	vec3 N = vsIn.normal;
 	vec3 L;
@@ -189,10 +198,10 @@ void main(void) {
 	/**/
 
 	// Debug for DirectionalLight shadow mapping
-	/** /
+	/**/
 	vec3 L = normalize(-lights[0].direction);
 	vec3 N = vsIn.normal;
-	outColor = vec4(vec3(debugShadowFactor(vsIn.lightSpacePosition, N, L)), 1.0);
+	outColor = vec4(vec3(debugFluxMap(vsIn.lightSpacePosition, N, L)), 1.0);
 	//outColor = vec4(debugNormalMap(vsIn.lightSpacePosition, N, L), 1.0);
 	//outColor = vec4(texture(positionMap, vsIn.texCoords).rgb, 1.0);
 	/**/
