@@ -15,28 +15,28 @@ BlinnPhongMaterial::BlinnPhongMaterial() {
 	_normalMap = -1;
 }
 
-void BlinnPhongMaterial::uploadData() {
+void BlinnPhongMaterial::uploadData(GLuint prog) {
 	// set shader variables
-	setVec3("ambient", _ambient);
+	setVec3(prog, "ambient", _ambient);
 
 	if (_diffuseTex != -1) {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, _diffuseTex);
-		setSampler("diffuseTex", 0);
+		setSampler(prog, "diffuseTex", 0);
 	}
 	else {
-		setVec3("diffuse", _diffuse);
+		setVec3(prog, "diffuse", _diffuse);
 	}
 
-	setVec3("specular", _specular);
-	setFloat("shininess", _shininess);
+	setVec3(prog, "specular", _specular);
+	setFloat(prog, "shininess", _shininess);
 
 	// Optional Textures for consideration in the future
 	/** /
 	if (_specularTex != -1) {
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, _specularTex);
-		setSampler("specularTex", 1);
+		setSampler(prog, "specularTex", 1);
 	}
 	else {
 		setVec3("specular", _specular);
@@ -45,7 +45,7 @@ void BlinnPhongMaterial::uploadData() {
 	if (_normalMap != -1) {
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, _normalMap);
-		setSampler("normalMap", 2);
+		setSampler(prog, "normalMap", 2);
 	}
 	/**/
 

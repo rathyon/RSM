@@ -39,5 +39,5 @@ void main(void) {
 
 	position = vec4(vsIn.position, 1.0);
 	normal = vec4(vsIn.normal, 1.0);
-	flux = vec4(diffuse, 1.0);
+	flux = vec4(lights[0].emission * diffuse, 1.0);
 }

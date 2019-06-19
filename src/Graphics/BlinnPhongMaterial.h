@@ -11,7 +11,7 @@ namespace rsm {
 	public:
 		BlinnPhongMaterial();
 
-		void uploadData();
+		void uploadData(GLuint prog);
 
 		void setAmbient(const vec3& ambient);
 
