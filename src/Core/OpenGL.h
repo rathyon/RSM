@@ -18,6 +18,38 @@
 #endif
 
 #define NUM_LIGHTS 1
+#define NUM_VPL 100
+#define VPL_DIST_MAX 0.05f
+
+enum TextureUnit {
+	DIFFUSE_MAP  = 0,
+	SPECULAR_MAP = 1,
+	NORMAL_MAP   = 2,
+
+	G_DEPTH    = 3,
+	G_POSITION = 4,
+	G_NORMAL   = 5,
+	G_FLUX     = 6,
+
+	OMNI_G_DEPTH    = 7,
+	OMNI_G_POSITION = 8,
+	OMNI_G_NORMAL   = 9,
+	OMNI_G_FLUX     = 10
+};
+
+const GLenum OpenGLTextureUnits[]{
+	GL_TEXTURE0,
+	GL_TEXTURE1,
+	GL_TEXTURE2,
+	GL_TEXTURE3,
+	GL_TEXTURE4,
+	GL_TEXTURE5,
+	GL_TEXTURE6,
+	GL_TEXTURE7,
+	GL_TEXTURE8,
+	GL_TEXTURE9,
+	GL_TEXTURE10,
+};
 
 const GLenum OpenGLShaderType[]{
 	GL_VERTEX_SHADER,
@@ -96,5 +128,6 @@ const enum BufferIndices {
 
 void checkOpenGLError(const std::string& error);
 bool isOpenGLError();
+float randf();
 
 #endif

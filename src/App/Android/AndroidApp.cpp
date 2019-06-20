@@ -58,7 +58,8 @@ void init() {
     fBP.inject(std::string("#version 320 es\n") +
                std::string("#extension GL_EXT_shader_io_blocks : enable\n") +
                std::string("precision highp float;\n") +
-               std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n");
+               std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n" +
+               std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
     vBP.compile();
     fBP.compile();
 
@@ -70,7 +71,8 @@ void init() {
     fBPTex.inject(std::string("#version 320 es\n") +
                std::string("#extension GL_EXT_shader_io_blocks : enable\n") +
                std::string("precision highp float;\n") +
-               std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n");
+               std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n" +
+               std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
     vBPTex.compile();
     fBPTex.compile();
 

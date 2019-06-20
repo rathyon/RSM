@@ -74,7 +74,7 @@ void OpenGLApplication::prepare() {
 	// cube cam
 	/**/
 	_camera = make_sref<Perspective>(_width, _height,
-		vec3(0.0f, 10.0f, 10.0f),
+		vec3(10.0f, 10.0f, 10.0f),
 		vec3(0.0f, 5.0f, 0.0f),
 		vec3(0.0f, 1.0f, 0.0f),
 		0.1f, 1000.0f, 60.0f);
@@ -154,6 +154,26 @@ void OpenGLApplication::prepare() {
 	// Prepare shared buffers
 	prepareCameraBuffer();
 
+	/* ===================================================================================
+		RSM
+	=====================================================================================*/
+	// precalculate sampling pattern
+
+	for (int i = 0; i < NUM_VPL; i++) {
+		VPLSamples[i][0] = randf();
+		VPLSamples[i][1] = randf();
+	}
+
+	// upload RSM data
+	for (GLuint prog : _programs) {
+		glUseProgram(prog);
+		for (int i = 0; i < NUM_VPL; i++) {
+			std::string name = "VPLSamples[" + std::to_string(i) + "]";
+			glUniform2fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(glm::vec2(VPLSamples[i][0], VPLSamples[i][1])));
+		}
+	}
+	glUseProgram(0);
+
 	checkOpenGLError("Error preparing OpenGL Application!");
 }
 
@@ -206,24 +226,6 @@ void OpenGLApplication::genRSMaps() {
             glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, lights[l]->depthMap(), 0);
 		}
 
-		/** /
-		// turn off front face culling for this part
-		glCullFace(GL_BACK);
-		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->_positionFBO);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glUseProgram(GB);
-		glUniform1i(glGetUniformLocation(GB, "mode"), 0);
-		lights[l]->uploadSpatialData(GB);
-		_scene.draw(GB);
-
-		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->_normalFBO);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glUseProgram(GB);
-		glUniform1i(glGetUniformLocation(GB, "mode"), 1);
-		lights[l]->uploadSpatialData(GB);
-		_scene.draw(GB);
-		/**/
-
 	}
 
 	glCullFace(GL_BACK);
@@ -236,6 +238,7 @@ void OpenGLApplication::genRSMaps() {
 }
 
 void OpenGLApplication::render() { 
+
 	// Generate Depth Map
 	genRSMaps();
     checkOpenGLError("Error generating depth maps!");
@@ -333,32 +336,31 @@ void OpenGLApplication::uploadShadowMappingData() {
 		for (int l = 0; l < NUM_LIGHTS; l++) {
 			lights[l]->uploadShadowMapData(prog);
 
-			// TODO: define Tex Unit number for depth maps
 			GLenum type = lights[l]->depthMapType();
 			if (type == OpenGLTexTargets[IMG_2D]) {
 
-				glActiveTexture(GL_TEXTURE1);
+				glActiveTexture(OpenGLTextureUnits[TextureUnit::G_DEPTH]);
 				glBindTexture(type, lights[l]->depthMap());
-				glUniform1i(glGetUniformLocation(prog, "depthMap"), 1);
+				glUniform1i(glGetUniformLocation(prog, "depthMap"), TextureUnit::G_DEPTH);
 
 				/**/
-				glActiveTexture(GL_TEXTURE3);
+				glActiveTexture(OpenGLTextureUnits[TextureUnit::G_POSITION]);
 				glBindTexture(type, lights[l]->positionMap());
-				glUniform1i(glGetUniformLocation(prog, "positionMap"), 3);
+				glUniform1i(glGetUniformLocation(prog, "positionMap"), TextureUnit::G_POSITION);
 
-				glActiveTexture(GL_TEXTURE4);
+				glActiveTexture(OpenGLTextureUnits[TextureUnit::G_NORMAL]);
 				glBindTexture(type, lights[l]->normalMap());
-				glUniform1i(glGetUniformLocation(prog, "normalMap"), 4);
+				glUniform1i(glGetUniformLocation(prog, "normalMap"), TextureUnit::G_NORMAL);
 
-				glActiveTexture(GL_TEXTURE5);
+				glActiveTexture(OpenGLTextureUnits[TextureUnit::G_FLUX]);
 				glBindTexture(type, lights[l]->fluxMap());
-				glUniform1i(glGetUniformLocation(prog, "fluxMap"), 5);
+				glUniform1i(glGetUniformLocation(prog, "fluxMap"), TextureUnit::G_FLUX);
 				/**/
 			}
 			else {
-				glActiveTexture(GL_TEXTURE2);
+				glActiveTexture(OpenGLTextureUnits[TextureUnit::OMNI_G_DEPTH]);
 				glBindTexture(type, lights[l]->depthMap());
-				glUniform1i(glGetUniformLocation(prog, "depthCubeMap"), 2);
+				glUniform1i(glGetUniformLocation(prog, "depthCubeMap"), TextureUnit::OMNI_G_DEPTH);
 			}
 
 		}

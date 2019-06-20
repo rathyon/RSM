@@ -20,9 +20,9 @@ void BlinnPhongMaterial::uploadData(GLuint prog) {
 	setVec3(prog, "ambient", _ambient);
 
 	if (_diffuseTex != -1) {
-		glActiveTexture(GL_TEXTURE0);
+		glActiveTexture(OpenGLTextureUnits[TextureUnit::DIFFUSE_MAP]);
 		glBindTexture(GL_TEXTURE_2D, _diffuseTex);
-		setSampler(prog, "diffuseTex", 0);
+		setSampler(prog, "diffuseTex", TextureUnit::DIFFUSE_MAP);
 	}
 	else {
 		setVec3(prog, "diffuse", _diffuse);
@@ -34,18 +34,18 @@ void BlinnPhongMaterial::uploadData(GLuint prog) {
 	// Optional Textures for consideration in the future
 	/** /
 	if (_specularTex != -1) {
-		glActiveTexture(GL_TEXTURE1);
+		glActiveTexture(OpenGLTextureUnits[TextureUnit::SPECULAR_MAP]);
 		glBindTexture(GL_TEXTURE_2D, _specularTex);
-		setSampler(prog, "specularTex", 1);
+		setSampler(prog, "specularTex", TextureUnit::SPECULAR_MAP);
 	}
 	else {
 		setVec3("specular", _specular);
 	}
 
 	if (_normalMap != -1) {
-		glActiveTexture(GL_TEXTURE2);
+		glActiveTexture(OpenGLTextureUnits[TextureUnit::NORMAL_MAP]);
 		glBindTexture(GL_TEXTURE_2D, _normalMap);
-		setSampler(prog, "normalMap", 2);
+		setSampler(prog, "normalMap", TextureUnit::NORMAL_MAP);
 	}
 	/**/
 

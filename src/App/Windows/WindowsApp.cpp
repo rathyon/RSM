@@ -73,7 +73,8 @@ void rsm::init(int argc, char* argv[]) {
 	ShaderSource fBP = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/BlinnPhong.fs");
 	vBP.inject(std::string("#version 330 core\n"));
 	fBP.inject(std::string("#version 330 core\n") +
-			   std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n");
+		std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n" +
+		std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
 	vBP.compile();
 	fBP.compile();
 
@@ -81,7 +82,8 @@ void rsm::init(int argc, char* argv[]) {
 	ShaderSource fBPTex = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/BlinnPhongTex.fs");
 	vBPTex.inject(std::string("#version 330 core\n"));
 	fBPTex.inject(std::string("#version 330 core\n") +
-		          std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n");
+		          std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n" +
+		          std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
 	vBPTex.compile();
 	fBPTex.compile();
 

@@ -42,3 +42,8 @@ bool isOpenGLError() {
 	}
 	return isError;
 }
+
+// returns float from interval 0.0 to 1.0
+float randf() {
+	return (static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
+}

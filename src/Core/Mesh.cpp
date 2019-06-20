@@ -66,12 +66,12 @@ void Mesh::prepare() {
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * _vertices.size(), &_vertices[0], GL_STATIC_DRAW);
 
 	// vertex buffer attribute layout
-	glEnableVertexAttribArray(POSITION);
-	glVertexAttribPointer(POSITION, 3, GL_FLOAT, GL_FALSE, (GLsizei)sizeof(Vertex), (const void*)offsetof(Vertex, position));
-	glEnableVertexAttribArray(NORMAL);
-	glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, (GLsizei)sizeof(Vertex), (const void*)offsetof(Vertex, normal));
-	glEnableVertexAttribArray(UV);
-	glVertexAttribPointer(UV, 2, GL_FLOAT, GL_FALSE, (GLsizei)sizeof(Vertex), (const void*)offsetof(Vertex, uv));
+	glEnableVertexAttribArray(AttributeType::POSITION);
+	glVertexAttribPointer(AttributeType::POSITION, 3, GL_FLOAT, GL_FALSE, (GLsizei)sizeof(Vertex), (const void*)offsetof(Vertex, position));
+	glEnableVertexAttribArray(AttributeType::NORMAL);
+	glVertexAttribPointer(AttributeType::NORMAL, 3, GL_FLOAT, GL_FALSE, (GLsizei)sizeof(Vertex), (const void*)offsetof(Vertex, normal));
+	glEnableVertexAttribArray(AttributeType::UV);
+	glVertexAttribPointer(AttributeType::UV, 2, GL_FLOAT, GL_FALSE, (GLsizei)sizeof(Vertex), (const void*)offsetof(Vertex, uv));
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 

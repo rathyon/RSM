@@ -1,4 +1,8 @@
 
+#define PI 3.1415926538
+#define TWO_PI 6.2831853076
+#define HALF_PI 1.5707963269
+
 in FragData {
 	vec3 position;
 	vec3 normal; 
@@ -24,8 +28,8 @@ uniform cameraBlock {
 	mat4 ViewProjMatrix;
 	vec3 ViewPos;
 };
-uniform float far;
 
+uniform float far;
 uniform Light lights[NUM_LIGHTS];
 
 //Material parameters
@@ -34,6 +38,8 @@ uniform vec3 diffuse;
 uniform vec3 specular;
 uniform float shininess;
 
+uniform vec2 VPLSamples[NUM_VPL];
+const float rsmRMax = 0.2f;
 
 /* ==============================================================================
         Directional / Spot Lights
@@ -44,7 +50,7 @@ uniform sampler2D normalMap;
 uniform sampler2D fluxMap;
 
 // TODO: Use Bias matrix in vertex shader instead of doing this here, in the frag shader
-float debugShadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
+float debugDepthMap(vec4 lightSpacePosition, vec3 N, vec3 L){
 	// perform perspective divide: clip space-> normalized device coords (done automatically for gl_Position)
     vec3 projCoords = lightSpacePosition.xyz / lightSpacePosition.w;
     // bring from [-1,1] to [0,1]
@@ -129,21 +135,12 @@ float debugShadowFactor(vec3 fragPos, vec3 lightPos){
 
 out vec4 outColor;
 
-float LinearizeDepth(float depth)
-{
-    float z = depth * 2.0 - 1.0; // Back to NDC 
-    return (2.0 * 0.1 * 1000.0) / (1000.0 + 0.1 - z * (1000.0 - 0.1));
-}
-
-void main(void) {
-
-	/** /
+vec3 directIllumination() {
 	vec3 V = normalize(ViewPos - vsIn.position);
 	vec3 N = vsIn.normal;
 	vec3 L;
 
 	float shadow = 1.0;
-
 	vec3 retColor = vec3(0.0);
 
 	for(int i=0; i < NUM_LIGHTS; i++){
@@ -194,16 +191,49 @@ void main(void) {
 		retColor += (diff + spec) * shadow;
 	}
 
-	outColor = vec4(retColor, 1.0);
+	return retColor;
+}
+
+vec3 indirectIllumination() {
+	vec3 retColor = vec3(0.0);
+
+	// perform perspective divide: clip space-> normalized device coords (done automatically for gl_Position)
+    vec3 projCoords = vsIn.lightSpacePosition.xyz / vsIn.lightSpacePosition.w;
+    // bring from [-1,1] to [0,1]
+    projCoords = projCoords * 0.5 + 0.5;
+
+    for(int i=0; i < NUM_VPL; i++){
+    	//vec2 sample = VPLSamples[i];
+
+    	//vec2 sampleCoords = vec2(projCoords.x + rsmRMax * sample.x * sin(TWO_PI*sample.y), projCoords.y + rsmRMax * sample.x * cos(TWO_PI * sample.y) );
+
+    	vec2 sampleCoords = vec2(1.0, 0.0);
+
+    	vec3 vplPosition = texture(positionMap, sampleCoords).rgb;
+    	vec3 vplNormal = texture(normalMap, sampleCoords).rgb;
+    	vec3 vplFlux = texture(fluxMap, sampleCoords).rgb;
+
+    	vec3 result = vplFlux * ((max(0, dot(vplNormal, vsIn.position - vplPosition))) * (max(0, dot(vsIn.normal, vplPosition - vsIn.position)))) / pow(length(vsIn.position - vplPosition), 4.0);
+
+    	retColor = retColor + result;
+    }
+
+	
+	return retColor;
+}
+
+void main(void) {
+
+	//outColor = vec4( directIllumination() + indirectIllumination(), 1.0);
+	outColor = vec4( indirectIllumination(), 1.0);
 	/**/
 
 	// Debug for DirectionalLight shadow mapping
-	/**/
+	/** /
 	vec3 L = normalize(-lights[0].direction);
 	vec3 N = vsIn.normal;
-	//outColor = vec4(vec3(debugNormalMap(vsIn.lightSpacePosition, N, L)), 1.0);
-	outColor = vec4(debugNormalMap(vsIn.lightSpacePosition, N, L), 1.0);
-	//outColor = vec4(texture(positionMap, vsIn.texCoords).rgb, 1.0);
+	//outColor = vec4(vec3(debugFluxMap(vsIn.lightSpacePosition, N, L)), 1.0);
+	outColor = vec4(texture(positionMap, vsIn.texCoords).rgb, 1.0);
 	/**/
 
 	// Debug for PointLight shadow mapping

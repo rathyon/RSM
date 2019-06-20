@@ -55,6 +55,8 @@ namespace rsm {
 
 		Scene _scene;
 		sref<Camera> _camera;
+
+		GLfloat VPLSamples[NUM_VPL][2];
 	};
 }
 

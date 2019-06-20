@@ -25,6 +25,7 @@ uniform cameraBlock {
 	vec3 ViewPos;
 };
 
+uniform float far;
 uniform Light lights[NUM_LIGHTS];
 
 //Material parameters
@@ -35,24 +36,6 @@ uniform float shininess;
 
 uniform sampler2D diffuseTex;
 
-// shadow mapping
-uniform sampler2D depthMap;
-uniform samplerCube depthCubeMap;
-
-uniform float far;
-
-/** /
-// for specular maps
-float fetchParameter(sampler2D samp){
-	return texture(samp, vsIn.texCoords).r;
-}
-
-vec3 fetchNormal(){
-	// normal map [0,1] to [-1,1]
-	return normalize((texture(normalMap, vsIn.texCoords).rgb) * 2.0 - 1.0);
-}
-/**/
-
 vec3 fetchDiffuse(){
 	vec4 texel = texture(diffuseTex, vsIn.texCoords);
 	if (texel.a <= 0.0)
@@ -60,11 +43,13 @@ vec3 fetchDiffuse(){
 	return texel.rgb;
 }
 
-float debugShadowFactor(vec3 fragPos, vec3 lightPos){
-	vec3 fragToLight = fragPos - lightPos;
-	float closestDepth = texture(depthCubeMap, fragToLight).r;
-	return closestDepth;
-}
+/* ==============================================================================
+        Directional / Spot Lights
+ ============================================================================== */
+uniform sampler2D depthMap;
+uniform sampler2D positionMap;
+uniform sampler2D normalMap;
+uniform sampler2D fluxMap;
 
 // TODO: Use Bias matrix in vertex shader instead of doing this here, in the frag shader
 float debugShadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
@@ -75,16 +60,6 @@ float debugShadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
 
     float closestDepth = texture(depthMap, projCoords.xy).r;
     return closestDepth;
-}
-
-float shadowFactor(vec3 fragPos, vec3 lightPos){
-	vec3 fragToLight = fragPos - lightPos;
-	float closestDepth = texture(depthCubeMap, fragToLight).r;
-	closestDepth *= far;
-	float currentDepth = length(fragToLight);
-
-	float shadow = currentDepth > closestDepth  ? 0.0 : 1.0;
-    return shadow;
 }
 
 float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
@@ -109,6 +84,52 @@ float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
     return shadow;
 }
 
+vec3 debugPositionMap(vec4 lightSpacePosition, vec3 N, vec3 L) {
+    vec3 projCoords = lightSpacePosition.xyz / lightSpacePosition.w;
+    projCoords = projCoords * 0.5 + 0.5;
+
+    vec3 position = texture(positionMap, projCoords.xy).rgb;
+    return position;
+}
+
+vec3 debugNormalMap(vec4 lightSpacePosition, vec3 N, vec3 L) {
+    vec3 projCoords = lightSpacePosition.xyz / lightSpacePosition.w;
+    projCoords = projCoords * 0.5 + 0.5;
+
+    vec3 normal = texture(normalMap, projCoords.xy).rgb;
+    return normal;
+}
+
+vec3 debugFluxMap(vec4 lightSpacePosition, vec3 N, vec3 L) {
+    vec3 projCoords = lightSpacePosition.xyz / lightSpacePosition.w;
+    projCoords = projCoords * 0.5 + 0.5;
+
+    vec3 flux = texture(fluxMap, projCoords.xy).rgb;
+    return flux;
+}
+
+/* ==============================================================================
+        Point Lights
+ ============================================================================== */
+
+uniform samplerCube depthCubeMap;
+
+float shadowFactor(vec3 fragPos, vec3 lightPos){
+	vec3 fragToLight = fragPos - lightPos;
+	float closestDepth = texture(depthCubeMap, fragToLight).r;
+	closestDepth *= far;
+	float currentDepth = length(fragToLight);
+
+	float shadow = currentDepth > closestDepth  ? 0.0 : 1.0;
+    return shadow;
+}
+
+float debugShadowFactor(vec3 fragPos, vec3 lightPos){
+	vec3 fragToLight = fragPos - lightPos;
+	float closestDepth = texture(depthCubeMap, fragToLight).r;
+	return closestDepth;
+}
+
 /* ==============================================================================
         Stage Outputs
  ============================================================================== */
@@ -117,7 +138,7 @@ out vec4 outColor;
 
 void main(void) {
 
-	/**/
+	/** /
 	vec3 V = normalize(ViewPos - vsIn.position);
 	vec3 N = vsIn.normal;
 	vec3 L;
@@ -178,10 +199,12 @@ void main(void) {
 	/**/
 
 	// Debug for DirectionalLight shadow mapping
-	/** /
+	/**/
 	vec3 L = normalize(-lights[0].direction);
 	vec3 N = vsIn.normal;
-	outColor = vec4(vec3(debugShadowFactor(vsIn.lightSpacePosition, N, L)), 1.0);
+	outColor = vec4(vec3(debugPositionMap(vsIn.lightSpacePosition, N, L)), 1.0);
+	//outColor = vec4(debugNormalMap(vsIn.lightSpacePosition, N, L), 1.0);
+	//outColor = vec4(texture(positionMap, vsIn.texCoords).rgb, 1.0);
 	/**/
 
 	// Debug for PointLight shadow mapping
