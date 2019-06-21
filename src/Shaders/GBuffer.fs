@@ -44,7 +44,6 @@ vec3 fetchDiffuse(){
 	}
 }
 
-
 uniform int mode;
 
 layout(location = 0) out vec4 position;
@@ -55,5 +54,5 @@ void main(void) {
 
 	position = vec4(vsIn.position, 1.0);
 	normal = vec4(vsIn.normal, 1.0);
-	flux = vec4(lights[0].emission * fetchDiffuse(), 1.0);
+	flux = vec4(lights[0].emission * fetchDiffuse() * lights[0].intensity, 1.0);
 }

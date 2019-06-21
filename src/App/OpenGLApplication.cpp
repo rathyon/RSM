@@ -74,8 +74,8 @@ void OpenGLApplication::prepare() {
 	// cube cam
 	/**/
 	_camera = make_sref<Perspective>(_width, _height,
-		vec3(10.0f, 10.0f, 10.0f),
-		vec3(0.0f, 5.0f, 0.0f),
+		vec3(15.0f, 10.0f, 3.0f),
+		vec3(0.0f, 3.0f, 0.0f),
 		vec3(0.0f, 1.0f, 0.0f),
 		0.1f, 1000.0f, 60.0f);
 	/**/
@@ -101,14 +101,14 @@ void OpenGLApplication::prepare() {
 	spot->prepare(1024);
 	/**/
 
-	/** /
-	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 5.0f, glm::vec3(0.0f, 7.0f, 0.0f));
+	/**/
+	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 5.0f, glm::vec3(0.0f, 5.0f, 2.0f));
 	_scene.addLight(candle);
 	candle->prepare(1024, 1024);
 	/**/
 
-	/**/
-	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(-1.0f, -1.0f, -1.0f));
+	/** /
+	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), 0.5f, glm::vec3(-1.0f, -1.0f, -1.0f));
 	_scene.addLight(sun);
 	sun->prepare(_width, _height);
 	/**/
@@ -122,7 +122,7 @@ void OpenGLApplication::prepare() {
 	cube->prepare();
 	_scene.addModel(cube);
 
-	cube->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+	//cube->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	/**/
 
 	/** /

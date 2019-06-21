@@ -99,10 +99,7 @@ bool Model::loadObj(bool fromFile, const char* objsource, const char* matsource)
 		for (tinyobj::material_t material : materials) {
 			sref<BlinnPhongMaterial> mat = make_sref<BlinnPhongMaterial>();
 
-			if (material.diffuse_texname != "")
-				mat->setProgram(RM.getShader("BlinnPhongTex")->id());
-			else
-				mat->setProgram(RM.getShader("BlinnPhong")->id());
+			mat->setProgram(RM.getShader("BlinnPhong")->id());
 
 			mat->setAmbient(glm::vec3(material.ambient[0], material.ambient[1], material.ambient[2]));
 			mat->setShininess(material.shininess);

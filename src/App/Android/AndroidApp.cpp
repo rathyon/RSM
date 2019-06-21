@@ -63,19 +63,6 @@ void init() {
     vBP.compile();
     fBP.compile();
 
-    ShaderSource vBPTex = ShaderSource(VERTEX_SHADER, "vBPTex", getAssetSource("shaders/BlinnPhongTex.vs"));
-    ShaderSource fBPTex = ShaderSource(FRAGMENT_SHADER, "fBPTex", getAssetSource("shaders/BlinnPhongTex.fs"));
-    vBPTex.inject(std::string("#version 320 es\n") +
-               std::string("#extension GL_EXT_shader_io_blocks : enable\n"));
-
-    fBPTex.inject(std::string("#version 320 es\n") +
-               std::string("#extension GL_EXT_shader_io_blocks : enable\n") +
-               std::string("precision highp float;\n") +
-               std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n" +
-               std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
-    vBPTex.compile();
-    fBPTex.compile();
-
     ShaderSource vDM = ShaderSource(VERTEX_SHADER, "vSM",getAssetSource("shaders/DepthMap.vs"));
     ShaderSource fDM = ShaderSource(FRAGMENT_SHADER, "fSM", getAssetSource("shaders/DepthMap.fs"));
     vDM.inject(std::string("#version 320 es\n"));
@@ -110,13 +97,6 @@ void init() {
     BlinnPhong->link();
     RM.addShader("BlinnPhong", BlinnPhong);
     glApp->addProgram(BlinnPhong->id());
-
-    sref<Shader> BlinnPhongTex = make_sref<Shader>("BlinnPhongTex");
-    BlinnPhongTex->addShader(vBPTex);
-    BlinnPhongTex->addShader(fBPTex);
-    BlinnPhongTex->link();
-    RM.addShader("BlinnPhongTex", BlinnPhongTex);
-    glApp->addProgram(BlinnPhongTex->id());
 
     sref<Shader> ShadowMap = make_sref<Shader>("DepthMap");
     ShadowMap->addShader(vDM);

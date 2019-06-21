@@ -78,15 +78,6 @@ void rsm::init(int argc, char* argv[]) {
 	vBP.compile();
 	fBP.compile();
 
-	ShaderSource vBPTex = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/BlinnPhongTex.vs");
-	ShaderSource fBPTex = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/BlinnPhongTex.fs");
-	vBPTex.inject(std::string("#version 330 core\n"));
-	fBPTex.inject(std::string("#version 330 core\n") +
-		          std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n" +
-		          std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
-	vBPTex.compile();
-	fBPTex.compile();
-
 	ShaderSource vDM = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/DepthMap.vs");
 	ShaderSource fDM = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/DepthMap.fs");
 	vDM.inject(std::string("#version 330 core\n"));
@@ -118,13 +109,6 @@ void rsm::init(int argc, char* argv[]) {
 	BlinnPhong->link();
 	RM.addShader("BlinnPhong", BlinnPhong);
 	glApp->addProgram(BlinnPhong->id());
-
-	sref<Shader> BlinnPhongTex = make_sref<Shader>("BlinnPhongTex");
-	BlinnPhongTex->addShader(vBPTex);
-	BlinnPhongTex->addShader(fBPTex);
-	BlinnPhongTex->link();
-	RM.addShader("BlinnPhongTex", BlinnPhongTex);
-	glApp->addProgram(BlinnPhongTex->id());
 
 	sref<Shader> DepthMap = make_sref<Shader>("DepthMap");
 	DepthMap->addShader(vDM);
@@ -178,14 +162,13 @@ void rsm::init(int argc, char* argv[]) {
 	sref<Model> cube = make_sref<Model>("Cube");
 	cube->loadFromFile("../../../assets/models/cube/cube.obj", "../../../assets/models/cube");
 	RM.addModel("cube", cube);
-	cube->setMaterial(bp_red);
+	cube->setMaterial(bp_gray);
 	/**/
 
 	/** /
 	sref<Model> sponza = make_sref<Model>("sponza");
 	sponza->loadFromFile("../../../assets/models/crytek sponza/sponza.obj", "../../../assets/models/crytek sponza/");
 	RM.addModel("sponza", sponza);
-	sponza->setMaterial(bp_green);
 	/**/
 
 	/** /

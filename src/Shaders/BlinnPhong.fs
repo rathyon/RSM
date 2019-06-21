@@ -38,6 +38,23 @@ uniform vec3 diffuse;
 uniform vec3 specular;
 uniform float shininess;
 
+// Material textures
+uniform sampler2D diffuseTex;
+
+vec3 fetchDiffuse(){
+	if (diffuse.r < 0.0){
+		vec4 texel = texture(diffuseTex, vsIn.texCoords);
+		if (texel.a <= 0.0)
+			discard;
+		return texel.rgb;
+	}
+	else{
+		return diffuse;
+	}
+
+}
+
+// RSM Variables
 uniform vec2 VPLSamples[NUM_VPL];
 const float rsmRMax = 0.2f;
 
@@ -82,28 +99,12 @@ float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
     return shadow;
 }
 
-vec3 debugPositionMap(vec4 lightSpacePosition, vec3 N, vec3 L) {
+vec3 debugMap(vec4 lightSpacePosition, vec3 N, vec3 L, sampler2D map) {
     vec3 projCoords = lightSpacePosition.xyz / lightSpacePosition.w;
     projCoords = projCoords * 0.5 + 0.5;
 
-    vec3 position = texture(positionMap, projCoords.xy).rgb;
+    vec3 position = texture(map, projCoords.xy).rgb;
     return position;
-}
-
-vec3 debugNormalMap(vec4 lightSpacePosition, vec3 N, vec3 L) {
-    vec3 projCoords = lightSpacePosition.xyz / lightSpacePosition.w;
-    projCoords = projCoords * 0.5 + 0.5;
-
-    vec3 normal = texture(normalMap, projCoords.xy).rgb;
-    return normal;
-}
-
-vec3 debugFluxMap(vec4 lightSpacePosition, vec3 N, vec3 L) {
-    vec3 projCoords = lightSpacePosition.xyz / lightSpacePosition.w;
-    projCoords = projCoords * 0.5 + 0.5;
-
-    vec3 flux = texture(fluxMap, projCoords.xy).rgb;
-    return flux;
 }
 
 /* ==============================================================================
@@ -175,7 +176,7 @@ vec3 directIllumination() {
 
 		if (NdotL > 0.0){
 
-			diff = lights[i].emission * lights[i].intensity * ( diffuse * NdotL);
+			diff = lights[i].emission * lights[i].intensity * ( fetchDiffuse() * NdotL);
 			spec = lights[i].emission * lights[i].intensity * ( specular * pow(NdotH, shininess));
 
 			// if not directional light
@@ -203,7 +204,7 @@ vec3 indirectIllumination() {
     projCoords = projCoords * 0.5 + 0.5;
 
     for(int i=0; i < NUM_VPL; i++){
-    	vec2 sample = VPLSamples[i].xy;
+    	vec2 sample = VPLSamples[i];
 
     	//vec2 sampleCoords = projCoords.xy + rsmRMax * sample;
 
@@ -215,6 +216,10 @@ vec3 indirectIllumination() {
 
     	vec3 result = vplFlux * ((max(0, dot(vplNormal, vsIn.position - vplPosition))) * (max(0, dot(vsIn.normal, vplPosition - vsIn.position)))) / pow(length(vsIn.position - vplPosition), 4.0);
 
+    	//vec3 result = vplFlux * ((max(0, dot(vplNormal, vsIn.position - vplPosition)) * max(0,dot(vsIn.normal, vplPosition - vsIn.position))) / pow(length(vsIn.position - vplPosition), 4));
+
+    	result = result * sample.x * sample.x;
+
     	retColor = retColor + result;
     }
 
@@ -225,15 +230,18 @@ vec3 indirectIllumination() {
 void main(void) {
 
 	//outColor = vec4( directIllumination() + indirectIllumination(), 1.0);
-	outColor = vec4( indirectIllumination(), 1.0);
+	//outColor = vec4( directIllumination(), 1.0);
+	//outColor = vec4( indirectIllumination(), 1.0);
 	/**/
 
 	// Debug for DirectionalLight shadow mapping
-	/** /
+	//outColor = vec4(lights[0].emission * fetchDiffuse() * lights[0].intensity, 1.0);
+
+	/**/
 	vec3 L = normalize(-lights[0].direction);
 	vec3 N = vsIn.normal;
-	//outColor = vec4(vec3(debugFluxMap(vsIn.lightSpacePosition, N, L)), 1.0);
-	outColor = vec4(texture(positionMap, vsIn.texCoords).rgb, 1.0);
+	outColor = vec4(vec3(debugMap(vsIn.lightSpacePosition, N, L, positionMap)), 1.0);
+	//outColor = vec4(vec3(debugDepthMap(vsIn.lightSpacePosition, N, L)), 1.0);
 	/**/
 
 	// Debug for PointLight shadow mapping
