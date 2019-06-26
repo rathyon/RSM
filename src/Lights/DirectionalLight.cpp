@@ -35,7 +35,7 @@ void DirectionalLight::prepare(int width, int height) {
 	_gBufferHeight = height;
 
 	// shadow mapping for directional lights is weird, they need a "position" for generating the depth map...
-	_projMatrix = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 1000.0f);
+	_projMatrix = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 1000.0f);
 	_viewMatrix = glm::lookAt(_direction * -100.0f,
 		glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3(0.0f, 1.0f, 0.0f));

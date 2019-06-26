@@ -74,8 +74,8 @@ void OpenGLApplication::prepare() {
 	// cube cam
 	/**/
 	_camera = make_sref<Perspective>(_width, _height,
-		vec3(15.0f, 10.0f, 3.0f),
-		vec3(0.0f, 3.0f, 0.0f),
+		vec3(10.0f, 10.0f, 10.0f),
+		vec3(0.0f, 3.5f, 0.0f),
 		vec3(0.0f, 1.0f, 0.0f),
 		0.1f, 1000.0f, 60.0f);
 	/**/
@@ -101,14 +101,14 @@ void OpenGLApplication::prepare() {
 	spot->prepare(1024);
 	/**/
 
-	/**/
+	/** /
 	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 5.0f, glm::vec3(0.0f, 5.0f, 2.0f));
 	_scene.addLight(candle);
 	candle->prepare(1024, 1024);
 	/**/
 
-	/** /
-	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), 0.5f, glm::vec3(-1.0f, -1.0f, -1.0f));
+	/**/
+	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(-1.0f, -1.0f, -1.0f));
 	_scene.addLight(sun);
 	sun->prepare(_width, _height);
 	/**/
@@ -149,6 +149,13 @@ void OpenGLApplication::prepare() {
 	sref<Model> Lucy = RM.getModel("Lucy");
 	Lucy->prepare();
 	_scene.addModel(Lucy);
+	/**/
+
+	/** /
+	sref<Model> demo2 = RM.getModel("demo2");
+	demo2->prepare();
+	_scene.addModel(demo2);
+	//demo2->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	/**/
 
 	// Prepare shared buffers
@@ -262,8 +269,10 @@ void OpenGLApplication::render() {
 
 	// render objects...
 	_scene.render();
+    LOG("Render done!\n");
 
 	checkOpenGLError("Error in render loop!");
+	LOG("Oops\n");
 }
 
 void OpenGLApplication::prepareCameraBuffer() {

@@ -44,19 +44,19 @@ uniform sampler2D diffuseTex;
 vec3 fetchDiffuse(){
 	if (diffuse.r < 0.0){
 		vec4 texel = texture(diffuseTex, vsIn.texCoords);
-		if (texel.a <= 0.0)
-			discard;
 		return texel.rgb;
 	}
 	else{
 		return diffuse;
 	}
-
 }
+
+// Shadow Mapping variables
+const float baseBias = 0.005f;
 
 // RSM Variables
 uniform vec2 VPLSamples[NUM_VPL];
-const float rsmRMax = 0.2f;
+const float rsmRMax = 0.8f;
 
 /* ==============================================================================
         Directional / Spot Lights
@@ -89,13 +89,10 @@ float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
     float closestDepth = texture(depthMap, projCoords.xy).r;
     float currentDepth = projCoords.z; 
 
-    // shadow bias to reduce shadow acne -> for some reason shadows don't appear?
-    /** /
-    float bias = max(0.005 * (1.0 - dot(N,L)), 0.0005);
-    float shadow = currentDepth - bias > closestDepth  ? 0.0 : 1.0;
-    /**/
+    float bias = baseBias * tan(acos(dot(N,L)));
+    bias = clamp(bias, 0.0, 0.0005f);
 
-    float shadow = currentDepth > closestDepth  ? 0.0 : 1.0;
+    float shadow = currentDepth - bias > closestDepth  ? 0.0 : 1.0;
     return shadow;
 }
 
@@ -197,47 +194,62 @@ vec3 directIllumination() {
 
 vec3 indirectIllumination() {
 	vec3 retColor = vec3(0.0);
+	vec3 indirect = vec3(0.0);
 
 	// perform perspective divide: clip space-> normalized device coords (done automatically for gl_Position)
+
     vec3 projCoords = vsIn.lightSpacePosition.xyz / vsIn.lightSpacePosition.w;
+    //vec3 projCoords = vsIn.lightSpacePosition.xyz;
+
     // bring from [-1,1] to [0,1]
     projCoords = projCoords * 0.5 + 0.5;
 
     for(int i=0; i < NUM_VPL; i++){
     	vec2 sample = VPLSamples[i];
 
-    	//vec2 sampleCoords = projCoords.xy + rsmRMax * sample;
+    	//vec2 coords = projCoords.xy + rsmRMax*sample;
+    	vec2 coords = vec2(projCoords.x + rsmRMax*sample.x*sin(TWO_PI*sample.y), projCoords.y + rsmRMax*sample.x*cos(TWO_PI*sample.y));
 
-    	vec2 sampleCoords = vec2(projCoords.x + rsmRMax * sample.x * sin(TWO_PI*sample.y), projCoords.y + rsmRMax * sample.x * cos(TWO_PI * sample.y) );
+    	vec3 vplP = texture(positionMap, coords.xy).xyz;
+    	vec3 vplN = texture(normalMap, coords.xy).xyz;
+    	vec3 vplFlux = texture(fluxMap, coords.xy).rgb;
 
-    	vec3 vplPosition = texture(positionMap, sampleCoords).rgb;
-    	vec3 vplNormal = texture(normalMap, sampleCoords).rgb;
-    	vec3 vplFlux = texture(fluxMap, sampleCoords).rgb;
+    	// original formulas, somehow they don't work?! - SOMETHING is very wrong about the VPL position or frag pos? I dunno MUST INVESTIGATE
+    	/** /
+    	float dot1 = max(0.0, dot(vplN, vsIn.position - vplP));
+    	float dot2 = max(0.0, dot(vsIn.normal, vplP - vsIn.position));
+    	/**/
 
-    	vec3 result = vplFlux * ((max(0, dot(vplNormal, vsIn.position - vplPosition))) * (max(0, dot(vsIn.normal, vplPosition - vsIn.position)))) / pow(length(vsIn.position - vplPosition), 4.0);
+    	/**/
+    	float dot2 = max(0.0, dot(vplP - vsIn.position, normalize(vsIn.normal)));
+    	float dot1 = max(0.0, -dot(vsIn.position - vplP, vplN));
+    	/**/
 
-    	//vec3 result = vplFlux * ((max(0, dot(vplNormal, vsIn.position - vplPosition)) * max(0,dot(vsIn.normal, vplPosition - vsIn.position))) / pow(length(vsIn.position - vplPosition), 4));
+    	float dist = length(vplP - vsIn.position);
 
-    	result = result * sample.x * sample.x;
+    	indirect += vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
+    	indirect = indirect * sample.x * sample.x;
 
-    	retColor = retColor + result;
+    	retColor += indirect;
     }
 
-	
-	return retColor;
+    //indirect = 4.0 * PI * indirect / NUM_VPL;
+    return retColor;
+
+	//return clamp(retColor, 0.0, 1.0) * fetchDiffuse();
 }
 
 void main(void) {
 
-	//outColor = vec4( directIllumination() + indirectIllumination(), 1.0);
+	outColor = vec4( directIllumination() + indirectIllumination(), 1.0);
 	//outColor = vec4( directIllumination(), 1.0);
 	//outColor = vec4( indirectIllumination(), 1.0);
 	/**/
 
 	// Debug for DirectionalLight shadow mapping
-	//outColor = vec4(lights[0].emission * fetchDiffuse() * lights[0].intensity, 1.0);
+	//outColor = vec4(vsIn.position, 1.0);
 
-	/**/
+	/** /
 	vec3 L = normalize(-lights[0].direction);
 	vec3 N = vsIn.normal;
 	outColor = vec4(vec3(debugMap(vsIn.lightSpacePosition, N, L, positionMap)), 1.0);

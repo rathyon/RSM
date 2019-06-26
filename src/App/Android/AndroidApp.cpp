@@ -144,6 +144,12 @@ void init() {
     /**/
 
     /** /
+    sref<Model> demo2 = make_sref<Model>("demo2");
+    demo2->loadFromMemory(getAssetSource("models/demo2/demo2.obj"), getAssetSource("models/demo2/demo2.mtl"));
+    RM.addModel("demo2", demo2);
+    /**/
+
+    /** /
     sref<Model> demo_scene = make_sref<Model>("demo_scene");
     demo_scene->loadFromMemory(getAssetSource("models/demo scene closed/demo_scene.obj"), getAssetSource("models/demo scene closed/demo_scene.mtl"));
     RM.addModel("demo_scene", demo_scene);

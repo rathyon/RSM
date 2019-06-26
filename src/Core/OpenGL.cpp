@@ -11,6 +11,8 @@ const char *getGLErrorString(GLenum err)
             return "Invalid value";
         case GL_INVALID_OPERATION:
             return "Invalid operation";
+        case GL_INVALID_FRAMEBUFFER_OPERATION:
+            return "Invalid framebuffer operation";
         case GL_STACK_OVERFLOW:
             return "Stack overflow";
         case GL_STACK_UNDERFLOW:
