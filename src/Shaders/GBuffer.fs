@@ -5,11 +5,6 @@ in FragData {
 	vec2 texCoords;
 } vsIn;
 
-// depth = 0
-// position = 1
-// normal = 2
-// flux = 3
-
 struct Light {
 	vec3 position;
 	vec3 direction;
@@ -52,6 +47,6 @@ layout(location = 2) out vec4 flux;
 
 void main(void) {
 	position = vec4(vsIn.position, 1.0);
-	normal = vec4(vsIn.normal, 1.0);
+	normal = vec4(normalize(vsIn.normal), 1.0);
 	flux = vec4(lights[0].emission * fetchDiffuse() * lights[0].intensity, 1.0);
 }

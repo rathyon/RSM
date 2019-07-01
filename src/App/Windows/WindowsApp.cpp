@@ -195,6 +195,7 @@ void rsm::init(int argc, char* argv[]) {
 	RM.addModel("Lucy", Lucy);
 	/**/
 
+
 	/** /
 	sref<Model> demo2 = make_sref<Model>("demo2");
 	demo2->loadFromFile("../../../assets/models/demo2/demo2.obj", "../../../assets/models/demo2/");
@@ -234,14 +235,7 @@ void rsm::update() {
 		moveDir += -glApp->getCamera()->right();
 
 	if (keys['i'])
-		RM.getModel("Lucy")->setPosition(RM.getModel("Lucy")->position() + glm::vec3(0.0f, 0.0f, 0.05f));
-	else if (keys['k'])
-		RM.getModel("Lucy")->setPosition(RM.getModel("Lucy")->position() + glm::vec3(0.0f, 0.0f, -0.05f));
-
-	if (keys['j'])
-		RM.getModel("Lucy")->setPosition(RM.getModel("Lucy")->position() + glm::vec3(0.05f, 0.0f, 0.0f));
-	else if (keys['l'])
-		RM.getModel("Lucy")->setPosition(RM.getModel("Lucy")->position() + glm::vec3(-0.05f, 0.0f, 0.0f));
+		LOG("Camera Pos: %f %f %f", glApp->getCamera()->position().x, glApp->getCamera()->position().y, glApp->getCamera()->position().z);
 
 	if (moveDir != glm::vec3(0.0f)) {
 		glApp->getCamera()->setPosition(glApp->getCamera()->position() + glm::normalize(moveDir) * dt * 10.0f);

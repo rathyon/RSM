@@ -74,7 +74,7 @@ void OpenGLApplication::prepare() {
 	// cube cam
 	/**/
 	_camera = make_sref<Perspective>(_width, _height,
-		vec3(10.0f, 10.0f, 10.0f),
+		vec3(-3.0f, 4.0f, -3.0f),
 		vec3(0.0f, 3.5f, 0.0f),
 		vec3(0.0f, 1.0f, 0.0f),
 		0.1f, 1000.0f, 60.0f);
@@ -269,10 +269,8 @@ void OpenGLApplication::render() {
 
 	// render objects...
 	_scene.render();
-    LOG("Render done!\n");
 
 	checkOpenGLError("Error in render loop!");
-	LOG("Oops\n");
 }
 
 void OpenGLApplication::prepareCameraBuffer() {

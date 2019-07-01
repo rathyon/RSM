@@ -38,7 +38,8 @@ uniform vec3 diffuse;
 uniform vec3 specular;
 uniform float shininess;
 
-// Material textures
+// Material textures -> OpenGL ES doesn't let me have 1 shader for both tex and non tex models...
+/** /
 uniform sampler2D diffuseTex;
 
 vec3 fetchDiffuse(){
@@ -50,13 +51,14 @@ vec3 fetchDiffuse(){
 		return diffuse;
 	}
 }
+/**/
 
 // Shadow Mapping variables
 const float baseBias = 0.005f;
 
 // RSM Variables
 uniform vec2 VPLSamples[NUM_VPL];
-const float rsmRMax = 0.8f;
+const float rsmRMax = 0.2f;
 
 /* ==============================================================================
         Directional / Spot Lights
@@ -173,7 +175,7 @@ vec3 directIllumination() {
 
 		if (NdotL > 0.0){
 
-			diff = lights[i].emission * lights[i].intensity * ( fetchDiffuse() * NdotL);
+			diff = lights[i].emission * lights[i].intensity * ( diffuse * NdotL);
 			spec = lights[i].emission * lights[i].intensity * ( specular * pow(NdotH, shininess));
 
 			// if not directional light
@@ -195,48 +197,32 @@ vec3 directIllumination() {
 vec3 indirectIllumination() {
 	vec3 retColor = vec3(0.0);
 	vec3 indirect = vec3(0.0);
-
 	// perform perspective divide: clip space-> normalized device coords (done automatically for gl_Position)
 
     vec3 projCoords = vsIn.lightSpacePosition.xyz / vsIn.lightSpacePosition.w;
-    //vec3 projCoords = vsIn.lightSpacePosition.xyz;
 
     // bring from [-1,1] to [0,1]
     projCoords = projCoords * 0.5 + 0.5;
 
     for(int i=0; i < NUM_VPL; i++){
-    	vec2 sample = VPLSamples[i];
-
-    	//vec2 coords = projCoords.xy + rsmRMax*sample;
-    	vec2 coords = vec2(projCoords.x + rsmRMax*sample.x*sin(TWO_PI*sample.y), projCoords.y + rsmRMax*sample.x*cos(TWO_PI*sample.y));
+    	vec2 rnd = VPLSamples[i];
+    	vec2 coords = vec2(projCoords.x + rsmRMax*rnd.x*sin(TWO_PI*rnd.y), projCoords.y + rsmRMax*rnd.x*cos(TWO_PI*rnd.y));
 
     	vec3 vplP = texture(positionMap, coords.xy).xyz;
-    	vec3 vplN = texture(normalMap, coords.xy).xyz;
+    	vec3 vplN = normalize(texture(normalMap, coords.xy)).xyz;
     	vec3 vplFlux = texture(fluxMap, coords.xy).rgb;
 
-    	// original formulas, somehow they don't work?! - SOMETHING is very wrong about the VPL position or frag pos? I dunno MUST INVESTIGATE
-    	/** /
     	float dot1 = max(0.0, dot(vplN, vsIn.position - vplP));
-    	float dot2 = max(0.0, dot(vsIn.normal, vplP - vsIn.position));
-    	/**/
-
-    	/**/
-    	float dot2 = max(0.0, dot(vplP - vsIn.position, normalize(vsIn.normal)));
-    	float dot1 = max(0.0, -dot(vsIn.position - vplP, vplN));
-    	/**/
+    	float dot2 = max(0.0, dot(normalize(vsIn.normal), vplP - vsIn.position));
 
     	float dist = length(vplP - vsIn.position);
 
     	indirect += vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
-    	indirect = indirect * sample.x * sample.x;
+    	indirect = indirect * rnd.x * rnd.x;
 
     	retColor += indirect;
     }
-
-    //indirect = 4.0 * PI * indirect / NUM_VPL;
-    return retColor;
-
-	//return clamp(retColor, 0.0, 1.0) * fetchDiffuse();
+	return clamp(retColor, 0.0, 1.0) * diffuse;
 }
 
 void main(void) {
@@ -252,7 +238,7 @@ void main(void) {
 	/** /
 	vec3 L = normalize(-lights[0].direction);
 	vec3 N = vsIn.normal;
-	outColor = vec4(vec3(debugMap(vsIn.lightSpacePosition, N, L, positionMap)), 1.0);
+	outColor = vec4(vec3(debugMap(vsIn.lightSpacePosition, N, L, normalMap)), 1.0);
 	//outColor = vec4(vec3(debugDepthMap(vsIn.lightSpacePosition, N, L)), 1.0);
 	/**/
 
