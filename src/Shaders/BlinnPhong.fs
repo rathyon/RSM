@@ -62,13 +62,25 @@ float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
     if(projCoords.z > 1.0)
         return 1.0;
 
-    float closestDepth = texture(depthMap, projCoords.xy).r;
+    //float closestDepth = texture(depthMap, projCoords.xy).r;
     float currentDepth = projCoords.z; 
 
     float bias = baseBias * tan(acos(dot(N,L)));
     bias = clamp(bias, 0.0, 0.0005f);
 
-    float shadow = currentDepth - bias > closestDepth  ? 0.0 : 1.0;
+    //float shadow = currentDepth - bias > closestDepth  ? 0.0 : 1.0;
+
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(depthMap, 0);
+    for(int x = -1; x <= 1; x++){
+    	for(int y = -1; y <= 1; y++){
+    		float depth = texture(depthMap, projCoords.xy + vec2(x,y) * texelSize).r;
+    		shadow += currentDepth - bias > depth ? 0.0 : 1.0;
+    	}
+    }
+
+    shadow = shadow / 9.0;
+
     return shadow;
 }
 /* ==============================================================================
