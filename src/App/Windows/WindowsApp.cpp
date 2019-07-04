@@ -78,6 +78,15 @@ void rsm::init(int argc, char* argv[]) {
 	vBP.compile();
 	fBP.compile();
 
+	ShaderSource vBPT = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/BlinnPhongTex.vs");
+	ShaderSource fBPT = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/BlinnPhongTex.fs");
+	vBPT.inject(std::string("#version 330 core\n"));
+	fBPT.inject(std::string("#version 330 core\n") +
+		std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n" +
+		std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
+	vBPT.compile();
+	fBPT.compile();
+
 	ShaderSource vDM = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/DepthMap.vs");
 	ShaderSource fDM = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/DepthMap.fs");
 	vDM.inject(std::string("#version 330 core\n"));
@@ -109,6 +118,13 @@ void rsm::init(int argc, char* argv[]) {
 	BlinnPhong->link();
 	RM.addShader("BlinnPhong", BlinnPhong);
 	glApp->addProgram(BlinnPhong->id());
+
+	sref<Shader> BlinnPhongTex = make_sref<Shader>("BlinnPhongTex");
+	BlinnPhongTex->addShader(vBPT);
+	BlinnPhongTex->addShader(fBPT);
+	BlinnPhongTex->link();
+	RM.addShader("BlinnPhongTex", BlinnPhongTex);
+	glApp->addProgram(BlinnPhongTex->id());
 
 	sref<Shader> DepthMap = make_sref<Shader>("DepthMap");
 	DepthMap->addShader(vDM);
@@ -234,31 +250,67 @@ void rsm::update() {
 	else if (keys['a'])
 		moveDir += -glApp->getCamera()->right();
 
-	if (keys['i'])
-		LOG("Camera Pos: %f %f %f", glApp->getCamera()->position().x, glApp->getCamera()->position().y, glApp->getCamera()->position().z);
+	if (keys['c'])
+		LOG("Camera Pos: %f %f %f\n", glApp->getCamera()->position().x, glApp->getCamera()->position().y, glApp->getCamera()->position().z);
+
+	if (keys['o']) {
+		if (glApp->rsmRMax() < 0.999f) {
+			glApp->setRSMRMax(glApp->rsmRMax() + 0.001f);
+			LOG("rsmRMax = %f\n", glApp->rsmRMax());
+			std::vector<GLuint> progs = glApp->programs();
+
+			for (GLuint prog : progs) {
+				glUseProgram(prog);
+				glUniform1f(glGetUniformLocation(prog, "rsmRMax"), glApp->rsmRMax());
+			}
+			glUseProgram(0);
+		}
+	}
+
+	if (keys['i']) {
+		if (glApp->rsmRMax() > 0.001f) {
+			glApp->setRSMRMax(glApp->rsmRMax() - 0.001f);
+			LOG("RSM R Max = %f\n", glApp->rsmRMax());
+			std::vector<GLuint> progs = glApp->programs();
+
+			for (GLuint prog : progs) {
+				glUseProgram(prog);
+				glUniform1f(glGetUniformLocation(prog, "rsmRMax"), glApp->rsmRMax());
+			}
+			glUseProgram(0);
+		}
+	}
+
+	if (keys['k']) {
+		glApp->setRSMIntensity(glApp->rsmIntensity() + 0.01f);
+		LOG("RSM Intensity = %f\n", glApp->rsmIntensity());
+		std::vector<GLuint> progs = glApp->programs();
+
+		for (GLuint prog : progs) {
+			glUseProgram(prog);
+			glUniform1f(glGetUniformLocation(prog, "rsmIntensity"), glApp->rsmIntensity());
+		}
+		glUseProgram(0);
+	}
+
+	if (keys['j']) {
+		if (glApp->rsmIntensity() > 0.01f) {
+			glApp->setRSMIntensity(glApp->rsmIntensity() - 0.01f);
+			LOG("RSM Intensity = %f\n", glApp->rsmIntensity());
+			std::vector<GLuint> progs = glApp->programs();
+
+			for (GLuint prog : progs) {
+				glUseProgram(prog);
+				glUniform1f(glGetUniformLocation(prog, "rsmIntensity"), glApp->rsmIntensity());
+			}
+			glUseProgram(0);
+		}
+	}
 
 	if (moveDir != glm::vec3(0.0f)) {
 		glApp->getCamera()->setPosition(glApp->getCamera()->position() + glm::normalize(moveDir) * dt * 10.0f);
 		glApp->getCamera()->updateViewMatrix();
 	}
-
-	/**/
-
-	// debug for point light
-	/** /
-	sref<Light> light = glApp->getScene().lights()[0];
-	if (keys['i'])
-		light->setPosition(light->position() + glm::vec3(0.0f, 0.0f, 0.05f));
-	else if (keys['k'])
-		light->setPosition(light->position() + glm::vec3(0.0f, 0.0f, -0.05f));
-
-	if (keys['j'])
-		light->setPosition(light->position() + glm::vec3(-0.05f, 0.0f, 0.0f));
-	else if (keys['l'])
-		light->setPosition(light->position() + glm::vec3(0.05f, 0.0f, 0.0f));
-
-	light->updateMatrix();
-	/**/
 
 	glApp->update(dt);
 }

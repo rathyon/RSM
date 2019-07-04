@@ -4,11 +4,11 @@ using namespace rsm;
 
 DirectionalLight::DirectionalLight() : Light() { }
 
-DirectionalLight::DirectionalLight(const glm::vec3& emission, float intensity)
-	: Light(emission, intensity), _direction(glm::vec3(0.0f, -1.0f, 0.0f)) { }
+DirectionalLight::DirectionalLight(const glm::vec3& emission)
+	: Light(emission), _direction(glm::vec3(0.0f, -1.0f, 0.0f)) { }
 
-DirectionalLight::DirectionalLight(const glm::vec3& emission, float intensity, const glm::vec3& direction)
-	: Light(emission, intensity), _direction(glm::normalize(direction)) { }
+DirectionalLight::DirectionalLight(const glm::vec3& emission, const glm::vec3& direction)
+	: Light(emission), _direction(glm::normalize(direction)) { }
 
 glm::vec3 DirectionalLight::direction() const {
 	return _direction;
@@ -18,7 +18,6 @@ void DirectionalLight::toData(LightData& data) const {
 	data.position = _position;
 	data.direction = _direction;
 	data.emission = _emission;
-	data.intensity = _intensity;
 	data.linear = 0.0f;
 	data.quadratic = 0.0f;
 	data.type = LightType::LIGHTYPE_DIR;
@@ -48,7 +47,7 @@ void DirectionalLight::prepare(int width, int height) {
 	// depth buffer
 	glGenTextures(1, &_depthMap);
 	glBindTexture(GL_TEXTURE_2D, _depthMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, _gBufferWidth, _gBufferHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, _gBufferWidth, _gBufferHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);

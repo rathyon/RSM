@@ -65,16 +65,36 @@ sref<Camera> OpenGLApplication::getCamera() {
 	return _camera;
 }
 
+std::vector<GLuint> OpenGLApplication::programs() {
+	return _programs;
+}
+
+float OpenGLApplication::rsmRMax() {
+	return _rsmRMax;
+}
+
+float OpenGLApplication::rsmIntensity() {
+	return _rsmIntensity;
+}
+
+void OpenGLApplication::setRSMRMax(float val) {
+	_rsmRMax = val;
+}
+
+void OpenGLApplication::setRSMIntensity(float val) {
+	_rsmIntensity = val;
+}
+
 void OpenGLApplication::prepare() {
 
 	/* ===================================================================================
 			Cameras
 	=====================================================================================*/
 
-	// cube cam
+	// def cam
 	/**/
 	_camera = make_sref<Perspective>(_width, _height,
-		vec3(-3.0f, 4.0f, -3.0f),
+		vec3(7.0f, 4.0f, -3.0f),
 		vec3(0.0f, 3.5f, 0.0f),
 		vec3(0.0f, 1.0f, 0.0f),
 		0.1f, 1000.0f, 60.0f);
@@ -87,6 +107,15 @@ void OpenGLApplication::prepare() {
          vec3(-15.0f, 15.0f, 0.0f),
          vec3(0.0f, 1.0f, 0.0f),
          0.1f, 100000.0f, 60.0f);
+	/**/
+
+	// sponza dir light cam
+	/** /
+	_camera = make_sref<Perspective>(_width, _height,
+		vec3(100.0f, 100.0f, 0.0f),
+		vec3(0.0f, 0.0f, 0.0f),
+		vec3(0.0f, 1.0f, 0.0f),
+		0.1f, 10000.0f, 60.0f);
 	/**/
 
 	_scene.addCamera(_camera);
@@ -108,7 +137,7 @@ void OpenGLApplication::prepare() {
 	/**/
 
 	/**/
-	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::vec3(-1.0f, -1.0f, -1.0f));
+	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
 	_scene.addLight(sun);
 	sun->prepare(_width, _height);
 	/**/
@@ -164,6 +193,8 @@ void OpenGLApplication::prepare() {
 	/* ===================================================================================
 		RSM
 	=====================================================================================*/
+	_rsmRMax = VPL_DIST_MAX;
+	_rsmIntensity = RSM_INTENSITY;
 	// precalculate sampling pattern
 
 	for (int i = 0; i < NUM_VPL; i++) {
@@ -178,6 +209,8 @@ void OpenGLApplication::prepare() {
 			std::string name = "VPLSamples[" + std::to_string(i) + "]";
 			glUniform2fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(glm::vec2(VPLSamples[i][0], VPLSamples[i][1])));
 		}
+		glUniform1f(glGetUniformLocation(prog, "rsmRMax"), _rsmRMax);
+		glUniform1f(glGetUniformLocation(prog, "rsmIntensity"), _rsmIntensity);
 	}
 	glUseProgram(0);
 
@@ -189,7 +222,7 @@ void OpenGLApplication::genRSMaps() {
 	GLuint ODM = RM.getShader("OmniDepthMap")->id();
 	GLuint GB = RM.getShader("GBuffer")->id();
 
-	GLuint prog;
+	uploadLights(GB);
 
 	const std::vector<sref<Light>>& lights = _scene.lights();
 	for (int l = 0; l < NUM_LIGHTS; l++) {
@@ -198,26 +231,22 @@ void OpenGLApplication::genRSMaps() {
 
 		// if directional light/spotlight
 		if (lights[l]->depthMapType() == OpenGLTexTargets[IMG_2D]) {
-			uploadLights(GB);
 
 			glUseProgram(GB);
 			glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->gBuffer());
-
-			// depth
-			//glCullFace(GL_FRONT);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			lights[l]->uploadSpatialData(GB);
 
-			glUseProgram(GB);
+			lights[l]->uploadSpatialData(GB);
+			glUniform1i(glGetUniformLocation(GB, "lightIdx"), l);
+
 			_scene.draw(GB);
 
 		}
 		// if point light
 		else {
-			prog = ODM;
-			glUseProgram(prog);
+			glUseProgram(ODM);
 	
-			lights[l]->uploadSpatialData(prog);
+			lights[l]->uploadSpatialData(ODM);
 
 			glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->gBuffer());
 			//glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
@@ -225,9 +254,10 @@ void OpenGLApplication::genRSMaps() {
 			for (int face = 0; face < 6; face++) {
 
 				glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, lights[l]->depthMap(), 0);
-				glUniform1i(glGetUniformLocation(prog, "face"), face);
+				glUniform1i(glGetUniformLocation(ODM, "face"), face);
+				glUniform1i(glGetUniformLocation(ODM, "lightIdx"), l);
 
-				_scene.draw(prog);
+				_scene.draw(ODM);
 			}
 
             glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, lights[l]->depthMap(), 0);
@@ -313,9 +343,6 @@ void OpenGLApplication::uploadLights(GLuint prog) {
 
 		name = prefix + "emission";
 		glUniform3fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(data.emission));
-
-		name = prefix + "intensity";
-		glUniform1f(glGetUniformLocation(prog, name.c_str()), data.intensity);
 
 		name = prefix + "linear";
 		glUniform1f(glGetUniformLocation(prog, name.c_str()), data.linear);

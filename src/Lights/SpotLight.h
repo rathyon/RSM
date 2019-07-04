@@ -9,10 +9,10 @@ namespace rsm {
 	class SpotLight : public Light {
 	public:
 		SpotLight();
-		SpotLight(const glm::vec3& emission, float intensity, float cutoff);
-		SpotLight(const glm::vec3& emission, float intensity, float cutoff, const glm::vec3& direction);
-		SpotLight(const glm::vec3& emission, float intensity, float cutoff, const glm::vec3& direction, const glm::vec3& position);
-		SpotLight(const glm::vec3& emission, float intensity, float cutoff, const glm::vec3& direction, const glm::vec3& position, float linearAttenuation, float quadraticAttenuation);
+		SpotLight(const glm::vec3& emission, float cutoff);
+		SpotLight(const glm::vec3& emission, float cutoff, const glm::vec3& direction);
+		SpotLight(const glm::vec3& emission, float cutoff, const glm::vec3& direction, const glm::vec3& position);
+		SpotLight(const glm::vec3& emission, float cutoff, const glm::vec3& direction, const glm::vec3& position, float linearAttenuation, float quadraticAttenuation);
 
 		glm::vec3 direction() const;
 		float cutoff() const;

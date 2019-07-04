@@ -9,8 +9,8 @@ namespace rsm {
 	class DirectionalLight : public Light {
 	public:
 		DirectionalLight();
-		DirectionalLight(const glm::vec3& emission, float intensity);
-		DirectionalLight(const glm::vec3& emission, float intensity, const glm::vec3& direction);
+		DirectionalLight(const glm::vec3& emission);
+		DirectionalLight(const glm::vec3& emission, const glm::vec3& direction);
 
 		glm::vec3 direction() const;
 

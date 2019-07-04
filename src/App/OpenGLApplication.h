@@ -37,7 +37,13 @@ namespace rsm {
 
 		Scene getScene();
 		sref<Camera> getCamera();
+		std::vector<GLuint> programs();
 
+		float rsmRMax();
+		float rsmIntensity();
+
+		void setRSMRMax(float val);
+		void setRSMIntensity(float val);
 		void genRSMaps();
 
 	private:
@@ -56,6 +62,8 @@ namespace rsm {
 		Scene _scene;
 		sref<Camera> _camera;
 
+		float _rsmRMax;
+		float _rsmIntensity;
 		GLfloat VPLSamples[NUM_VPL][2];
 	};
 }

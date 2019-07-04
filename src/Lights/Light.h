@@ -19,7 +19,6 @@ namespace rsm {
 		glm::vec3 position;
 		glm::vec3 direction;   // for directional and spot lights
 		glm::vec3 emission;    // "color" of the light
-		float intensity;
 		float linear;	 // attenuation
 		float quadratic; // attenuation
 		int type;
@@ -30,18 +29,15 @@ namespace rsm {
 	class Light : public SceneObject {
 	public:
 		Light();
-		Light(const glm::vec3& emission, float intensity);
-		Light(const glm::vec3& emission, float intensity, const glm::vec3& position);
-		//Light(const vec3& emission, float intensity, const mat4& lightToWorld);
+		Light(const glm::vec3& emission);
+		Light(const glm::vec3& emission, const glm::vec3& position);
 
 		bool isOn() const;
 		bool castingShadows() const;
-		float intensity() const;
 		glm::vec3 emission() const;
 
 		void setOn(bool on);
 		void setCastShadows(bool val);
-		void setIntensity(float intensity);
 		void setEmission(glm::vec3& emission);
 
 		virtual void toData(LightData& data) const = 0;
@@ -68,7 +64,6 @@ namespace rsm {
 	protected:
 		bool _on;
 		bool _shadows;
-		float _intensity;
 		glm::vec3 _emission;
 
 		// shadow mapping

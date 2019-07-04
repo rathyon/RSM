@@ -10,30 +10,29 @@ using namespace rsm;
 
 PointLight::PointLight() : Light() { }
 
-PointLight::PointLight(const glm::vec3& emission, float intensity)
-	: Light(emission, intensity) {
+PointLight::PointLight(const glm::vec3& emission)
+	: Light(emission) {
 	
 	// approximate values for MOST cases
 	_linearAttenuation = 0.1f;
 	_quadraticAttenuation = 0.032;
 }
 
-PointLight::PointLight(const glm::vec3& emission, float intensity, const glm::vec3& position)
-	: Light(emission, intensity, position) {
+PointLight::PointLight(const glm::vec3& emission, const glm::vec3& position)
+	: Light(emission, position) {
 
 	// approximate values for MOST cases
 	_linearAttenuation = 0.1f;
 	_quadraticAttenuation = 0.032;
 }
 
-PointLight::PointLight(const glm::vec3& emission, float intensity, const glm::vec3& position, float linear, float quadratic)
-	: Light(emission, intensity, position), _linearAttenuation(linear), _quadraticAttenuation(quadratic) { }
+PointLight::PointLight(const glm::vec3& emission, const glm::vec3& position, float linear, float quadratic)
+	: Light(emission, position), _linearAttenuation(linear), _quadraticAttenuation(quadratic) { }
 
 void PointLight::toData(LightData& data) const {
 	data.position = _position;
 	data.direction = glm::vec3(0);
 	data.emission = _emission;
-	data.intensity = _intensity;
 	data.linear = _linearAttenuation;
 	data.quadratic = _quadraticAttenuation;
 	data.type = LightType::LIGHTYPE_POINT;
@@ -60,7 +59,7 @@ void PointLight::prepare(int width, int height) {
 	glBindTexture(GL_TEXTURE_CUBE_MAP, _depthMap);
 
 	for (int i = 0; i < 6; i++) {
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT16, _gBufferWidth, _gBufferHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT32F, _gBufferWidth, _gBufferHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	}
 
 	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_MAG_FILTER, GL_NEAREST);

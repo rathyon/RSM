@@ -4,8 +4,8 @@ using namespace rsm;
 
 SpotLight::SpotLight() : Light() { }
 
-SpotLight::SpotLight(const glm::vec3& emission, float intensity, float cutoff)
-	: Light(emission, intensity) {
+SpotLight::SpotLight(const glm::vec3& emission, float cutoff)
+	: Light(emission) {
 
 	// approximate values for MOST cases
 	_linearAttenuation = 0.1f;
@@ -15,8 +15,8 @@ SpotLight::SpotLight(const glm::vec3& emission, float intensity, float cutoff)
 	_cutoff = glm::cos(glm::radians(cutoff));
 }
 
-SpotLight::SpotLight(const glm::vec3& emission, float intensity, float cutoff, const glm::vec3& direction)
-	: Light(emission, intensity) { 
+SpotLight::SpotLight(const glm::vec3& emission, float cutoff, const glm::vec3& direction)
+	: Light(emission) { 
 
 	// approximate values for MOST cases
 	_linearAttenuation = 0.1f;
@@ -26,8 +26,8 @@ SpotLight::SpotLight(const glm::vec3& emission, float intensity, float cutoff, c
 	_cutoff = glm::cos(glm::radians(cutoff));
 }
 
-SpotLight::SpotLight(const glm::vec3& emission, float intensity, float cutoff, const glm::vec3& direction, const glm::vec3& position)
-	: Light(emission, intensity, position) {
+SpotLight::SpotLight(const glm::vec3& emission, float cutoff, const glm::vec3& direction, const glm::vec3& position)
+	: Light(emission, position) {
 
 	// approximate values for MOST cases
 	_linearAttenuation = 0.1f;
@@ -37,7 +37,8 @@ SpotLight::SpotLight(const glm::vec3& emission, float intensity, float cutoff, c
 	_cutoff = glm::cos(glm::radians(cutoff));
 }
 
-SpotLight::SpotLight(const glm::vec3& emission, float intensity, float cutoff, const glm::vec3& direction, const glm::vec3& position, float linearAttenuation, float quadraticAttenuation) {
+SpotLight::SpotLight(const glm::vec3& emission, float cutoff, const glm::vec3& direction, const glm::vec3& position, float linearAttenuation, float quadraticAttenuation)
+	: Light(emission, position) {
 	// approximate values for MOST cases
 	_linearAttenuation = linearAttenuation;
 	_quadraticAttenuation = quadraticAttenuation;
@@ -58,7 +59,6 @@ void SpotLight::toData(LightData& data) const {
 	data.position = _position;
 	data.direction = _direction;
 	data.emission = _emission;
-	data.intensity = _intensity;
 	data.linear = _linearAttenuation;
 	data.quadratic = _quadraticAttenuation;
 	data.type = LightType::LIGHTYPE_SPOT;

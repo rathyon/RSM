@@ -37,6 +37,16 @@ uniform vec3 diffuse;
 uniform vec3 specular;
 uniform float shininess;
 
+uniform sampler2D diffuseTex;
+
+vec3 fetchDiffuse(){
+	vec4 texel = texture(diffuseTex, vsIn.texCoords);
+	if (texel.a <= 0.0){
+		discard;
+	}
+	return texel.rgb;
+}
+
 // Shadow Mapping variables
 const float baseBias = 0.005f;
 
@@ -133,7 +143,7 @@ vec3 directIllumination() {
 
 		if (NdotL > 0.0){
 
-			diff = lights[i].emission * ( diffuse * NdotL);
+			diff = lights[i].emission * ( fetchDiffuse() * NdotL);
 			spec = lights[i].emission * ( specular * pow(NdotH, shininess));
 
 			// if not directional light
@@ -180,9 +190,9 @@ vec3 indirectIllumination() {
 
     	retColor += indirect;
     }
-	//return clamp(retColor, 0.0, 1.0) * diffuse;
-
-	return (retColor * diffuse) * rsmIntensity;
+	
+	//return clamp(retColor, 0.0, 1.0) * fetchDiffuse();
+	return (retColor * fetchDiffuse()) * rsmIntensity;
 }
 
 void main(void) {
@@ -190,5 +200,10 @@ void main(void) {
 	outColor = vec4( directIllumination() + indirectIllumination(), 1.0);
 	//outColor = vec4( directIllumination(), 1.0);
 	//outColor = vec4( indirectIllumination(), 1.0);
-	
+
+	/** /
+	vec3 projCoords = vsIn.lightSpacePosition.xyz / vsIn.lightSpacePosition.w;
+    projCoords = projCoords * 0.5 + 0.5;
+    outColor = vec4(texture(fluxMap, projCoords.xy).rgb, 1.0);
+    /**/
 }
