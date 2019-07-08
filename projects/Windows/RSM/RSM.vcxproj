@@ -69,13 +69,12 @@
     <None Include="..\..\..\src\Shaders\BlinnPhong.vs">
       <FileType>Document</FileType>
     </None>
-    <None Include="..\..\..\src\Shaders\DepthMap.fs" />
-    <None Include="..\..\..\src\Shaders\DepthMap.vs" />
+    <None Include="..\..\..\src\Shaders\BlinnPhongTex.fs" />
+    <None Include="..\..\..\src\Shaders\BlinnPhongTex.vs" />
     <None Include="..\..\..\src\Shaders\GBuffer.fs" />
     <None Include="..\..\..\src\Shaders\GBuffer.vs" />
-    <None Include="..\..\..\src\Shaders\OmniDepthMap.fs" />
-    <None Include="..\..\..\src\Shaders\OmniDepthMap.gs" />
-    <None Include="..\..\..\src\Shaders\OmniDepthMap.vs" />
+    <None Include="..\..\..\src\Shaders\OmniGBuffer.fs" />
+    <None Include="..\..\..\src\Shaders\OmniGBuffer.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

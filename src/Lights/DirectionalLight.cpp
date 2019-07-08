@@ -59,7 +59,6 @@ void DirectionalLight::prepare(int width, int height) {
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthMap, 0);
 	glDrawBuffers(0, GL_NONE);
 
-	/**/
 	// world space coordinates / position buffer
 	glGenTextures(1, &_positionMap);
 	glBindTexture(GL_TEXTURE_2D, _positionMap);
@@ -92,12 +91,11 @@ void DirectionalLight::prepare(int width, int height) {
 
 	GLenum attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
 	glDrawBuffers(3, attachments);
-	//glReadBuffer(GL_NONE);
 
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	checkOpenGLError("Error in preparing light source!");
+	checkOpenGLError("Error in preparing directional light source!");
 }
 
 void DirectionalLight::uploadSpatialData(GLuint program) {

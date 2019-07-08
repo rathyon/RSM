@@ -131,7 +131,7 @@ void OpenGLApplication::prepare() {
 	/**/
 
 	/** /
-	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), 5.0f, glm::vec3(0.0f, 5.0f, 2.0f));
+	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 7.0f, 2.0f));
 	_scene.addLight(candle);
 	candle->prepare(1024, 1024);
 	/**/
@@ -218,11 +218,11 @@ void OpenGLApplication::prepare() {
 }
 
 void OpenGLApplication::genRSMaps() {
-	GLuint DM = RM.getShader("DepthMap")->id();
-	GLuint ODM = RM.getShader("OmniDepthMap")->id();
 	GLuint GB = RM.getShader("GBuffer")->id();
+	GLuint OGB = RM.getShader("OmniGBuffer")->id();
 
 	uploadLights(GB);
+	uploadLights(OGB);
 
 	const std::vector<sref<Light>>& lights = _scene.lights();
 	for (int l = 0; l < NUM_LIGHTS; l++) {
@@ -244,29 +244,28 @@ void OpenGLApplication::genRSMaps() {
 		}
 		// if point light
 		else {
-			glUseProgram(ODM);
-	
-			lights[l]->uploadSpatialData(ODM);
-
+			glUseProgram(OGB);
 			glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->gBuffer());
-			//glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			lights[l]->uploadSpatialData(OGB);
 			for (int face = 0; face < 6; face++) {
-
 				glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, lights[l]->depthMap(), 0);
-				glUniform1i(glGetUniformLocation(ODM, "face"), face);
-				glUniform1i(glGetUniformLocation(ODM, "lightIdx"), l);
-
-				_scene.draw(ODM);
+				glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, lights[l]->positionMap(), 0);
+				glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, lights[l]->normalMap(), 0);
+				glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, lights[l]->fluxMap(), 0);
+				glUniform1i(glGetUniformLocation(OGB, "face"), face);
+				glUniform1i(glGetUniformLocation(OGB, "lightIdx"), l);
+				_scene.draw(OGB);
 			}
-
             glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, lights[l]->depthMap(), 0);
+			glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, lights[l]->positionMap(), 0);
+			glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, lights[l]->normalMap(), 0);
+			glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, lights[l]->fluxMap(), 0);
 		}
-
 	}
 
 	glCullFace(GL_BACK);
-	//glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
 	glUseProgram(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -377,7 +376,6 @@ void OpenGLApplication::uploadShadowMappingData() {
 				glBindTexture(type, lights[l]->depthMap());
 				glUniform1i(glGetUniformLocation(prog, "depthMap"), TextureUnit::G_DEPTH);
 
-				/**/
 				glActiveTexture(OpenGLTextureUnits[TextureUnit::G_POSITION]);
 				glBindTexture(type, lights[l]->positionMap());
 				glUniform1i(glGetUniformLocation(prog, "positionMap"), TextureUnit::G_POSITION);
@@ -389,12 +387,23 @@ void OpenGLApplication::uploadShadowMappingData() {
 				glActiveTexture(OpenGLTextureUnits[TextureUnit::G_FLUX]);
 				glBindTexture(type, lights[l]->fluxMap());
 				glUniform1i(glGetUniformLocation(prog, "fluxMap"), TextureUnit::G_FLUX);
-				/**/
 			}
 			else {
 				glActiveTexture(OpenGLTextureUnits[TextureUnit::OMNI_G_DEPTH]);
 				glBindTexture(type, lights[l]->depthMap());
 				glUniform1i(glGetUniformLocation(prog, "depthCubeMap"), TextureUnit::OMNI_G_DEPTH);
+
+				glActiveTexture(OpenGLTextureUnits[TextureUnit::OMNI_G_POSITION]);
+				glBindTexture(type, lights[l]->positionMap());
+				glUniform1i(glGetUniformLocation(prog, "positionCubeMap"), TextureUnit::OMNI_G_POSITION);
+
+				glActiveTexture(OpenGLTextureUnits[TextureUnit::OMNI_G_NORMAL]);
+				glBindTexture(type, lights[l]->normalMap());
+				glUniform1i(glGetUniformLocation(prog, "normalCubeMap"), TextureUnit::OMNI_G_NORMAL);
+
+				glActiveTexture(OpenGLTextureUnits[TextureUnit::OMNI_G_FLUX]);
+				glBindTexture(type, lights[l]->fluxMap());
+				glUniform1i(glGetUniformLocation(prog, "fluxCubeMap"), TextureUnit::OMNI_G_FLUX);
 			}
 
 		}

@@ -5,6 +5,7 @@ layout(location = 2) in vec2 TexCoords;
 
 uniform mat4 ModelMatrix;
 uniform mat3 NormalMatrix;
+
 uniform mat4 lightSpaceMatrix;
 
 // Passes everything in world coordinates to the fragment shader

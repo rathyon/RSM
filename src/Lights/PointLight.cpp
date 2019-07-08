@@ -44,45 +44,16 @@ GLenum PointLight::depthMapType() {
 	return OpenGLTexTargets[IMG_CUBE];
 }
 
-// TODO: add far as argument/parameter
 void PointLight::prepare(int width, int height) {
 	_gBufferWidth = width;
 	_gBufferHeight = height;
 	_far = 100.0f;
 
-	// prepare framebuffer and shadow cubemap (texture)
-	glGenFramebuffers(1, &_gBuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, _gBuffer);
-
-	// IMPORTANT: depthMap is a CUBEMAP!
-	glGenTextures(1, &_depthMap);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, _depthMap);
-
-	for (int i = 0; i < 6; i++) {
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT32F, _gBufferWidth, _gBufferHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	}
-
-	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-	if (MOBILE) {
-		glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-		glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-	}
-
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, _depthMap, 0);
-	glDrawBuffers(0, GL_NONE);
-	//glReadBuffer(GL_NONE);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	
 	// aspect is 1.0f: Width == Height
-	// 90 degree FOV is important to properly align each face of the cubemap
+// 90 degree FOV is important to properly align each face of the cubemap
 	_projMatrix = glm::perspective(glm::radians(90.0f), 1.0f, 1.0f, _far);
 
-	_viewProjMatrices.push_back(_projMatrix * 
+	_viewProjMatrices.push_back(_projMatrix *
 		glm::lookAt(_position, _position + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
 	_viewProjMatrices.push_back(_projMatrix *
 		glm::lookAt(_position, _position + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
@@ -94,6 +65,73 @@ void PointLight::prepare(int width, int height) {
 		glm::lookAt(_position, _position + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
 	_viewProjMatrices.push_back(_projMatrix *
 		glm::lookAt(_position, _position + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+
+	// prepare framebuffer and shadow cubemap (texture)
+	glGenFramebuffers(1, &_gBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, _gBuffer);
+
+	// IMPORTANT: depthMap is a CUBEMAP!
+	glGenTextures(1, &_depthMap);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, _depthMap);
+	for (int i = 0; i < 6; i++)
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT32F, _gBufferWidth, _gBufferHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	if (MOBILE) {
+		glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+		glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+	}
+
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, _depthMap, 0);
+	glDrawBuffers(0, GL_NONE);
+
+	// world space coordinates / position buffer
+	glGenTextures(1, &_positionMap);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, _positionMap);
+	for (int i = 0; i < 6; i++)
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, _positionMap, 0);
+
+	// normals buffer
+	glGenTextures(1, &_normalMap);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, _normalMap);
+	for (int i = 0; i < 6; i++)
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, _normalMap, 0);
+
+	// flux buffer
+	glGenTextures(1, &_fluxMap);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, _fluxMap);
+	for (int i = 0; i < 6; i++)
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(OpenGLTexTargets[IMG_CUBE], GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, _fluxMap, 0);
+
+	GLenum attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+	glDrawBuffers(3, attachments);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	checkOpenGLError("Error in preparing point light source!");
 }
 
 void PointLight::uploadSpatialData(GLuint program) {

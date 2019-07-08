@@ -88,6 +88,9 @@ float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
  ============================================================================== */
 
 uniform samplerCube depthCubeMap;
+uniform samplerCube positionCubeMap;
+uniform samplerCube normalCubeMap;
+uniform samplerCube fluxCubeMap;
 
 float shadowFactor(vec3 fragPos, vec3 lightPos){
 	vec3 fragToLight = fragPos - lightPos;
@@ -174,6 +177,8 @@ vec3 indirectIllumination() {
     // bring from [-1,1] to [0,1]
     projCoords = projCoords * 0.5 + 0.5;
 
+    float totalWeight = 0.0;
+
     for(int i=0; i < NUM_VPL; i++){
     	vec2 rnd = VPLSamples[i];
     	vec2 coords = vec2(projCoords.x + rsmRMax*rnd.x*sin(TWO_PI*rnd.y), projCoords.y + rsmRMax*rnd.x*cos(TWO_PI*rnd.y));
@@ -188,19 +193,48 @@ vec3 indirectIllumination() {
     	float dist = length(vplP - vsIn.position);
 
     	indirect += vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
-    	indirect = indirect * rnd.x * rnd.x;
+
+    	float weight = rnd.x * rnd.x;
+    	indirect = indirect * weight;
+
+    	//totalWeight += weight;
 
     	retColor += indirect;
     }
 	//return clamp(retColor, 0.0, 1.0) * diffuse;
+	//return (retColor / totalWeight) * diffuse * rsmIntensity;
+	return (retColor * diffuse) * rsmIntensity;
+}
+
+/** /
+vec3 indirectIllumination2() {
+	vec3 retColor = vec3(0.0);
+	vec3 indirect = vec3(0,0);
+
+	vec3 projCoords = vsIn.position - lights[0].position;
+
+	for(int i=0; i < NUM_VPL; i++){
+		vec2 rnd = VPLSamples[i];
+
+		// get sample proj coords...
+	}
 
 	return (retColor * diffuse) * rsmIntensity;
 }
+/**/
 
 void main(void) {
 
 	outColor = vec4( directIllumination() + indirectIllumination(), 1.0);
 	//outColor = vec4( directIllumination(), 1.0);
 	//outColor = vec4( indirectIllumination(), 1.0);
-	
+
+
+	// point light gbuffer testing
+	/** /
+	vec3 fragToLight = vsIn.position - lights[0].position;
+	vec3 pos = texture(fluxCubeMap, fragToLight).rgb;
+
+	outColor = vec4(pos, 1.0);
+	/**/
 }
