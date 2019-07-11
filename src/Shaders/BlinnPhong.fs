@@ -71,7 +71,7 @@ float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
     //float shadow = currentDepth - bias > closestDepth  ? 0.0 : 1.0;
 
     float shadow = 0.0;
-    vec2 texelSize = 1.0 / textureSize(depthMap, 0);
+    vec2 texelSize = 1.0 / vec2(textureSize(depthMap, 0));
     for(int x = -1; x <= 1; x++){
     	for(int y = -1; y <= 1; y++){
     		float depth = texture(depthMap, projCoords.xy + vec2(x,y) * texelSize).r;
@@ -168,7 +168,7 @@ vec3 directIllumination() {
 }
 
 vec3 indirectIllumination() {
-	vec3 retColor = vec3(0.0);
+	vec3 result = vec3(0.0);
 	vec3 indirect = vec3(0.0);
 	// perform perspective divide: clip space-> normalized device coords (done automatically for gl_Position)
 
@@ -176,8 +176,6 @@ vec3 indirectIllumination() {
 
     // bring from [-1,1] to [0,1]
     projCoords = projCoords * 0.5 + 0.5;
-
-    float totalWeight = 0.0;
 
     for(int i=0; i < NUM_VPL; i++){
     	vec2 rnd = VPLSamples[i];
@@ -195,33 +193,12 @@ vec3 indirectIllumination() {
     	indirect += vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
 
     	float weight = rnd.x * rnd.x;
+
     	indirect = indirect * weight;
-
-    	//totalWeight += weight;
-
-    	retColor += indirect;
+    	result += indirect;
     }
-	//return clamp(retColor, 0.0, 1.0) * diffuse;
-	//return (retColor / totalWeight) * diffuse * rsmIntensity;
-	return (retColor * diffuse) * rsmIntensity;
+	return (result * diffuse) * rsmIntensity;
 }
-
-/** /
-vec3 indirectIllumination2() {
-	vec3 retColor = vec3(0.0);
-	vec3 indirect = vec3(0,0);
-
-	vec3 projCoords = vsIn.position - lights[0].position;
-
-	for(int i=0; i < NUM_VPL; i++){
-		vec2 rnd = VPLSamples[i];
-
-		// get sample proj coords...
-	}
-
-	return (retColor * diffuse) * rsmIntensity;
-}
-/**/
 
 void main(void) {
 

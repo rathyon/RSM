@@ -15,6 +15,8 @@
 #include "Graphics/BlinnPhongMaterial.h"
 #include "Graphics/Texture.h"
 
+#include "Math/hammersley.hpp"
+
 namespace rsm {
 
 	class OpenGLApplication {

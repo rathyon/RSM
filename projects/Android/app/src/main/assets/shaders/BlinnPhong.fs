@@ -14,7 +14,6 @@ struct Light {
 	vec3 position;
 	vec3 direction;
 	vec3 emission;
-	float intensity;
 	float linear;
 	float quadratic;
 	int type;
@@ -38,27 +37,13 @@ uniform vec3 diffuse;
 uniform vec3 specular;
 uniform float shininess;
 
-// Material textures -> OpenGL ES doesn't let me have 1 shader for both tex and non tex models...
-/** /
-uniform sampler2D diffuseTex;
-
-vec3 fetchDiffuse(){
-	if (diffuse.r < 0.0){
-		vec4 texel = texture(diffuseTex, vsIn.texCoords);
-		return texel.rgb;
-	}
-	else{
-		return diffuse;
-	}
-}
-/**/
-
 // Shadow Mapping variables
 const float baseBias = 0.005f;
 
 // RSM Variables
 uniform vec2 VPLSamples[NUM_VPL];
-const float rsmRMax = 0.2f;
+uniform float rsmRMax;
+uniform float rsmIntensity;
 
 /* ==============================================================================
         Directional / Spot Lights
@@ -67,17 +52,6 @@ uniform sampler2D depthMap;
 uniform sampler2D positionMap;
 uniform sampler2D normalMap;
 uniform sampler2D fluxMap;
-
-// TODO: Use Bias matrix in vertex shader instead of doing this here, in the frag shader
-float debugDepthMap(vec4 lightSpacePosition, vec3 N, vec3 L){
-	// perform perspective divide: clip space-> normalized device coords (done automatically for gl_Position)
-    vec3 projCoords = lightSpacePosition.xyz / lightSpacePosition.w;
-    // bring from [-1,1] to [0,1]
-    projCoords = projCoords * 0.5 + 0.5;
-
-    float closestDepth = texture(depthMap, projCoords.xy).r;
-    return closestDepth;
-}
 
 float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
 	// perform perspective divide: clip space-> normalized device coords (done automatically for gl_Position)
@@ -88,29 +62,35 @@ float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
     if(projCoords.z > 1.0)
         return 1.0;
 
-    float closestDepth = texture(depthMap, projCoords.xy).r;
+    //float closestDepth = texture(depthMap, projCoords.xy).r;
     float currentDepth = projCoords.z; 
 
     float bias = baseBias * tan(acos(dot(N,L)));
     bias = clamp(bias, 0.0, 0.0005f);
 
-    float shadow = currentDepth - bias > closestDepth  ? 0.0 : 1.0;
+    //float shadow = currentDepth - bias > closestDepth  ? 0.0 : 1.0;
+
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / vec2(textureSize(depthMap, 0));
+    for(int x = -1; x <= 1; x++){
+    	for(int y = -1; y <= 1; y++){
+    		float depth = texture(depthMap, projCoords.xy + vec2(x,y) * texelSize).r;
+    		shadow += currentDepth - bias > depth ? 0.0 : 1.0;
+    	}
+    }
+
+    shadow = shadow / 9.0;
+
     return shadow;
 }
-
-vec3 debugMap(vec4 lightSpacePosition, vec3 N, vec3 L, sampler2D map) {
-    vec3 projCoords = lightSpacePosition.xyz / lightSpacePosition.w;
-    projCoords = projCoords * 0.5 + 0.5;
-
-    vec3 position = texture(map, projCoords.xy).rgb;
-    return position;
-}
-
 /* ==============================================================================
         Point Lights
  ============================================================================== */
 
 uniform samplerCube depthCubeMap;
+uniform samplerCube positionCubeMap;
+uniform samplerCube normalCubeMap;
+uniform samplerCube fluxCubeMap;
 
 float shadowFactor(vec3 fragPos, vec3 lightPos){
 	vec3 fragToLight = fragPos - lightPos;
@@ -121,13 +101,6 @@ float shadowFactor(vec3 fragPos, vec3 lightPos){
 	float shadow = currentDepth > closestDepth  ? 0.0 : 1.0;
     return shadow;
 }
-
-float debugShadowFactor(vec3 fragPos, vec3 lightPos){
-	vec3 fragToLight = fragPos - lightPos;
-	float closestDepth = texture(depthCubeMap, fragToLight).r;
-	return closestDepth;
-}
-
 
 /* ==============================================================================
         Stage Outputs
@@ -175,8 +148,8 @@ vec3 directIllumination() {
 
 		if (NdotL > 0.0){
 
-			diff = lights[i].emission * lights[i].intensity * ( diffuse * NdotL);
-			spec = lights[i].emission * lights[i].intensity * ( specular * pow(NdotH, shininess));
+			diff = lights[i].emission * ( diffuse * NdotL);
+			spec = lights[i].emission * ( specular * pow(NdotH, shininess));
 
 			// if not directional light
 			if (lights[i].type != 0){
@@ -195,7 +168,7 @@ vec3 directIllumination() {
 }
 
 vec3 indirectIllumination() {
-	vec3 retColor = vec3(0.0);
+	vec3 result = vec3(0.0);
 	vec3 indirect = vec3(0.0);
 	// perform perspective divide: clip space-> normalized device coords (done automatically for gl_Position)
 
@@ -218,11 +191,13 @@ vec3 indirectIllumination() {
     	float dist = length(vplP - vsIn.position);
 
     	indirect += vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
-    	indirect = indirect * rnd.x * rnd.x;
 
-    	retColor += indirect;
+    	float weight = rnd.x * rnd.x;
+
+    	indirect = indirect * weight;
+    	result += indirect;
     }
-	return clamp(retColor, 0.0, 1.0) * diffuse;
+	return (result * diffuse) * rsmIntensity;
 }
 
 void main(void) {
@@ -230,21 +205,13 @@ void main(void) {
 	outColor = vec4( directIllumination() + indirectIllumination(), 1.0);
 	//outColor = vec4( directIllumination(), 1.0);
 	//outColor = vec4( indirectIllumination(), 1.0);
-	/**/
 
-	// Debug for DirectionalLight shadow mapping
-	//outColor = vec4(vsIn.position, 1.0);
 
+	// point light gbuffer testing
 	/** /
-	vec3 L = normalize(-lights[0].direction);
-	vec3 N = vsIn.normal;
-	outColor = vec4(vec3(debugMap(vsIn.lightSpacePosition, N, L, normalMap)), 1.0);
-	//outColor = vec4(vec3(debugDepthMap(vsIn.lightSpacePosition, N, L)), 1.0);
-	/**/
+	vec3 fragToLight = vsIn.position - lights[0].position;
+	vec3 pos = texture(fluxCubeMap, fragToLight).rgb;
 
-	// Debug for PointLight shadow mapping
-	/** /
-	outColor = vec4(vec3(debugShadowFactor(vsIn.position, lights[0].position)), 1.0);
+	outColor = vec4(pos, 1.0);
 	/**/
-	
 }

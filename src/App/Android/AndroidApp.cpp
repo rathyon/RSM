@@ -63,22 +63,18 @@ void init() {
     vBP.compile();
     fBP.compile();
 
-    ShaderSource vDM = ShaderSource(VERTEX_SHADER, "vSM",getAssetSource("shaders/DepthMap.vs"));
-    ShaderSource fDM = ShaderSource(FRAGMENT_SHADER, "fSM", getAssetSource("shaders/DepthMap.fs"));
-    vDM.inject(std::string("#version 320 es\n"));
-    fDM.inject(std::string("#version 320 es\n"));
-    vDM.compile();
-    fDM.compile();
+    ShaderSource vBPT = ShaderSource(VERTEX_SHADER, "vBPT", getAssetSource("shaders/BlinnPhongTex.vs"));
+    ShaderSource fBPT = ShaderSource(FRAGMENT_SHADER, "fBPT", getAssetSource("shaders/BlinnPhongTex.fs"));
+    vBPT.inject(std::string("#version 320 es\n") +
+               std::string("#extension GL_EXT_shader_io_blocks : enable\n"));
 
-    ShaderSource vODM = ShaderSource(VERTEX_SHADER, "vODM", getAssetSource("shaders/OmniDepthMap.vs"));
-    //ShaderSource gODM = ShaderSource(GEOMETRY_SHADER, "gODM", getAssetSource("shaders/OmniDepthMap.gs"));
-    ShaderSource fODM = ShaderSource(FRAGMENT_SHADER, "fODM", getAssetSource("shaders/OmniDepthMap.fs"));
-    vODM.inject(std::string("#version 320 es\n"));
-    //gODM.inject(std::string("#version 320 es\n"));
-    fODM.inject(std::string("#version 320 es\n") + std::string("precision highp float;\n"));
-    vODM.compile();
-    //gODM.compile();
-    fODM.compile();
+    fBPT.inject(std::string("#version 320 es\n") +
+               std::string("#extension GL_EXT_shader_io_blocks : enable\n") +
+               std::string("precision highp float;\n") +
+               std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n" +
+               std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
+    vBPT.compile();
+    fBPT.compile();
 
     ShaderSource vGB = ShaderSource(VERTEX_SHADER, "vGB",getAssetSource("shaders/GBuffer.vs"));
     ShaderSource fGB = ShaderSource(FRAGMENT_SHADER, "fGB", getAssetSource("shaders/GBuffer.fs"));
@@ -91,6 +87,17 @@ void init() {
     vGB.compile();
     fGB.compile();
 
+    ShaderSource vOGB = ShaderSource(VERTEX_SHADER, "vOGB", getAssetSource("shaders/OmniGBuffer.vs"));
+    ShaderSource fOGB = ShaderSource(FRAGMENT_SHADER, "fOGB", getAssetSource("shaders/OmniGBuffer.fs"));
+    vOGB.inject(std::string("#version 320 es\n")+
+                std::string("#extension GL_EXT_shader_io_blocks : enable\n"));
+    fOGB.inject(std::string("#version 320 es\n") +
+                std::string("#extension GL_EXT_shader_io_blocks : enable\n") +
+                std::string("precision highp float;\n") +
+                std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n");
+    vOGB.compile();
+    fOGB.compile();
+
     sref<Shader> BlinnPhong = make_sref<Shader>("BlinnPhong");
     BlinnPhong->addShader(vBP);
     BlinnPhong->addShader(fBP);
@@ -98,26 +105,24 @@ void init() {
     RM.addShader("BlinnPhong", BlinnPhong);
     glApp->addProgram(BlinnPhong->id());
 
-    sref<Shader> ShadowMap = make_sref<Shader>("DepthMap");
-    ShadowMap->addShader(vDM);
-    ShadowMap->addShader(fDM);
-    ShadowMap->link();
-    RM.addShader("DepthMap", ShadowMap);
-    //glApp->addProgram(ShadowMap->id());
-
-    sref<Shader> OmniShadowMap = make_sref<Shader>("OmniDepthMap");
-    OmniShadowMap->addShader(vODM);
-    //OmniShadowMap->addShader(gODM);
-    OmniShadowMap->addShader(fODM);
-    OmniShadowMap->link();
-    RM.addShader("OmniDepthMap", OmniShadowMap);
-    //glApp->addProgram(OmniShadowMap->id());
+    sref<Shader> BlinnPhongTex = make_sref<Shader>("BlinnPhongTex");
+    BlinnPhongTex->addShader(vBPT);
+    BlinnPhongTex->addShader(fBPT);
+    BlinnPhongTex->link();
+    RM.addShader("BlinnPhongTex", BlinnPhongTex);
+    glApp->addProgram(BlinnPhongTex->id());
 
     sref<Shader> GBuffer = make_sref<Shader>("GBuffer");
     GBuffer->addShader(vGB);
     GBuffer->addShader(fGB);
     GBuffer->link();
     RM.addShader("GBuffer", GBuffer);
+
+    sref<Shader> OmniGBuffer = make_sref<Shader>("OmniGBuffer");
+    OmniGBuffer->addShader(vOGB);
+    OmniGBuffer->addShader(fOGB);
+    OmniGBuffer->link();
+    RM.addShader("OmniGBuffer", OmniGBuffer);
 
     checkOpenGLError("Error during shader loading and setup!");
     LOG("Shaders loaded...\n");
@@ -181,7 +186,11 @@ void render() {
     oldTimeSinceStart = timeSinceStart;
 
     // nano to microseconds
-    float dt = float(deltaTime) * 1000.0f;
+    float dt = float(deltaTime) / 1000.0f;
+
+    float secs = dt / 1000000.0f;
+    LOG("FPS: %f\n", 1.0f / secs);
+
     if(dt > 0.25f)
         dt = 0.25f;
 

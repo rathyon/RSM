@@ -8,4 +8,6 @@
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
 
+#include "hammersley.hpp"
+
 #endif // !__RSM_MATH_H__

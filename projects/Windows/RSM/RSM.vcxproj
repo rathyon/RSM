@@ -38,6 +38,7 @@
     <ClCompile Include="..\..\..\src\Lights\Light.cpp" />
     <ClCompile Include="..\..\..\src\Lights\PointLight.cpp" />
     <ClCompile Include="..\..\..\src\Lights\SpotLight.cpp" />
+    <ClCompile Include="..\..\..\src\Math\hammersley.cpp" />
     <ClCompile Include="..\..\..\src\Utils\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -60,6 +61,7 @@
     <ClInclude Include="..\..\..\src\Lights\Light.h" />
     <ClInclude Include="..\..\..\src\Lights\PointLight.h" />
     <ClInclude Include="..\..\..\src\Lights\SpotLight.h" />
+    <ClInclude Include="..\..\..\src\Math\hammersley.hpp" />
     <ClInclude Include="..\..\..\src\Math\RSMaths.h" />
     <ClInclude Include="..\..\..\src\RSM.h" />
     <ClInclude Include="..\..\..\src\Utils\Utils.h" />
@@ -161,6 +163,7 @@ XCOPY  "$(SolutionDir)..\..\src\Shaders" "$(SolutionDir)..\..\bin\$(Configuratio
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>false</ConformanceMode>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>glew32.lib;freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -199,6 +202,7 @@ XCOPY  "$(SolutionDir)..\..\src\Shaders" "$(SolutionDir)..\..\bin\$(Configuratio
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>false</ConformanceMode>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

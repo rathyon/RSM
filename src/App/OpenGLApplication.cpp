@@ -197,10 +197,20 @@ void OpenGLApplication::prepare() {
 	_rsmIntensity = RSM_INTENSITY;
 	// precalculate sampling pattern
 
+	/**/
+	for (int i = 0; i < NUM_VPL; i++) {
+		double* sample = hammersley(i, 2, NUM_VPL);
+		VPLSamples[i][0] = (float) sample[0];
+		VPLSamples[i][1] = (float) sample[1];
+	}
+	/**/
+
+	/** /
 	for (int i = 0; i < NUM_VPL; i++) {
 		VPLSamples[i][0] = randf();
 		VPLSamples[i][1] = randf();
 	}
+	/**/
 
 	// upload RSM data
 	for (GLuint prog : _programs) {

@@ -49,6 +49,9 @@
     <Filter Include="Source Files\Lights">
       <UniqueIdentifier>{eacb30c0-fa3d-4916-abe0-bcedda3d98a4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Math">
+      <UniqueIdentifier>{c96db49c-9de4-4221-9da4-eac1ef90097b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Core\OpenGL.cpp">
@@ -110,6 +113,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\Lights\SpotLight.cpp">
       <Filter>Source Files\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Math\hammersley.cpp">
+      <Filter>Source Files\Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -178,6 +184,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Lights\SpotLight.h">
       <Filter>Header Files\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Math\hammersley.hpp">
+      <Filter>Header Files\Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
