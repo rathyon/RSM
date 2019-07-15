@@ -46,6 +46,14 @@ uniform float rsmRMax;
 uniform float rsmIntensity;
 
 /* ==============================================================================
+        Deferred Shading
+ ============================================================================== */
+uniform sampler2D gPosition;
+uniform sampler2D gNormal;
+uniform sampler2D gDiffuse;
+uniform sampler2D gSpecular;
+
+/* ==============================================================================
         Directional / Spot Lights
  ============================================================================== */
 uniform sampler2D depthMap;
@@ -206,6 +214,8 @@ void main(void) {
 	//outColor = vec4( directIllumination(), 1.0);
 	//outColor = vec4( indirectIllumination(), 1.0);
 
+	// deferred shading testing
+	//outColor = vec4(texture(gPosition, vsIn.texCoords).rgb, 1.0);
 
 	// point light gbuffer testing
 	/** /

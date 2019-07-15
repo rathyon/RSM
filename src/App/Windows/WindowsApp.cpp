@@ -87,14 +87,30 @@ void rsm::init(int argc, char* argv[]) {
 	vBPT.compile();
 	fBPT.compile();
 
+	ShaderSource vDS = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/DeferredShading.vs");
+	ShaderSource fDS = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/DeferredShading.fs");
+	vDS.inject(std::string("#version 330 core\n"));
+	fDS.inject(std::string("#version 330 core\n") +
+		std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n");
+	vDS.compile();
+	fDS.compile();
+
 	ShaderSource vGB = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/GBuffer.vs");
 	ShaderSource fGB = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/GBuffer.fs");
 	vGB.inject(std::string("#version 330 core\n"));
-	fGB.inject(std::string("#version 330 core\n") +
-				std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n");
+	fGB.inject(std::string("#version 330 core\n"));
 	vGB.compile();
 	fGB.compile();
 
+	ShaderSource vRGB = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/RSMGBuffer.vs");
+	ShaderSource fRGB = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/RSMGBuffer.fs");
+	vRGB.inject(std::string("#version 330 core\n"));
+	fRGB.inject(std::string("#version 330 core\n") +
+		std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n");
+	vRGB.compile();
+	fRGB.compile();
+
+	/** /
 	ShaderSource vOGB = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/OmniGBuffer.vs");
 	ShaderSource fOGB = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/OmniGBuffer.fs");
 	vOGB.inject(std::string("#version 330 core\n"));
@@ -102,6 +118,7 @@ void rsm::init(int argc, char* argv[]) {
 		std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n");
 	vOGB.compile();
 	fOGB.compile();
+	/**/
 
 	sref<Shader> BlinnPhong = make_sref<Shader>("BlinnPhong");
 	BlinnPhong->addShader(vBP);
@@ -117,23 +134,38 @@ void rsm::init(int argc, char* argv[]) {
 	RM.addShader("BlinnPhongTex", BlinnPhongTex);
 	glApp->addProgram(BlinnPhongTex->id());
 
+	sref<Shader> DeferredShading = make_sref<Shader>("DeferredShading");
+	DeferredShading->addShader(vDS);
+	DeferredShading->addShader(fDS);
+	DeferredShading->link();
+	RM.addShader("DeferredShading", DeferredShading);
+	glApp->addProgram(DeferredShading->id());
+
 	sref<Shader> GBuffer = make_sref<Shader>("GBuffer");
 	GBuffer->addShader(vGB);
 	GBuffer->addShader(fGB);
 	GBuffer->link();
 	RM.addShader("GBuffer", GBuffer);
 
+	sref<Shader> RSMGBuffer = make_sref<Shader>("RSMGBuffer");
+	RSMGBuffer->addShader(vRGB);
+	RSMGBuffer->addShader(fRGB);
+	RSMGBuffer->link();
+	RM.addShader("RSMGBuffer", RSMGBuffer);
+
+	/** /
 	sref<Shader> OmniGBuffer = make_sref<Shader>("OmniGBuffer");
 	OmniGBuffer->addShader(vOGB);
 	OmniGBuffer->addShader(fOGB);
 	OmniGBuffer->link();
 	RM.addShader("OmniGBuffer", OmniGBuffer);
+	/**/
 
 	/* ===================================================================================
 				Materials
 	=====================================================================================*/
 
-	/**/
+	/** /
 	sref<BlinnPhongMaterial> bp_red = make_sref<BlinnPhongMaterial>();
 	bp_red->setDiffuse(glm::vec3(1.0f, 0.0f, 0.0f));
 	bp_red->setSpecular(glm::vec3(1.0f));

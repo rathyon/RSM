@@ -5,14 +5,8 @@ layout(location = 2) in vec2 TexCoords;
 
 uniform mat4 ModelMatrix;
 uniform mat3 NormalMatrix;
-uniform mat4 lightSpaceMatrix;
 
-uniform cameraBlock {
-	mat4 ViewMatrix;
-	mat4 ProjMatrix;
-	mat4 ViewProjMatrix;
-	vec3 ViewPos;
-};
+uniform mat4 lightSpaceMatrix;
 
 // Passes everything in world coordinates to the fragment shader
 out FragData {
@@ -29,5 +23,5 @@ void main()
 	vsOut.texCoords = TexCoords;
 	
 	// Return position in Light MVP coordinates
-    gl_Position = ViewProjMatrix * vec4(vsOut.position, 1.0);
+    gl_Position = lightSpaceMatrix * vec4(vsOut.position, 1.0);
 }

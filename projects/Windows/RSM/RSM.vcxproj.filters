@@ -196,22 +196,22 @@
     <None Include="..\..\..\src\Shaders\BlinnPhong.vs">
       <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="..\..\..\src\Shaders\GBuffer.fs">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="..\..\..\src\Shaders\GBuffer.vs">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
     <None Include="..\..\..\src\Shaders\BlinnPhongTex.fs">
       <Filter>Source Files\Shaders</Filter>
     </None>
     <None Include="..\..\..\src\Shaders\BlinnPhongTex.vs">
       <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="..\..\..\src\Shaders\OmniGBuffer.fs">
+    <None Include="..\..\..\src\Shaders\RSMGBuffer.fs">
       <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="..\..\..\src\Shaders\OmniGBuffer.vs">
+    <None Include="..\..\..\src\Shaders\RSMGBuffer.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\Shaders\GBuffer.fs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\Shaders\GBuffer.vs">
       <Filter>Source Files\Shaders</Filter>
     </None>
   </ItemGroup>

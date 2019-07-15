@@ -18,7 +18,9 @@
 #endif
 
 #define NUM_LIGHTS 1
+
 #define NUM_VPL 200
+
 #define VPL_DIST_MAX 0.5f
 #define RSM_INTENSITY 1.0f
 
@@ -28,15 +30,15 @@ enum TextureUnit {
 	SPECULAR_MAP = 1,
 	NORMAL_MAP   = 2,
 
-	G_DEPTH    = 3,
-	G_POSITION = 4,
-	G_NORMAL   = 5,
-	G_FLUX     = 6,
+	G_POSITION = 3,
+	G_NORMAL   = 4,
+	G_DIFFUSE  = 5,
+	G_SPECULAR = 6,
 
-	OMNI_G_DEPTH    = 7,
-	OMNI_G_POSITION = 8,
-	OMNI_G_NORMAL   = 9,
-	OMNI_G_FLUX     = 10
+	RSM_DEPTH    = 7,
+	RSM_POSITION = 8,
+	RSM_NORMAL   = 9,
+	RSM_FLUX     = 10,
 };
 
 const GLenum OpenGLTextureUnits[]{

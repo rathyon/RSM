@@ -41,19 +41,18 @@ namespace rsm {
 		sref<Camera> getCamera();
 		std::vector<GLuint> programs();
 
+		// RSM
 		float rsmRMax();
 		float rsmIntensity();
 
 		void setRSMRMax(float val);
 		void setRSMIntensity(float val);
-		void genRSMaps();
 
 	private:
 		void prepareCameraBuffer();
 
 		void uploadCameraBuffer();
 		void uploadLights(GLuint prog);
-		void uploadShadowMappingData();
 
 		int _width;
 		int _height;
@@ -63,6 +62,23 @@ namespace rsm {
 
 		Scene _scene;
 		sref<Camera> _camera;
+
+		// Deferred Shading
+		const int _gBufferWidth = 1000;
+		const int _gBufferHeight = 1000;
+		GLuint _gBuffer;
+		GLuint _gPosition, _gNormal, _gDiffuse, _gSpecular;
+
+		GLuint _screenQuadVAO;
+		GLuint _screenQuadVBO;
+
+		void geometryPass();
+		void uploadDeferredShadingData();
+		void renderScreenQuad();
+
+		// RSM
+		void genRSMaps();
+		void uploadShadowMappingData();
 
 		float _rsmRMax;
 		float _rsmIntensity;

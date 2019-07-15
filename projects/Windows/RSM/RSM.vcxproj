@@ -75,8 +75,8 @@
     <None Include="..\..\..\src\Shaders\BlinnPhongTex.vs" />
     <None Include="..\..\..\src\Shaders\GBuffer.fs" />
     <None Include="..\..\..\src\Shaders\GBuffer.vs" />
-    <None Include="..\..\..\src\Shaders\OmniGBuffer.fs" />
-    <None Include="..\..\..\src\Shaders\OmniGBuffer.vs" />
+    <None Include="..\..\..\src\Shaders\RSMGBuffer.fs" />
+    <None Include="..\..\..\src\Shaders\RSMGBuffer.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

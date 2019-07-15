@@ -191,26 +191,96 @@ void OpenGLApplication::prepare() {
 	prepareCameraBuffer();
 
 	/* ===================================================================================
+		DEFERRED SHADING
+	=====================================================================================*/
+	glGenFramebuffers(1, &_gBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, _gBuffer);
+
+	// - position color buffer
+	glGenTextures(1, &_gPosition);
+	glBindTexture(GL_TEXTURE_2D, _gPosition);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _gPosition, 0);
+
+	// - normal color buffer
+	glGenTextures(1, &_gNormal);
+	glBindTexture(GL_TEXTURE_2D, _gNormal);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, _gNormal, 0);
+
+	// diffuse
+	glGenTextures(1, &_gDiffuse);
+	glBindTexture(GL_TEXTURE_2D, _gDiffuse);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, _gDiffuse, 0);
+
+	// specular
+	glGenTextures(1, &_gSpecular);
+	glBindTexture(GL_TEXTURE_2D, _gSpecular);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, _gSpecular, 0);
+
+	// - tell OpenGL which color attachments we'll use (of this framebuffer) for rendering 
+	unsigned int attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+	glDrawBuffers(4, attachments);
+
+	// create and attach depth buffer (renderbuffer)
+	unsigned int rboDepth;
+	glGenRenderbuffers(1, &rboDepth);
+	glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, _gBufferWidth, _gBufferHeight);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		LOGE("Framebuffer not complete!\n");
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	// Screen Quad Setup
+
+	float quadVertices[] = {
+		// positions        // texture Coords
+		-1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+		-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+		 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+		 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+	};
+	// setup plane VAO
+	glGenVertexArrays(1, &_screenQuadVAO);
+	glGenBuffers(1, &_screenQuadVBO);
+
+	glBindVertexArray(_screenQuadVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, _screenQuadVBO);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(AttributeType::POSITION);
+	glVertexAttribPointer(AttributeType::POSITION, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(AttributeType::UV);
+	glVertexAttribPointer(AttributeType::UV, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+	/* ===================================================================================
 		RSM
 	=====================================================================================*/
 	_rsmRMax = VPL_DIST_MAX;
 	_rsmIntensity = RSM_INTENSITY;
 	// precalculate sampling pattern
 
-	/**/
 	for (int i = 0; i < NUM_VPL; i++) {
 		double* sample = hammersley(i, 2, NUM_VPL);
 		VPLSamples[i][0] = (float) sample[0];
 		VPLSamples[i][1] = (float) sample[1];
 	}
-	/**/
-
-	/** /
-	for (int i = 0; i < NUM_VPL; i++) {
-		VPLSamples[i][0] = randf();
-		VPLSamples[i][1] = randf();
-	}
-	/**/
 
 	// upload RSM data
 	for (GLuint prog : _programs) {
@@ -227,12 +297,34 @@ void OpenGLApplication::prepare() {
 	checkOpenGLError("Error preparing OpenGL Application!");
 }
 
-void OpenGLApplication::genRSMaps() {
-	GLuint GB = RM.getShader("GBuffer")->id();
-	GLuint OGB = RM.getShader("OmniGBuffer")->id();
+void OpenGLApplication::renderScreenQuad() {
+	GLuint prog = RM.getShader("DeferredShading")->id();
 
+	glUseProgram(prog);
+	glBindVertexArray(_screenQuadVAO);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(0);
+	glUseProgram(0);
+}
+
+void OpenGLApplication::geometryPass() {
+	GLuint GB = RM.getShader("GBuffer")->id();
+
+	glViewport(0, 0, _gBufferWidth, _gBufferHeight);
+	glUseProgram(GB);
+	glBindFramebuffer(GL_FRAMEBUFFER, _gBuffer);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	_scene.draw(GB);
+
+	glUseProgram(0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	reshape(_width, _height);
+}
+
+void OpenGLApplication::genRSMaps() {
+	GLuint GB = RM.getShader("RSMGBuffer")->id();
 	uploadLights(GB);
-	uploadLights(OGB);
 
 	const std::vector<sref<Light>>& lights = _scene.lights();
 	for (int l = 0; l < NUM_LIGHTS; l++) {
@@ -250,32 +342,30 @@ void OpenGLApplication::genRSMaps() {
 			glUniform1i(glGetUniformLocation(GB, "lightIdx"), l);
 
 			_scene.draw(GB);
-
 		}
+
+		/** /
 		// if point light
-		else {
-			glUseProgram(OGB);
-			glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->gBuffer());
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glUseProgram(OGB);
+		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->gBuffer());
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			lights[l]->uploadSpatialData(OGB);
-			for (int face = 0; face < 6; face++) {
-				glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, lights[l]->depthMap(), 0);
-				glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, lights[l]->positionMap(), 0);
-				glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, lights[l]->normalMap(), 0);
-				glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, lights[l]->fluxMap(), 0);
-				glUniform1i(glGetUniformLocation(OGB, "face"), face);
-				glUniform1i(glGetUniformLocation(OGB, "lightIdx"), l);
-				_scene.draw(OGB);
-			}
-            glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, lights[l]->depthMap(), 0);
-			glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, lights[l]->positionMap(), 0);
-			glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, lights[l]->normalMap(), 0);
-			glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, lights[l]->fluxMap(), 0);
+		lights[l]->uploadSpatialData(OGB);
+		for (int face = 0; face < 6; face++) {
+			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, lights[l]->depthMap(), 0);
+			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, lights[l]->positionMap(), 0);
+			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, lights[l]->normalMap(), 0);
+			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, lights[l]->fluxMap(), 0);
+			glUniform1i(glGetUniformLocation(OGB, "face"), face);
+			glUniform1i(glGetUniformLocation(OGB, "lightIdx"), l);
+			_scene.draw(OGB);
 		}
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, lights[l]->depthMap(), 0);
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, lights[l]->positionMap(), 0);
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, lights[l]->normalMap(), 0);
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, lights[l]->fluxMap(), 0);
+		/**/
 	}
-
-	glCullFace(GL_BACK);
 
 	glUseProgram(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -285,29 +375,37 @@ void OpenGLApplication::genRSMaps() {
 
 void OpenGLApplication::render() { 
 
-	// Generate Depth Map
-	genRSMaps();
-    checkOpenGLError("Error generating depth maps!");
-
-	// clear framebuffer
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// upload lights...
+	// Upload lights...
 	for (GLuint prog : _programs) {
 		uploadLights(prog);
 	}
-    checkOpenGLError("Error uploading lights data!");
+	checkOpenGLError("Error uploading lights data!");
 
-	// upload camera...
+	// Upload camera...
 	uploadCameraBuffer();
-    checkOpenGLError("Error uploading camera data!");
+	checkOpenGLError("Error uploading camera data!");
 
-	//upload shadow mapping data
+	// Geometry Pass (Deferred Shading)...
+	geometryPass();
+
+	// Generate Depth Map...
+	genRSMaps();
+    checkOpenGLError("Error generating depth maps!");
+
+	// Clear framebuffer...
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Upload deferred shading data...
+	uploadDeferredShadingData();
+	checkOpenGLError("Error uploading deferred shading data!");
+
+	// Upload shadow mapping data...
 	uploadShadowMappingData();
     checkOpenGLError("Error uploading shadow mapping data!");
 
-	// render objects...
-	_scene.render();
+	// Render scene...
+	//_scene.render();
+	renderScreenQuad();
 
 	checkOpenGLError("Error in render loop!");
 }
@@ -371,6 +469,28 @@ void OpenGLApplication::uploadLights(GLuint prog) {
 	glUseProgram(0);
 }
 
+void OpenGLApplication::uploadDeferredShadingData() {
+	for (GLuint prog : _programs) {
+		glUseProgram(prog);
+
+		glActiveTexture(OpenGLTextureUnits[TextureUnit::G_POSITION]);
+		glBindTexture(GL_TEXTURE_2D, _gPosition);
+		glUniform1i(glGetUniformLocation(prog, "gPosition"), TextureUnit::G_POSITION);
+
+		glActiveTexture(OpenGLTextureUnits[TextureUnit::G_NORMAL]);
+		glBindTexture(GL_TEXTURE_2D, _gNormal);
+		glUniform1i(glGetUniformLocation(prog, "gNormal"), TextureUnit::G_NORMAL);
+
+		glActiveTexture(OpenGLTextureUnits[TextureUnit::G_DIFFUSE]);
+		glBindTexture(GL_TEXTURE_2D, _gDiffuse);
+		glUniform1i(glGetUniformLocation(prog, "gDiffuse"), TextureUnit::G_DIFFUSE);
+
+		glActiveTexture(OpenGLTextureUnits[TextureUnit::G_SPECULAR]);
+		glBindTexture(GL_TEXTURE_2D, _gSpecular);
+		glUniform1i(glGetUniformLocation(prog, "gSpecular"), TextureUnit::G_SPECULAR);
+	}
+}
+
 void OpenGLApplication::uploadShadowMappingData() {
 	const std::vector<sref<Light>>& lights = _scene.lights();
 
@@ -380,24 +500,24 @@ void OpenGLApplication::uploadShadowMappingData() {
 			lights[l]->uploadShadowMapData(prog);
 
 			GLenum type = lights[l]->depthMapType();
-			if (type == OpenGLTexTargets[IMG_2D]) {
 
-				glActiveTexture(OpenGLTextureUnits[TextureUnit::G_DEPTH]);
+				glActiveTexture(OpenGLTextureUnits[TextureUnit::RSM_DEPTH]);
 				glBindTexture(type, lights[l]->depthMap());
-				glUniform1i(glGetUniformLocation(prog, "depthMap"), TextureUnit::G_DEPTH);
+				glUniform1i(glGetUniformLocation(prog, "depthMap"), TextureUnit::RSM_DEPTH);
 
-				glActiveTexture(OpenGLTextureUnits[TextureUnit::G_POSITION]);
+				glActiveTexture(OpenGLTextureUnits[TextureUnit::RSM_POSITION]);
 				glBindTexture(type, lights[l]->positionMap());
-				glUniform1i(glGetUniformLocation(prog, "positionMap"), TextureUnit::G_POSITION);
+				glUniform1i(glGetUniformLocation(prog, "positionMap"), TextureUnit::RSM_POSITION);
 
-				glActiveTexture(OpenGLTextureUnits[TextureUnit::G_NORMAL]);
+				glActiveTexture(OpenGLTextureUnits[TextureUnit::RSM_NORMAL]);
 				glBindTexture(type, lights[l]->normalMap());
-				glUniform1i(glGetUniformLocation(prog, "normalMap"), TextureUnit::G_NORMAL);
+				glUniform1i(glGetUniformLocation(prog, "normalMap"), TextureUnit::RSM_NORMAL);
 
-				glActiveTexture(OpenGLTextureUnits[TextureUnit::G_FLUX]);
+				glActiveTexture(OpenGLTextureUnits[TextureUnit::RSM_FLUX]);
 				glBindTexture(type, lights[l]->fluxMap());
-				glUniform1i(glGetUniformLocation(prog, "fluxMap"), TextureUnit::G_FLUX);
-			}
+				glUniform1i(glGetUniformLocation(prog, "fluxMap"), TextureUnit::RSM_FLUX);
+
+			/** /
 			else {
 				glActiveTexture(OpenGLTextureUnits[TextureUnit::OMNI_G_DEPTH]);
 				glBindTexture(type, lights[l]->depthMap());
@@ -415,6 +535,7 @@ void OpenGLApplication::uploadShadowMappingData() {
 				glBindTexture(type, lights[l]->fluxMap());
 				glUniform1i(glGetUniformLocation(prog, "fluxCubeMap"), TextureUnit::OMNI_G_FLUX);
 			}
+			/**/
 
 		}
 	}
