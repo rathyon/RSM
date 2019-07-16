@@ -30,15 +30,16 @@ enum TextureUnit {
 	SPECULAR_MAP = 1,
 	NORMAL_MAP   = 2,
 
-	G_POSITION = 3,
-	G_NORMAL   = 4,
-	G_DIFFUSE  = 5,
-	G_SPECULAR = 6,
+	G_POSITION           = 3,
+	G_NORMAL             = 4,
+	G_DIFFUSE            = 5,
+	G_SPECULAR           = 6,
+	G_LIGHTSPACEPOSITION = 7,
 
-	RSM_DEPTH    = 7,
-	RSM_POSITION = 8,
-	RSM_NORMAL   = 9,
-	RSM_FLUX     = 10,
+	RSM_DEPTH    = 8,
+	RSM_POSITION = 9,
+	RSM_NORMAL   = 10,
+	RSM_FLUX     = 11,
 };
 
 const GLenum OpenGLTextureUnits[]{
@@ -53,6 +54,8 @@ const GLenum OpenGLTextureUnits[]{
 	GL_TEXTURE8,
 	GL_TEXTURE9,
 	GL_TEXTURE10,
+	GL_TEXTURE11,
+	GL_TEXTURE12,
 };
 
 const GLenum OpenGLShaderType[]{

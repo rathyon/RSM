@@ -228,15 +228,23 @@ void OpenGLApplication::prepare() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, _gSpecular, 0);
 
+	// - light space position color buffer (need W component)
+	glGenTextures(1, &_gLightSpacePosition);
+	glBindTexture(GL_TEXTURE_2D, _gLightSpacePosition);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, _gBufferWidth, _gBufferHeight, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, _gLightSpacePosition, 0);
+
 	// - tell OpenGL which color attachments we'll use (of this framebuffer) for rendering 
-	unsigned int attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-	glDrawBuffers(4, attachments);
+	unsigned int attachments[5] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4 };
+	glDrawBuffers(5, attachments);
 
 	// create and attach depth buffer (renderbuffer)
 	unsigned int rboDepth;
 	glGenRenderbuffers(1, &rboDepth);
 	glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, _gBufferWidth, _gBufferHeight);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32F, _gBufferWidth, _gBufferHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -314,6 +322,8 @@ void OpenGLApplication::geometryPass() {
 	glUseProgram(GB);
 	glBindFramebuffer(GL_FRAMEBUFFER, _gBuffer);
 
+	// WARNING: THIS CALL ASSUMES ONLY 1 LIGHT PRESENT!
+	_scene.lights()[0]->uploadSpatialData(GB);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	_scene.draw(GB);
 
@@ -385,12 +395,13 @@ void OpenGLApplication::render() {
 	uploadCameraBuffer();
 	checkOpenGLError("Error uploading camera data!");
 
-	// Geometry Pass (Deferred Shading)...
-	geometryPass();
-
 	// Generate Depth Map...
 	genRSMaps();
-    checkOpenGLError("Error generating depth maps!");
+	checkOpenGLError("Error generating depth maps!");
+
+	// Geometry Pass (Deferred Shading)...
+	geometryPass();
+	checkOpenGLError("Error in geometry pass!");
 
 	// Clear framebuffer...
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -488,6 +499,10 @@ void OpenGLApplication::uploadDeferredShadingData() {
 		glActiveTexture(OpenGLTextureUnits[TextureUnit::G_SPECULAR]);
 		glBindTexture(GL_TEXTURE_2D, _gSpecular);
 		glUniform1i(glGetUniformLocation(prog, "gSpecular"), TextureUnit::G_SPECULAR);
+
+		glActiveTexture(OpenGLTextureUnits[TextureUnit::G_LIGHTSPACEPOSITION]);
+		glBindTexture(GL_TEXTURE_2D, _gLightSpacePosition);
+		glUniform1i(glGetUniformLocation(prog, "gLightSpacePosition"), TextureUnit::G_LIGHTSPACEPOSITION);
 	}
 }
 

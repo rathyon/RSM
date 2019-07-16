@@ -19,6 +19,7 @@ out FragData {
 	vec3 position;
 	vec3 normal;
 	vec2 texCoords;
+	vec4 lightSpacePosition;
 } vsOut;
 
 void main()
@@ -27,6 +28,7 @@ void main()
 	vsOut.position  = vec3(ModelMatrix * vec4(Position, 1.0));
 	vsOut.normal    = normalize(NormalMatrix * Normal);
 	vsOut.texCoords = TexCoords;
+	vsOut.lightSpacePosition = lightSpaceMatrix * vec4(vsOut.position, 1.0);
 	
 	// Return position in Light MVP coordinates
     gl_Position = ViewProjMatrix * vec4(vsOut.position, 1.0);

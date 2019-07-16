@@ -73,6 +73,8 @@
     </None>
     <None Include="..\..\..\src\Shaders\BlinnPhongTex.fs" />
     <None Include="..\..\..\src\Shaders\BlinnPhongTex.vs" />
+    <None Include="..\..\..\src\Shaders\DeferredShading.fs" />
+    <None Include="..\..\..\src\Shaders\DeferredShading.vs" />
     <None Include="..\..\..\src\Shaders\GBuffer.fs" />
     <None Include="..\..\..\src\Shaders\GBuffer.vs" />
     <None Include="..\..\..\src\Shaders\RSMGBuffer.fs" />

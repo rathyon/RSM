@@ -3,21 +3,8 @@ in FragData {
 	vec3 position;
 	vec3 normal;
 	vec2 texCoords;
+	vec4 lightSpacePosition;
 } vsIn;
-
-struct Light {
-	vec3 position;
-	vec3 direction;
-	vec3 emission;
-	float linear;
-	float quadratic;
-	int type;
-	bool state;
-	float cutoff;
-};
-
-uniform Light lights[NUM_LIGHTS];
-uniform int lightIdx;
 
 //Material parameters
 uniform vec3 ambient;
@@ -36,12 +23,16 @@ vec3 fetchDiffuse(){
 	}
 }
 
-layout(location = 0) out vec4 position;
-layout(location = 1) out vec4 normal;
-layout(location = 2) out vec4 flux;
+layout(location = 0) out vec4 gPosition;
+layout(location = 1) out vec4 gNormal;
+layout(location = 2) out vec4 gDiffuse;
+layout(location = 3) out vec4 gSpecular;
+layout(location = 4) out vec4 gLightSpacePosition;
 
 void main(void) {
-	position = vec4(vsIn.position, 1.0);
-	normal = vec4(normalize(vsIn.normal), 1.0);
-	flux = vec4(lights[lightIdx].emission * fetchDiffuse(), 1.0);
+	gPosition = vec4(vsIn.position, 1.0);
+	gNormal = vec4(normalize(vsIn.normal), 1.0);
+	gDiffuse = vec4(fetchDiffuse(), 1.0);
+	gSpecular = vec4(specular, 1.0);
+	gLightSpacePosition = vsIn.lightSpacePosition;
 }

@@ -91,7 +91,8 @@ void rsm::init(int argc, char* argv[]) {
 	ShaderSource fDS = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/DeferredShading.fs");
 	vDS.inject(std::string("#version 330 core\n"));
 	fDS.inject(std::string("#version 330 core\n") +
-		std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n");
+		std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n" +
+		std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
 	vDS.compile();
 	fDS.compile();
 

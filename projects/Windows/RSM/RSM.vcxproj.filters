@@ -214,5 +214,11 @@
     <None Include="..\..\..\src\Shaders\GBuffer.vs">
       <Filter>Source Files\Shaders</Filter>
     </None>
+    <None Include="..\..\..\src\Shaders\DeferredShading.fs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\Shaders\DeferredShading.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
