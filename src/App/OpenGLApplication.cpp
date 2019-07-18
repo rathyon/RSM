@@ -9,6 +9,9 @@ using namespace rsm;
 OpenGLApplication::OpenGLApplication(int width, int height) {
 	_width = width;
 	_height = height;
+
+	_gBufferWidth = width;
+	_gBufferHeight = height;
 }
 
 void OpenGLApplication::init() {
@@ -55,6 +58,7 @@ void OpenGLApplication::reshape(int w, int h) {
 	_height = h;
 	_camera->updateProjMatrix(w, h);
 	glViewport(0, 0, w, h);
+	// TODO: RESET GBUFFER PARAMS!
 }
 
 Scene OpenGLApplication::getScene() {
@@ -302,6 +306,28 @@ void OpenGLApplication::prepare() {
 	}
 	glUseProgram(0);
 
+	// prepare low res indirect illumination buffer
+	_indirectLowResWidth = 64;
+	_indirectLowResHeight = 64;
+	glGenFramebuffers(1, &_indirectLowResFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, _indirectLowResFBO);
+
+	glGenTextures(1, &_indirectLowResMap);
+	glBindTexture(GL_TEXTURE_2D, _indirectLowResMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, _indirectLowResWidth, _indirectLowResHeight, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _indirectLowResMap, 0);
+
+	// - tell OpenGL which color attachments we'll use (of this framebuffer) for rendering 
+	unsigned int attachment[1] = { GL_COLOR_ATTACHMENT0 };
+	glDrawBuffers(1, attachment);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		LOGE("Framebuffer not complete!\n");
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 	checkOpenGLError("Error preparing OpenGL Application!");
 }
 
@@ -310,7 +336,9 @@ void OpenGLApplication::renderScreenQuad() {
 
 	glUseProgram(prog);
 	glBindVertexArray(_screenQuadVAO);
+
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	
 	glBindVertexArray(0);
 	glUseProgram(0);
 }
@@ -383,6 +411,24 @@ void OpenGLApplication::genRSMaps() {
 	reshape(_width, _height);
 }
 
+void OpenGLApplication::renderLowResIndirect() {
+	GLuint prog = RM.getShader("IndirectIllumination")->id();
+
+	glViewport(0, 0, _indirectLowResWidth, _indirectLowResHeight);
+
+	glUseProgram(prog);
+	glBindFramebuffer(GL_FRAMEBUFFER, _indirectLowResFBO);
+	glBindVertexArray(_screenQuadVAO);
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+	glBindVertexArray(0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glUseProgram(0);
+
+	reshape(_width, _height);
+}
+
 void OpenGLApplication::render() { 
 
 	// Upload lights...
@@ -414,6 +460,13 @@ void OpenGLApplication::render() {
 	uploadShadowMappingData();
     checkOpenGLError("Error uploading shadow mapping data!");
 
+	// render low res indirect illumination
+	renderLowResIndirect();
+	uploadLowResIndirect();
+
+	// render high res indirect illumination
+
+	// render direct illumination + pre calc indirect
 	// Render scene...
 	//_scene.render();
 	renderScreenQuad();
@@ -553,5 +606,14 @@ void OpenGLApplication::uploadShadowMappingData() {
 			/**/
 
 		}
+	}
+}
+
+void OpenGLApplication::uploadLowResIndirect() {
+	for (GLuint prog : _programs) {
+		glUseProgram(prog);
+		glActiveTexture(OpenGLTextureUnits[TextureUnit::LOW_RES_INDIRECT]);
+		glBindTexture(GL_TEXTURE_2D, _indirectLowResMap);
+		glUniform1i(glGetUniformLocation(prog, "lowResIndirect"), TextureUnit::LOW_RES_INDIRECT);
 	}
 }

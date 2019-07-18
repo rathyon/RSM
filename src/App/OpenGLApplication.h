@@ -64,8 +64,8 @@ namespace rsm {
 		sref<Camera> _camera;
 
 		// Deferred Shading
-		const int _gBufferWidth = 1000;
-		const int _gBufferHeight = 1000;
+		int _gBufferWidth;
+		int _gBufferHeight;
 		GLuint _gBuffer;
 		GLuint _gPosition, _gNormal, _gDiffuse, _gSpecular, _gLightSpacePosition;
 
@@ -77,12 +77,19 @@ namespace rsm {
 		void renderScreenQuad();
 
 		// RSM
-		void genRSMaps();
-		void uploadShadowMappingData();
-
 		float _rsmRMax;
 		float _rsmIntensity;
 		GLfloat VPLSamples[NUM_VPL][2];
+
+		int _indirectLowResWidth;
+		int _indirectLowResHeight;
+		GLuint _indirectLowResFBO;
+		GLuint _indirectLowResMap;
+
+		void genRSMaps();
+		void uploadShadowMappingData();
+		void renderLowResIndirect();
+		void uploadLowResIndirect();
 	};
 }
 

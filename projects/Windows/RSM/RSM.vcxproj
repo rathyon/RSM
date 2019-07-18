@@ -77,6 +77,8 @@
     <None Include="..\..\..\src\Shaders\DeferredShading.vs" />
     <None Include="..\..\..\src\Shaders\GBuffer.fs" />
     <None Include="..\..\..\src\Shaders\GBuffer.vs" />
+    <None Include="..\..\..\src\Shaders\IndirectIllumination.fs" />
+    <None Include="..\..\..\src\Shaders\IndirectIllumination.vs" />
     <None Include="..\..\..\src\Shaders\RSMGBuffer.fs" />
     <None Include="..\..\..\src\Shaders\RSMGBuffer.vs" />
   </ItemGroup>

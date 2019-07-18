@@ -40,6 +40,8 @@ enum TextureUnit {
 	RSM_POSITION = 9,
 	RSM_NORMAL   = 10,
 	RSM_FLUX     = 11,
+
+	LOW_RES_INDIRECT = 12,
 };
 
 const GLenum OpenGLTextureUnits[]{
@@ -56,6 +58,7 @@ const GLenum OpenGLTextureUnits[]{
 	GL_TEXTURE10,
 	GL_TEXTURE11,
 	GL_TEXTURE12,
+	GL_TEXTURE13,
 };
 
 const GLenum OpenGLShaderType[]{

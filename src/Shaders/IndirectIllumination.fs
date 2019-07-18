@@ -52,42 +52,9 @@ uniform sampler2D depthMap;
 uniform sampler2D positionMap;
 uniform sampler2D normalMap;
 uniform sampler2D fluxMap;
-
-float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
-	// perform perspective divide: clip space-> normalized device coords (done automatically for gl_Position)
-    vec3 projCoords = lightSpacePosition.xyz / lightSpacePosition.w;
-    // bring from [-1,1] to [0,1]
-    projCoords = projCoords * 0.5 + 0.5;
-
-    if(projCoords.z > 1.0)
-        return 1.0;
-
-    float currentDepth = projCoords.z; 
-
-    float bias = baseBias * tan(acos(dot(N,L)));
-    bias = clamp(bias, 0.0, 0.0005f);
-
-    //float shadow = currentDepth - bias > closestDepth  ? 0.0 : 1.0;
-
-    float shadow = 0.0;
-    vec2 texelSize = 1.0 / vec2(textureSize(depthMap, 0));
-    for(int x = -1; x <= 1; x++){
-    	for(int y = -1; y <= 1; y++){
-    		float depth = texture(depthMap, projCoords.xy + vec2(x,y) * texelSize).r;
-    		shadow += currentDepth - bias > depth ? 0.0 : 1.0;
-    	}
-    }
-
-    shadow = shadow / 9.0;
-
-    return shadow;
-}
-
 /* ==============================================================================
         Illumination
  ============================================================================== */
-
- uniform sampler2D lowResIndirect;
 
 vec3 indirectIllumination(vec3 FragPos, vec4 LightSpacePos, vec3 Normal, vec3 Diffuse) {
 	vec3 result = vec3(0.0);
@@ -123,79 +90,19 @@ vec3 indirectIllumination(vec3 FragPos, vec4 LightSpacePos, vec3 Normal, vec3 Di
 	return (result * Diffuse) * rsmIntensity;
 }
 
-vec3 directIllumination(vec3 FragPos, vec4 LightSpacePos, vec3 Normal, vec3 Diffuse, vec3 Specular) {
-	vec3 V = normalize(ViewPos - FragPos);
-	vec3 N = Normal;
-	vec3 L;
-
-	float shadow = 1.0;
-	vec3 retColor = vec3(0.0);
-
-	for(int i=0; i < NUM_LIGHTS; i++){
-
-		// Get Light Vector
-		if (lights[i].type == 0){
-			L = normalize(-lights[i].direction);
-
-			shadow = shadowFactor(LightSpacePos, N, L);
-		}
-		else {
-			L = normalize(lights[i].position - FragPos);
-		}
-
-		if (lights[i].type == 2){
-			float theta = dot(L, normalize(-lights[i].direction));
-			if(theta <= lights[i].cutoff){
-				continue;
-			}
-		}
-
-		vec3 H = normalize(L + V);
-
-		float NdotL = max(dot(N, L), 0.0);
-		float NdotH = max(dot(N, H), 0.0);
-
-		vec3 diff = vec3(0.0);
-		vec3 spec = vec3(0.0);
-
-		if (NdotL > 0.0){
-
-			diff = lights[i].emission * ( Diffuse * NdotL);
-			spec = lights[i].emission * ( Specular * pow(NdotH, shininess));
-
-			// if not directional light
-			if (lights[i].type != 0){
-				float distance = length(lights[i].position - FragPos);
-				float attenuation = 1.0 / (1.0 + lights[i].linear * distance + lights[i].quadratic * pow(distance, 2.0));
-
-				diff *= attenuation;
-				spec *= attenuation;
-			}
-		}
-
-		retColor += (diff + spec) * shadow;
-	}
-
-	return retColor;
-}
-
 /* ==============================================================================
         Stage Outputs
  ============================================================================== */
 
-out vec4 outColor;
+layout(location = 0) out vec4 outColor;
 
 void main(void) {
 
 	vec3 pos      = texture(gPosition, texCoords).rgb;
 	vec3 N        = texture(gNormal, texCoords).rgb;
 	vec3 diffuse  = texture(gDiffuse, texCoords).rgb;
-	vec3 specular = texture(gSpecular, texCoords).rgb;
 	vec4 lightSpacePos = texture(gLightSpacePosition, texCoords);
 
-	//outColor = vec4(directIllumination(pos, lightSpacePos, N, diffuse, specular) + indirectIllumination(pos, lightSpacePos, N, diffuse), 1.0);
-
-	//outColor = vec4(directIllumination(pos, lightSpacePos, N, diffuse, specular), 1.0);
-	outColor = vec4(texture(lowResIndirect, texCoords).rgb, 1.0);
+	outColor = vec4(indirectIllumination(pos, lightSpacePos, N, diffuse), 1.0);
 
 }

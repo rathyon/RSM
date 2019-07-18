@@ -96,6 +96,15 @@ void rsm::init(int argc, char* argv[]) {
 	vDS.compile();
 	fDS.compile();
 
+	ShaderSource vII = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/IndirectIllumination.vs");
+	ShaderSource fII = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/IndirectIllumination.fs");
+	vII.inject(std::string("#version 330 core\n"));
+	fII.inject(std::string("#version 330 core\n") +
+		std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n" +
+		std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
+	vII.compile();
+	fII.compile();
+
 	ShaderSource vGB = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/GBuffer.vs");
 	ShaderSource fGB = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/GBuffer.fs");
 	vGB.inject(std::string("#version 330 core\n"));
@@ -141,6 +150,13 @@ void rsm::init(int argc, char* argv[]) {
 	DeferredShading->link();
 	RM.addShader("DeferredShading", DeferredShading);
 	glApp->addProgram(DeferredShading->id());
+
+	sref<Shader> IndirectIllumination = make_sref<Shader>("IndirectIllumination");
+	IndirectIllumination->addShader(vII);
+	IndirectIllumination->addShader(fII);
+	IndirectIllumination->link();
+	RM.addShader("IndirectIllumination", IndirectIllumination);
+	glApp->addProgram(IndirectIllumination->id());
 
 	sref<Shader> GBuffer = make_sref<Shader>("GBuffer");
 	GBuffer->addShader(vGB);
