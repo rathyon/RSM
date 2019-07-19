@@ -80,7 +80,6 @@ void init() {
     ShaderSource fDS = ShaderSource(FRAGMENT_SHADER, "fDS", getAssetSource("shaders/DeferredShading.fs"));
     vDS.inject(std::string("#version 320 es\n") +
                std::string("#extension GL_EXT_shader_io_blocks : enable\n"));
-
     fDS.inject(std::string("#version 320 es\n") +
                std::string("#extension GL_EXT_shader_io_blocks : enable\n") +
                std::string("precision highp float;\n") +
@@ -88,6 +87,18 @@ void init() {
                std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
     vDS.compile();
     fDS.compile();
+
+    ShaderSource vII = ShaderSource(VERTEX_SHADER, "vII", getAssetSource("shaders/IndirectIllumination.vs"));
+    ShaderSource fII = ShaderSource(FRAGMENT_SHADER, "fII", getAssetSource("shaders/IndirectIllumination.fs"));
+    vII.inject(std::string("#version 320 es\n") +
+               std::string("#extension GL_EXT_shader_io_blocks : enable\n"));
+    fII.inject(std::string("#version 320 es\n") +
+               std::string("#extension GL_EXT_shader_io_blocks : enable\n") +
+               std::string("precision highp float;\n") +
+               std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n" +
+               std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
+    vII.compile();
+    fII.compile();
 
     ShaderSource vGB = ShaderSource(VERTEX_SHADER, "vGB",getAssetSource("shaders/GBuffer.vs"));
     ShaderSource fGB = ShaderSource(FRAGMENT_SHADER, "fGB", getAssetSource("shaders/GBuffer.fs"));
@@ -130,6 +141,13 @@ void init() {
     DeferredShading->link();
     RM.addShader("DeferredShading", DeferredShading);
     glApp->addProgram(DeferredShading->id());
+
+    sref<Shader> IndirectIllumination = make_sref<Shader>("IndirectIllumination");
+    IndirectIllumination->addShader(vII);
+    IndirectIllumination->addShader(fII);
+    IndirectIllumination->link();
+    RM.addShader("IndirectIllumination", IndirectIllumination);
+    glApp->addProgram(IndirectIllumination->id());
 
     sref<Shader> GBuffer = make_sref<Shader>("GBuffer");
     GBuffer->addShader(vGB);

@@ -185,6 +185,9 @@ vec3 directIllumination(vec3 FragPos, vec4 LightSpacePos, vec3 Normal, vec3 Diff
 
 out vec4 outColor;
 
+const float maxDist = 2.0;
+const float minDot = 0.8;
+
 void main(void) {
 
 	vec3 pos      = texture(gPosition, texCoords).rgb;
@@ -194,8 +197,65 @@ void main(void) {
 	vec4 lightSpacePos = texture(gLightSpacePosition, texCoords);
 
 	//outColor = vec4(directIllumination(pos, lightSpacePos, N, diffuse, specular) + indirectIllumination(pos, lightSpacePos, N, diffuse), 1.0);
-
 	//outColor = vec4(directIllumination(pos, lightSpacePos, N, diffuse, specular), 1.0);
-	outColor = vec4(texture(lowResIndirect, texCoords).rgb, 1.0);
+	//outColor = vec4(texture(lowResIndirect, texCoords).rgb, 1.0);
 
+	/**/
+	vec3 direct = directIllumination(pos, lightSpacePos, N, diffuse, specular);
+
+	vec2 texelSize = 1.0 / vec2(textureSize(lowResIndirect, 0));
+
+	vec4 sampleX;
+	vec4 sampleY;
+	vec4 viable = vec4(1.0);
+	int viableSamples = 4;
+
+	// left up down right
+	sampleX[0] = texCoords.x - texelSize.x ; sampleY[0] = texCoords.y;
+	sampleX[1] = texCoords.x               ; sampleY[1] = texCoords.y + texelSize.y;
+	sampleX[2] = texCoords.x               ; sampleY[2] = texCoords.y - texelSize.y;
+	sampleX[3] = texCoords.x + texelSize.x ; sampleY[3] = texCoords.y;
+
+	// must have close World pos... what does that mean?
+	for(int i = 0; i < 4; i++){
+		if( length(pos - texture(gPosition, vec2(sampleX[i], sampleY[i])).rgb) > maxDist ){
+			viable[i] = 0.0;
+			viableSamples -= 1;
+		}
+	}
+
+	// must have similar normal... dot >= some value?
+	for(int i = 0; i < 4; i++){
+		if(viable[i] == 0.0){
+			continue;
+		}
+		else{
+			if(dot(N, texture(gNormal, vec2(sampleX[i], sampleY[i])).rgb) <= minDot){
+				viable[i] = 0.0;
+				viableSamples -= 1;
+			}
+		}
+	}
+
+	vec3 indirect = vec3(0.0);
+
+	if(viableSamples >= 3){
+
+		for(int i = 0; i < 4; i++){
+			if(viable[i] == 1.0){
+				indirect += texture(lowResIndirect, vec2(sampleX[i], sampleY[i])).rgb;
+			}
+		}
+
+		// TEMPORARY "NORMALIZATION"
+		indirect = indirect / float(viableSamples);
+		outColor = vec4(direct + indirect, 1.0);
+		//outColor = vec4(1.0);
+	}
+	//if not, do raw indirect illum call
+	else{
+		outColor = vec4(direct + indirectIllumination(pos, lightSpacePos, N, diffuse), 1.0);
+	}
+
+	/**/
 }

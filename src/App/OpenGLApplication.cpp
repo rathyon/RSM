@@ -98,7 +98,7 @@ void OpenGLApplication::prepare() {
 	// def cam
 	/**/
 	_camera = make_sref<Perspective>(_width, _height,
-		vec3(7.0f, 4.0f, -3.0f),
+		vec3(-5.0f, 3.0f, -6.0f),
 		vec3(0.0f, 3.5f, 0.0f),
 		vec3(0.0f, 1.0f, 0.0f),
 		0.1f, 1000.0f, 60.0f);
@@ -426,7 +426,7 @@ void OpenGLApplication::renderLowResIndirect() {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glUseProgram(0);
 
-	reshape(_width, _height);
+	glViewport(0, 0, _width, _height);
 }
 
 void OpenGLApplication::render() { 
@@ -441,11 +441,11 @@ void OpenGLApplication::render() {
 	uploadCameraBuffer();
 	checkOpenGLError("Error uploading camera data!");
 
-	// Generate Depth Map...
+	// Generate RSM GBuffer...
 	genRSMaps();
 	checkOpenGLError("Error generating depth maps!");
 
-	// Geometry Pass (Deferred Shading)...
+	// Geometry Pass (Deferred Shading) GBuffer...
 	geometryPass();
 	checkOpenGLError("Error in geometry pass!");
 
@@ -464,7 +464,7 @@ void OpenGLApplication::render() {
 	renderLowResIndirect();
 	uploadLowResIndirect();
 
-	// render high res indirect illumination
+	// render high res indirect illumination?
 
 	// render direct illumination + pre calc indirect
 	// Render scene...
