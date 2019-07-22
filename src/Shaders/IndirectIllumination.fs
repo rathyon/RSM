@@ -79,6 +79,10 @@ vec3 indirectIllumination(vec3 FragPos, vec4 LightSpacePos, vec3 Normal, vec3 Di
 
     	float dist = length(vplP - FragPos);
 
+        // VPL pos == Frag Pos???
+        if(dist <= 0.0)
+            continue;
+
     	indirect += vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
 
     	float weight = rnd.x * rnd.x;

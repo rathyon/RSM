@@ -86,6 +86,8 @@ namespace rsm {
 		GLuint _indirectLowResFBO;
 		GLuint _indirectLowResMap;
 
+		glm::vec4 _indirectSampleParams;
+
 		void genRSMaps();
 		void uploadShadowMappingData();
 		void renderLowResIndirect();

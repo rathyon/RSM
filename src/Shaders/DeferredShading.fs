@@ -112,7 +112,20 @@ vec3 indirectIllumination(vec3 FragPos, vec4 LightSpacePos, vec3 Normal, vec3 Di
 
     	float dist = length(vplP - FragPos);
 
+    	// frag == vpl pos???
+    	if(dist <= 0.0)
+    		continue;
+
     	indirect += vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
+
+    	if(isnan(indirect.x))
+			return vec3(1.0);
+
+		if(isnan(indirect.y))
+			return vec3(1.0);
+
+		if(isnan(indirect.z))
+			return vec3(1.0);
 
     	float weight = rnd.x * rnd.x;
 
@@ -185,8 +198,8 @@ vec3 directIllumination(vec3 FragPos, vec4 LightSpacePos, vec3 Normal, vec3 Diff
 
 out vec4 outColor;
 
-const float maxDist = 2.0;
-const float minDot = 0.8;
+// dist, dist weight, cos(angle), angle weight
+uniform vec4 indirectSampleParams;
 
 void main(void) {
 
@@ -197,6 +210,20 @@ void main(void) {
 	vec4 lightSpacePos = texture(gLightSpacePosition, texCoords);
 
 	//outColor = vec4(directIllumination(pos, lightSpacePos, N, diffuse, specular) + indirectIllumination(pos, lightSpacePos, N, diffuse), 1.0);
+
+	//outColor = vec4(indirectIllumination(pos, lightSpacePos, N, diffuse), 1.0);
+
+	/** /
+	if(isnan(outColor.x))
+		outColor = vec4(1.0);
+
+	if(isnan(outColor.y))
+		outColor = vec4(1.0);
+
+	if(isnan(outColor.z))
+		outColor = vec4(1.0);
+	/**/
+
 	//outColor = vec4(directIllumination(pos, lightSpacePos, N, diffuse, specular), 1.0);
 	//outColor = vec4(texture(lowResIndirect, texCoords).rgb, 1.0);
 
@@ -207,8 +234,8 @@ void main(void) {
 
 	vec4 sampleX;
 	vec4 sampleY;
-	vec4 viable = vec4(1.0);
-	int viableSamples = 4;
+	vec4 viable = vec4(0.0);
+	int viableSamples = 0;
 
 	// left up down right
 	sampleX[0] = texCoords.x - texelSize.x ; sampleY[0] = texCoords.y;
@@ -216,28 +243,16 @@ void main(void) {
 	sampleX[2] = texCoords.x               ; sampleY[2] = texCoords.y - texelSize.y;
 	sampleX[3] = texCoords.x + texelSize.x ; sampleY[3] = texCoords.y;
 
-	// must have close World pos... what does that mean?
-	for(int i = 0; i < 4; i++){
-		if( length(pos - texture(gPosition, vec2(sampleX[i], sampleY[i])).rgb) > maxDist ){
-			viable[i] = 0.0;
-			viableSamples -= 1;
-		}
-	}
+	vec3 indirect = vec3(0.0);
 
-	// must have similar normal... dot >= some value?
 	for(int i = 0; i < 4; i++){
-		if(viable[i] == 0.0){
-			continue;
-		}
-		else{
-			if(dot(N, texture(gNormal, vec2(sampleX[i], sampleY[i])).rgb) <= minDot){
-				viable[i] = 0.0;
-				viableSamples -= 1;
+		if (length(pos - texture(gPosition, vec2(sampleX[i], sampleY[i])).rgb) < indirectSampleParams.x){
+			if(dot(N, texture(gNormal, vec2(sampleX[i], sampleY[i])).rgb) >= indirectSampleParams.z){
+				viable[i] = 1.0;
+				viableSamples += 1;
 			}
 		}
 	}
-
-	vec3 indirect = vec3(0.0);
 
 	if(viableSamples >= 3){
 
@@ -250,12 +265,18 @@ void main(void) {
 		// TEMPORARY "NORMALIZATION"
 		indirect = indirect / float(viableSamples);
 		outColor = vec4(direct + indirect, 1.0);
-		//outColor = vec4(1.0);
+		//outColor = vec4(0.0, 1.0, 1.0, 1.0);
+
 	}
 	//if not, do raw indirect illum call
 	else{
 		outColor = vec4(direct + indirectIllumination(pos, lightSpacePos, N, diffuse), 1.0);
 	}
 
+	/**/
+	/** /
+	vec3 direct = directIllumination(pos, lightSpacePos, N, diffuse, specular);
+	vec3 indirect = texture(lowResIndirect, texCoords).rgb;
+	outColor = vec4(direct + indirect, 1.0);
 	/**/
 }

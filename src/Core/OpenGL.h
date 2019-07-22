@@ -19,7 +19,7 @@
 
 #define NUM_LIGHTS 1
 
-#define NUM_VPL 128
+#define NUM_VPL 100
 
 #define VPL_DIST_MAX 0.5f
 #define RSM_INTENSITY 1.0f

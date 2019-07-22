@@ -307,6 +307,13 @@ void OpenGLApplication::prepare() {
 	glUseProgram(0);
 
 	// prepare low res indirect illumination buffer
+
+	// max dist, dist weight, max "angle", angle weight
+	// dist = distance (world space) between frag pos and sample pos
+	// "angle" = cos( angle between two normals ) -> think of crease angle (answers question: "is it a hard edge or soft edge?")
+	// e.g max dist = 10 world space units; cos(45deg) 
+	_indirectSampleParams = glm::vec4(4.0f, 1.0f, glm::cos(glm::radians(45.0f)), 1.0f);
+
 	_indirectLowResWidth = 64;
 	_indirectLowResHeight = 64;
 	glGenFramebuffers(1, &_indirectLowResFBO);
@@ -615,5 +622,8 @@ void OpenGLApplication::uploadLowResIndirect() {
 		glActiveTexture(OpenGLTextureUnits[TextureUnit::LOW_RES_INDIRECT]);
 		glBindTexture(GL_TEXTURE_2D, _indirectLowResMap);
 		glUniform1i(glGetUniformLocation(prog, "lowResIndirect"), TextureUnit::LOW_RES_INDIRECT);
+		glUniform4fv(glGetUniformLocation(prog, "indirectSampleParams"), 1, glm::value_ptr(_indirectSampleParams));
 	}
+
+	glUseProgram(0);
 }
