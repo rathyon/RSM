@@ -118,15 +118,6 @@ vec3 indirectIllumination(vec3 FragPos, vec4 LightSpacePos, vec3 Normal, vec3 Di
 
     	indirect += vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
 
-    	if(isnan(indirect.x))
-			return vec3(1.0);
-
-		if(isnan(indirect.y))
-			return vec3(1.0);
-
-		if(isnan(indirect.z))
-			return vec3(1.0);
-
     	float weight = rnd.x * rnd.x;
 
     	indirect = indirect * weight;
@@ -263,9 +254,9 @@ void main(void) {
 		}
 
 		// TEMPORARY "NORMALIZATION"
-		indirect = indirect / float(viableSamples);
-		outColor = vec4(direct + indirect, 1.0);
-		//outColor = vec4(0.0, 1.0, 1.0, 1.0);
+		//indirect = indirect / float(viableSamples);
+		//outColor = vec4(direct + indirect, 1.0);
+		outColor = vec4(0.0, 1.0, 1.0, 1.0);
 
 	}
 	//if not, do raw indirect illum call

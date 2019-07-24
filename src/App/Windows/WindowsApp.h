@@ -8,6 +8,7 @@ namespace rsm {
 	void loop(); // glutMainLoop
 	void setupCallbacks();
 	void updateFPS(int value); //ignore "value"
+	void timer(int value); // ignore "value"
 	void setTitle(const std::string& title);
 
 	void update(); // time dependent updates

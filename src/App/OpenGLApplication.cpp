@@ -314,8 +314,8 @@ void OpenGLApplication::prepare() {
 	// e.g max dist = 10 world space units; cos(45deg) 
 	_indirectSampleParams = glm::vec4(4.0f, 1.0f, glm::cos(glm::radians(45.0f)), 1.0f);
 
-	_indirectLowResWidth = 64;
-	_indirectLowResHeight = 64;
+	_indirectLowResWidth = 256;
+	_indirectLowResHeight = 256;
 	glGenFramebuffers(1, &_indirectLowResFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, _indirectLowResFBO);
 

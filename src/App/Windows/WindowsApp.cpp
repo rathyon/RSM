@@ -363,6 +363,11 @@ void rsm::updateFPS(int value) {
 	frameCount = 0;
 }
 
+void rsm::timer(int value) {
+	updateFPS(value);
+	glutTimerFunc(1000, timer, 0);
+}
+
 void rsm::setTitle(const std::string& new_title) {
 	title = new_title;
 }
@@ -422,7 +427,7 @@ void rsm::setupCallbacks() {
 	glutReshapeFunc(reshape);
 	glutIdleFunc(idle);
 	glutCloseFunc(cleanup);
-	glutTimerFunc(1000, updateFPS, 0);
+	glutTimerFunc(0, timer, 0);
 	glutMotionFunc(mouseMotion);
 	glutKeyboardFunc(keyPress);
 	glutKeyboardUpFunc(keyUp);
