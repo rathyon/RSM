@@ -66,6 +66,8 @@ vec3 indirectIllumination(vec3 FragPos, vec4 LightSpacePos, vec3 Normal, vec3 Di
     // bring from [-1,1] to [0,1]
     projCoords = projCoords * 0.5 + 0.5;
 
+    float accumulatedWeight = 0;
+
     for(int i=0; i < NUM_VPL; i++){
     	vec2 rnd = VPLSamples[i];
     	vec2 coords = vec2(projCoords.x + rsmRMax*rnd.x*sin(TWO_PI*rnd.y), projCoords.y + rsmRMax*rnd.x*cos(TWO_PI*rnd.y));
@@ -79,18 +81,21 @@ vec3 indirectIllumination(vec3 FragPos, vec4 LightSpacePos, vec3 Normal, vec3 Di
 
     	float dist = length(vplP - FragPos);
 
-        // VPL pos == Frag Pos???
-        if(dist <= 0.0)
-            continue;
+    	// frag == vpl pos???
+    	if(dist <= 0.0)
+    		continue;
 
-    	indirect += vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
+    	indirect = vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
 
     	float weight = rnd.x * rnd.x;
+
+    	accumulatedWeight += weight;
 
     	indirect = indirect * weight;
     	result += indirect;
     }
 
+    //result /= accumulatedWeight;
 	return (result * Diffuse) * rsmIntensity;
 }
 
