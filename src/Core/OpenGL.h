@@ -17,7 +17,8 @@
 
 #endif
 
-#define NUM_LIGHTS 1
+// ive decided I will only have 1 light AT ANY TIME
+//#define NUM_LIGHTS 1
 
 #define NUM_VPL 100
 

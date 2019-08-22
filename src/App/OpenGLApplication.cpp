@@ -28,7 +28,6 @@ void OpenGLApplication::init() {
 	glDepthMask(GL_TRUE);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-	//glFrontFace(GL_CCW);
 	//glEnable(GL_MULTISAMPLE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -58,7 +57,7 @@ void OpenGLApplication::reshape(int w, int h) {
 	_height = h;
 	_camera->updateProjMatrix(w, h);
 	glViewport(0, 0, w, h);
-	// TODO: RESET GBUFFER PARAMS!
+	// TODO: RESET GBUFFER PARAMS! -> is it needed?
 }
 
 Scene OpenGLApplication::getScene() {
@@ -89,114 +88,7 @@ void OpenGLApplication::setRSMIntensity(float val) {
 	_rsmIntensity = val;
 }
 
-void OpenGLApplication::prepare() {
-
-	/* ===================================================================================
-			Cameras
-	=====================================================================================*/
-
-	// def cam
-	/**/
-	_camera = make_sref<Perspective>(_width, _height,
-		vec3(-5.0f, 3.0f, -6.0f),
-		vec3(0.0f, 3.5f, 0.0f),
-		vec3(0.0f, 1.0f, 0.0f),
-		0.1f, 1000.0f, 60.0f);
-	/**/
-
-	// sponza cam
-	/** /
-    _camera = make_sref<Perspective>(_width, _height,
-         vec3(0.0f, 15.0f, 0.0f),
-         vec3(-15.0f, 15.0f, 0.0f),
-         vec3(0.0f, 1.0f, 0.0f),
-         0.1f, 100000.0f, 60.0f);
-	/**/
-
-	// sponza dir light cam
-	/** /
-	_camera = make_sref<Perspective>(_width, _height,
-		vec3(100.0f, 100.0f, 0.0f),
-		vec3(0.0f, 0.0f, 0.0f),
-		vec3(0.0f, 1.0f, 0.0f),
-		0.1f, 10000.0f, 60.0f);
-	/**/
-
-	_scene.addCamera(_camera);
-
-	/* ===================================================================================
-			Lights
-	=====================================================================================*/
-
-	/** /
-	sref<SpotLight> spot = make_sref<SpotLight>(glm::vec3(1.0f, 1.0f, 1.0f), 3.0f, 30.0f, glm::vec3(-0.5f, -1.0f, -0.5f), glm::vec3(2.0f, 8.0f, 2.0f));
-	_scene.addLight(spot);
-	spot->prepare(1024);
-	/**/
-
-	/** /
-	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 7.0f, 2.0f));
-	_scene.addLight(candle);
-	candle->prepare(1024, 1024);
-	/**/
-
-	/**/
-	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
-	_scene.addLight(sun);
-	sun->prepare(_width, _height);
-	/**/
-
-	/* ===================================================================================
-			Models
-	=====================================================================================*/
-
-	/** /
-	sref<Model> cube = RM.getModel("cube");
-	cube->prepare();
-	_scene.addModel(cube);
-
-	//cube->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-	/**/
-
-	/** /
-	sref<Model> sponza = RM.getModel("sponza");
-	sponza->prepare();
-	_scene.addModel(sponza);
-
-	sponza->setScale(0.05f, 0.05f, 0.05f);
-	/**/
-
-	/** /
-	sref<Model> sibenik = RM.getModel("sibenik");
-	sibenik->prepare();
-	_scene.addModel(sibenik);
-	/**/
-
-	/** /
-	sref<Model> demo_scene = RM.getModel("demo_scene");
-	demo_scene->prepare();
-	_scene.addModel(demo_scene);
-	/**/
-
-	/**/
-	sref<Model> Lucy = RM.getModel("Lucy");
-	Lucy->prepare();
-	_scene.addModel(Lucy);
-	/**/
-
-	/** /
-	sref<Model> demo2 = RM.getModel("demo2");
-	demo2->prepare();
-	_scene.addModel(demo2);
-	//demo2->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-	/**/
-
-	// Prepare shared buffers
-	prepareCameraBuffer();
-
-	/* ===================================================================================
-		DEFERRED SHADING
-	=====================================================================================*/
+void OpenGLApplication::prepareDeferredShading() {
 	glGenFramebuffers(1, &_gBuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, _gBuffer);
 
@@ -280,18 +172,17 @@ void OpenGLApplication::prepare() {
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+}
 
-	/* ===================================================================================
-		RSM
-	=====================================================================================*/
+void OpenGLApplication::prepareRSM() {
 	_rsmRMax = VPL_DIST_MAX;
 	_rsmIntensity = RSM_INTENSITY;
 	// precalculate sampling pattern
 
 	for (int i = 0; i < NUM_VPL; i++) {
 		double* sample = hammersley(i, 2, NUM_VPL);
-		VPLSamples[i][0] = (float) sample[0];
-		VPLSamples[i][1] = (float) sample[1];
+		VPLSamples[i][0] = (float)sample[0];
+		VPLSamples[i][1] = (float)sample[1];
 	}
 
 	// upload RSM data
@@ -334,6 +225,97 @@ void OpenGLApplication::prepare() {
 		LOGE("Framebuffer not complete!\n");
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void OpenGLApplication::prepareLights() {
+	/* ===================================================================================
+			Lights
+	=====================================================================================*/
+
+	/** /
+	sref<SpotLight> spot = make_sref<SpotLight>(glm::vec3(1.0f, 1.0f, 1.0f), 3.0f, 30.0f, glm::vec3(-0.5f, -1.0f, -0.5f), glm::vec3(2.0f, 8.0f, 2.0f));
+	_scene.addLight(spot);
+	spot->prepare(1024);
+	/**/
+
+	/** /
+	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 7.0f, 2.0f));
+	_scene.addLight(candle);
+	candle->prepare(1024, 1024);
+	/**/
+
+	/**/
+	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
+	_scene.addLight(sun);
+	sun->prepare(_width, _height);
+	/**/
+}
+
+void OpenGLApplication::prepare() {
+
+	/* ===================================================================================
+			Cameras
+	=====================================================================================*/
+
+	// def cam
+	/**/
+	_camera = make_sref<Perspective>(_width, _height,
+		vec3(-5.0f, 3.0f, -6.0f),
+		vec3(0.0f, 3.5f, 0.0f),
+		vec3(0.0f, 1.0f, 0.0f),
+		0.1f, 1000.0f, 60.0f);
+	/**/
+
+	// sponza cam
+	/** /
+    _camera = make_sref<Perspective>(_width, _height,
+         vec3(0.0f, 15.0f, 0.0f),
+         vec3(-15.0f, 15.0f, 0.0f),
+         vec3(0.0f, 1.0f, 0.0f),
+         0.1f, 100000.0f, 60.0f);
+	/**/
+
+	// sponza dir light cam
+	/** /
+	_camera = make_sref<Perspective>(_width, _height,
+		vec3(100.0f, 100.0f, 0.0f),
+		vec3(0.0f, 0.0f, 0.0f),
+		vec3(0.0f, 1.0f, 0.0f),
+		0.1f, 10000.0f, 60.0f);
+	/**/
+
+	_scene.addCamera(_camera);
+
+	/* ===================================================================================
+			Models
+	=====================================================================================*/
+
+	/** /
+	sref<Model> sponza = RM.getModel("sponza");
+	sponza->prepare();
+	_scene.addModel(sponza);
+
+	sponza->setScale(0.05f, 0.05f, 0.05f);
+	/**/
+
+	/** /
+	sref<Model> demo_scene = RM.getModel("demo_scene");
+	demo_scene->prepare();
+	_scene.addModel(demo_scene);
+	/**/
+
+	/**/
+	sref<Model> Lucy = RM.getModel("Lucy");
+	Lucy->prepare();
+	_scene.addModel(Lucy);
+	/**/
+
+	// Prepare shared buffers
+	prepareCameraBuffer();
+
+	prepareDeferredShading();
+
+	prepareRSM();
 
 	checkOpenGLError("Error preparing OpenGL Application!");
 }
@@ -357,7 +339,6 @@ void OpenGLApplication::geometryPass() {
 	glUseProgram(GB);
 	glBindFramebuffer(GL_FRAMEBUFFER, _gBuffer);
 
-	// WARNING: THIS CALL ASSUMES ONLY 1 LIGHT PRESENT!
 	_scene.lights()[0]->uploadSpatialData(GB);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	_scene.draw(GB);
@@ -371,46 +352,17 @@ void OpenGLApplication::genRSMaps() {
 	GLuint GB = RM.getShader("RSMGBuffer")->id();
 	uploadLights(GB);
 
-	const std::vector<sref<Light>>& lights = _scene.lights();
-	for (int l = 0; l < NUM_LIGHTS; l++) {
+	const sref<Light>& light = _scene.lights()[0];
 
-		glViewport(0, 0, lights[l]->gBufferWidth(), lights[l]->gBufferHeight());
+	glViewport(0, 0, light->gBufferWidth(), light->gBufferHeight());
 
-		// if directional light/spotlight
-		if (lights[l]->depthMapType() == OpenGLTexTargets[IMG_2D]) {
+	glUseProgram(GB);
+	glBindFramebuffer(GL_FRAMEBUFFER, light->gBuffer());
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			glUseProgram(GB);
-			glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->gBuffer());
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	light->uploadSpatialData(GB);
 
-			lights[l]->uploadSpatialData(GB);
-			glUniform1i(glGetUniformLocation(GB, "lightIdx"), l);
-
-			_scene.draw(GB);
-		}
-
-		/** /
-		// if point light
-		glUseProgram(OGB);
-		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->gBuffer());
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		lights[l]->uploadSpatialData(OGB);
-		for (int face = 0; face < 6; face++) {
-			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, lights[l]->depthMap(), 0);
-			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, lights[l]->positionMap(), 0);
-			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, lights[l]->normalMap(), 0);
-			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, lights[l]->fluxMap(), 0);
-			glUniform1i(glGetUniformLocation(OGB, "face"), face);
-			glUniform1i(glGetUniformLocation(OGB, "lightIdx"), l);
-			_scene.draw(OGB);
-		}
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, lights[l]->depthMap(), 0);
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, lights[l]->positionMap(), 0);
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, lights[l]->normalMap(), 0);
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, lights[l]->fluxMap(), 0);
-		/**/
-	}
+	_scene.draw(GB);
 
 	glUseProgram(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -469,13 +421,12 @@ void OpenGLApplication::render() {
 
 	// render low res indirect illumination
 	renderLowResIndirect();
+
 	uploadLowResIndirect();
 
-	// render high res indirect illumination?
-
-	// render direct illumination + pre calc indirect
 	// Render scene...
 	//_scene.render();
+
 	renderScreenQuad();
 
 	checkOpenGLError("Error in render loop!");
@@ -500,43 +451,38 @@ void OpenGLApplication::uploadCameraBuffer() {
 }
 
 void OpenGLApplication::uploadLights(GLuint prog) {
-	const std::vector<sref<Light>>& lights = _scene.lights();
+	const sref<Light>& light = _scene.lights()[0];
 	LightData data;
 	std::string name;
-	std::string prefix;
 
 	glUseProgram(prog);
 
 	// I'll be assuming NUM_LIGHTS is always the actual number of lights in the scene at all times
-	for (int l = 0; l < NUM_LIGHTS; l++) {
-		lights[l]->toData(data);
+	light->toData(data);
 
-		prefix = "lights[" + std::to_string(l) + "].";
+	name = "light.position";
+	glUniform3fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(data.position));
 
-		name = prefix + "position";
-		glUniform3fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(data.position));
+	name = "light.direction";
+	glUniform3fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(data.direction));
 
-		name = prefix + "direction";
-		glUniform3fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(data.direction));
+	name = "light.emission";
+	glUniform3fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(data.emission));
 
-		name = prefix + "emission";
-		glUniform3fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(data.emission));
+	name = "light.linear";
+	glUniform1f(glGetUniformLocation(prog, name.c_str()), data.linear);
 
-		name = prefix + "linear";
-		glUniform1f(glGetUniformLocation(prog, name.c_str()), data.linear);
+	name = "light.quadratic";
+	glUniform1f(glGetUniformLocation(prog, name.c_str()), data.quadratic);
 
-		name = prefix + "quadratic";
-		glUniform1f(glGetUniformLocation(prog, name.c_str()), data.quadratic);
+	name = "light.type";
+	glUniform1i(glGetUniformLocation(prog, name.c_str()), data.type);
 
-		name = prefix + "type";
-		glUniform1i(glGetUniformLocation(prog, name.c_str()), data.type);
+	name = "light.state";
+	glUniform1i(glGetUniformLocation(prog, name.c_str()), data.state);
 
-		name = prefix + "state";
-		glUniform1i(glGetUniformLocation(prog, name.c_str()), data.state);
-
-		name = prefix + "cutoff";
-		glUniform1f(glGetUniformLocation(prog, name.c_str()), data.cutoff);
-	}
+	name = "light.cutoff";
+	glUniform1f(glGetUniformLocation(prog, name.c_str()), data.cutoff);
 	glUseProgram(0);
 }
 
@@ -567,52 +513,28 @@ void OpenGLApplication::uploadDeferredShadingData() {
 }
 
 void OpenGLApplication::uploadShadowMappingData() {
-	const std::vector<sref<Light>>& lights = _scene.lights();
+	const sref<Light>& light = _scene.lights()[0];
 
 	for (GLuint prog : _programs) {
 		glUseProgram(prog);
-		for (int l = 0; l < NUM_LIGHTS; l++) {
-			lights[l]->uploadShadowMapData(prog);
+		light->uploadShadowMapData(prog);
 
-			GLenum type = lights[l]->depthMapType();
+		glActiveTexture(OpenGLTextureUnits[TextureUnit::RSM_DEPTH]);
+		glBindTexture(OpenGLTexTargets[IMG_2D], light->depthMap());
+		glUniform1i(glGetUniformLocation(prog, "depthMap"), TextureUnit::RSM_DEPTH);
 
-				glActiveTexture(OpenGLTextureUnits[TextureUnit::RSM_DEPTH]);
-				glBindTexture(type, lights[l]->depthMap());
-				glUniform1i(glGetUniformLocation(prog, "depthMap"), TextureUnit::RSM_DEPTH);
+		glActiveTexture(OpenGLTextureUnits[TextureUnit::RSM_POSITION]);
+		glBindTexture(OpenGLTexTargets[IMG_2D], light->positionMap());
+		glUniform1i(glGetUniformLocation(prog, "positionMap"), TextureUnit::RSM_POSITION);
 
-				glActiveTexture(OpenGLTextureUnits[TextureUnit::RSM_POSITION]);
-				glBindTexture(type, lights[l]->positionMap());
-				glUniform1i(glGetUniformLocation(prog, "positionMap"), TextureUnit::RSM_POSITION);
+		glActiveTexture(OpenGLTextureUnits[TextureUnit::RSM_NORMAL]);
+		glBindTexture(OpenGLTexTargets[IMG_2D], light->normalMap());
+		glUniform1i(glGetUniformLocation(prog, "normalMap"), TextureUnit::RSM_NORMAL);
 
-				glActiveTexture(OpenGLTextureUnits[TextureUnit::RSM_NORMAL]);
-				glBindTexture(type, lights[l]->normalMap());
-				glUniform1i(glGetUniformLocation(prog, "normalMap"), TextureUnit::RSM_NORMAL);
+		glActiveTexture(OpenGLTextureUnits[TextureUnit::RSM_FLUX]);
+		glBindTexture(OpenGLTexTargets[IMG_2D], light->fluxMap());
+		glUniform1i(glGetUniformLocation(prog, "fluxMap"), TextureUnit::RSM_FLUX);
 
-				glActiveTexture(OpenGLTextureUnits[TextureUnit::RSM_FLUX]);
-				glBindTexture(type, lights[l]->fluxMap());
-				glUniform1i(glGetUniformLocation(prog, "fluxMap"), TextureUnit::RSM_FLUX);
-
-			/** /
-			else {
-				glActiveTexture(OpenGLTextureUnits[TextureUnit::OMNI_G_DEPTH]);
-				glBindTexture(type, lights[l]->depthMap());
-				glUniform1i(glGetUniformLocation(prog, "depthCubeMap"), TextureUnit::OMNI_G_DEPTH);
-
-				glActiveTexture(OpenGLTextureUnits[TextureUnit::OMNI_G_POSITION]);
-				glBindTexture(type, lights[l]->positionMap());
-				glUniform1i(glGetUniformLocation(prog, "positionCubeMap"), TextureUnit::OMNI_G_POSITION);
-
-				glActiveTexture(OpenGLTextureUnits[TextureUnit::OMNI_G_NORMAL]);
-				glBindTexture(type, lights[l]->normalMap());
-				glUniform1i(glGetUniformLocation(prog, "normalCubeMap"), TextureUnit::OMNI_G_NORMAL);
-
-				glActiveTexture(OpenGLTextureUnits[TextureUnit::OMNI_G_FLUX]);
-				glBindTexture(type, lights[l]->fluxMap());
-				glUniform1i(glGetUniformLocation(prog, "fluxCubeMap"), TextureUnit::OMNI_G_FLUX);
-			}
-			/**/
-
-		}
 	}
 }
 

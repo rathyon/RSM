@@ -64,16 +64,28 @@ void rsm::init(int argc, char* argv[]) {
 	glApp->init();
 	RM.init();
 
+	glApp->prepareLights();
+	const sref<Light>& light = glApp->getScene().lights()[0];
+	LightData data;
+	light->toData(data);
+	const int lightType = data.type;
+
 	/* ===================================================================================
 				Shaders
 	=====================================================================================*/
 	/**/
 
+	std::string lightDef;
+	if (lightType == LightType::LIGHTYPE_DIR)
+		lightDef = "#define DIRECTIONAL\n";
+	else
+		lightDef = "#define SPOTLIGHT\n";
+
 	ShaderSource vBP = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/BlinnPhong.vs");
 	ShaderSource fBP = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/BlinnPhong.fs");
 	vBP.inject(std::string("#version 330 core\n"));
 	fBP.inject(std::string("#version 330 core\n") +
-		std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n" +
+		lightDef +
 		std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
 	vBP.compile();
 	fBP.compile();
@@ -82,7 +94,7 @@ void rsm::init(int argc, char* argv[]) {
 	ShaderSource fBPT = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/BlinnPhongTex.fs");
 	vBPT.inject(std::string("#version 330 core\n"));
 	fBPT.inject(std::string("#version 330 core\n") +
-		std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n" +
+		lightDef +
 		std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
 	vBPT.compile();
 	fBPT.compile();
@@ -91,7 +103,7 @@ void rsm::init(int argc, char* argv[]) {
 	ShaderSource fDS = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/DeferredShading.fs");
 	vDS.inject(std::string("#version 330 core\n"));
 	fDS.inject(std::string("#version 330 core\n") +
-		std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n" +
+		lightDef +
 		std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
 	vDS.compile();
 	fDS.compile();
@@ -100,7 +112,6 @@ void rsm::init(int argc, char* argv[]) {
 	ShaderSource fII = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/IndirectIllumination.fs");
 	vII.inject(std::string("#version 330 core\n"));
 	fII.inject(std::string("#version 330 core\n") +
-		std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n" +
 		std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
 	vII.compile();
 	fII.compile();
@@ -115,20 +126,9 @@ void rsm::init(int argc, char* argv[]) {
 	ShaderSource vRGB = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/RSMGBuffer.vs");
 	ShaderSource fRGB = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/RSMGBuffer.fs");
 	vRGB.inject(std::string("#version 330 core\n"));
-	fRGB.inject(std::string("#version 330 core\n") +
-		std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n");
+	fRGB.inject(std::string("#version 330 core\n"));
 	vRGB.compile();
 	fRGB.compile();
-
-	/** /
-	ShaderSource vOGB = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/OmniGBuffer.vs");
-	ShaderSource fOGB = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/OmniGBuffer.fs");
-	vOGB.inject(std::string("#version 330 core\n"));
-	fOGB.inject(std::string("#version 330 core\n") +
-		std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n");
-	vOGB.compile();
-	fOGB.compile();
-	/**/
 
 	sref<Shader> BlinnPhong = make_sref<Shader>("BlinnPhong");
 	BlinnPhong->addShader(vBP);
@@ -170,14 +170,6 @@ void rsm::init(int argc, char* argv[]) {
 	RSMGBuffer->link();
 	RM.addShader("RSMGBuffer", RSMGBuffer);
 
-	/** /
-	sref<Shader> OmniGBuffer = make_sref<Shader>("OmniGBuffer");
-	OmniGBuffer->addShader(vOGB);
-	OmniGBuffer->addShader(fOGB);
-	OmniGBuffer->link();
-	RM.addShader("OmniGBuffer", OmniGBuffer);
-	/**/
-
 	/* ===================================================================================
 				Materials
 	=====================================================================================*/
@@ -188,18 +180,6 @@ void rsm::init(int argc, char* argv[]) {
 	bp_red->setSpecular(glm::vec3(1.0f));
 	bp_red->setShininess(32.0f);
 	bp_red->setProgram(BlinnPhong->id());
-
-	sref<BlinnPhongMaterial> bp_gray = make_sref<BlinnPhongMaterial>();
-	bp_gray->setDiffuse(glm::vec3(0.7f, 0.7f, 0.7f));
-	bp_gray->setSpecular(glm::vec3(1.0f));
-	bp_gray->setShininess(4.0f);
-	bp_gray->setProgram(BlinnPhong->id());
-
-	sref<BlinnPhongMaterial> bp_green = make_sref<BlinnPhongMaterial>();
-	bp_green->setDiffuse(glm::vec3(0.0f, 1.0f, 0.0f));
-	bp_green->setSpecular(glm::vec3(1.0f));
-	bp_green->setShininess(64.0f);
-	bp_green->setProgram(BlinnPhong->id());
 	/**/
 
 	/* ===================================================================================
@@ -207,12 +187,6 @@ void rsm::init(int argc, char* argv[]) {
 	=====================================================================================*/
 	/**/
 
-	/** /
-	sref<Model> cube = make_sref<Model>("Cube");
-	cube->loadFromFile("../../../assets/models/cube/cube.obj", "../../../assets/models/cube");
-	RM.addModel("cube", cube);
-	cube->setMaterial(bp_gray);
-	/**/
 
 	/** /
 	sref<Model> sponza = make_sref<Model>("sponza");
@@ -221,20 +195,8 @@ void rsm::init(int argc, char* argv[]) {
 	/**/
 
 	/** /
-	sref<Model> sibenik = make_sref<Model>("sibenik");
-	sibenik->loadFromFile("../../../assets/models/sibenik/sibenik.obj", "../../../assets/models/sibenik/");
-	RM.addModel("sibenik", sibenik);
-	/**/
-
-	/** /
 	sref<Model> demo_scene = make_sref<Model>("demo_scene");
 	demo_scene->loadFromFile("../../../assets/models/demo scene open/demo_scene.obj", "../../../assets/models/demo scene open/");
-	RM.addModel("demo_scene", demo_scene);
-	/**/
-
-	/** /
-	sref<Model> demo_scene = make_sref<Model>("demo_scene");
-	demo_scene->loadFromFile("../../../assets/models/demo scene closed/demo_scene.obj", "../../../assets/models/demo scene closed/");
 	RM.addModel("demo_scene", demo_scene);
 	/**/
 
@@ -248,13 +210,6 @@ void rsm::init(int argc, char* argv[]) {
 	sref<Model> Lucy = make_sref<Model>("Lucy");
 	Lucy->loadFromFile("../../../assets/models/Lucy2/Lucy2.obj", "../../../assets/models/Lucy2/");
 	RM.addModel("Lucy", Lucy);
-	/**/
-
-
-	/** /
-	sref<Model> demo2 = make_sref<Model>("demo2");
-	demo2->loadFromFile("../../../assets/models/demo2/demo2.obj", "../../../assets/models/demo2/");
-	RM.addModel("demo2", demo2);
 	/**/
 
 	/**/

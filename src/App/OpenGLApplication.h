@@ -24,6 +24,7 @@ namespace rsm {
 		OpenGLApplication(int width, int height);
 
 		void init();
+		void prepareLights(); // this allows shaders to compile based on light type
 		void prepare();
 		void cleanup();
 
@@ -72,6 +73,7 @@ namespace rsm {
 		GLuint _screenQuadVAO;
 		GLuint _screenQuadVBO;
 
+		void prepareDeferredShading();
 		void geometryPass();
 		void uploadDeferredShadingData();
 		void renderScreenQuad();
@@ -88,6 +90,7 @@ namespace rsm {
 
 		glm::vec4 _indirectSampleParams;
 
+		void prepareRSM();
 		void genRSMaps();
 		void uploadShadowMappingData();
 		void renderLowResIndirect();

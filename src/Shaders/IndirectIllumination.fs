@@ -23,7 +23,7 @@ uniform cameraBlock {
 	vec3 ViewPos;
 };
 
-uniform Light lights[NUM_LIGHTS];
+uniform Light light;
 
 // Shadow filtering
 const float baseBias = 0.005f;

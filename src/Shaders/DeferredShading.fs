@@ -23,7 +23,7 @@ uniform cameraBlock {
 	vec3 ViewPos;
 };
 
-uniform Light lights[NUM_LIGHTS];
+uniform Light light;
 
 // Shadow filtering
 const float baseBias = 0.005f;
@@ -84,10 +84,21 @@ float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
 }
 
 /* ==============================================================================
-        Illumination
+        Stage Outputs
  ============================================================================== */
 
+out vec4 outColor;
+
+// dist, dist weight, cos(angle), angle weight
+uniform vec4 indirectSampleParams;
  uniform sampler2D lowResIndirect;
+
+vec3 FragPos;
+vec3 N;
+vec3 Diffuse;
+vec3 Specular;
+vec4 LightSpacePos;
+
 
  vec3 texture2D_bilinear(sampler2D t, vec2 uv, vec2 textureSize, vec2 texelSize)
 {
@@ -102,7 +113,78 @@ float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
     return mix( tA, tB, f.y );
 }
 
-vec3 indirectIllumination(vec3 FragPos, vec4 LightSpacePos, vec3 Normal, vec3 Diffuse) {
+#ifdef DIRECTIONAL
+vec3 directIllumination() {
+	vec3 V = normalize(ViewPos - FragPos);
+	vec3 L;
+
+	float shadow = 1.0;
+	vec3 retColor = vec3(0.0);
+
+	L = normalize(-light.direction);
+	shadow = shadowFactor(LightSpacePos, N, L);
+
+	vec3 H = normalize(L + V);
+
+	float NdotL = max(dot(N, L), 0.0);
+	float NdotH = max(dot(N, H), 0.0);
+
+	vec3 diff = vec3(0.0);
+	vec3 spec = vec3(0.0);
+
+	if (NdotL > 0.0){
+		diff = light.emission * ( Diffuse * NdotL);
+		spec = light.emission * ( Specular * pow(NdotH, shininess));
+	}
+
+	return ((diff + spec) * shadow);
+}
+#endif
+
+#ifdef SPOTLIGHT
+vec3 directIllumination() {
+	vec3 V = normalize(ViewPos - FragPos);
+	vec3 L;
+
+	float shadow = 1.0;
+	vec3 retColor = vec3(0.0);
+
+
+	// Get Light Vector
+	L = normalize(light.position - FragPos);
+	shadow = shadowFactor(LightSpacePos, N, L);
+
+	float theta = dot(L, normalize(-light.direction));
+	if(theta <= light.cutoff){
+		return vec3(0.0);
+	}
+
+	vec3 H = normalize(L + V);
+
+	float NdotL = max(dot(N, L), 0.0);
+	float NdotH = max(dot(N, H), 0.0);
+
+	vec3 diff = vec3(0.0);
+	vec3 spec = vec3(0.0);
+
+	if (NdotL > 0.0){
+
+		diff = light.emission * ( Diffuse * NdotL);
+		spec = light.emission * ( Specular * pow(NdotH, shininess));
+
+		float distance = length(light.position - FragPos);
+		float attenuation = 1.0 / (1.0 + light.linear * distance + light.quadratic * pow(distance, 2.0));
+
+		diff *= attenuation;
+		spec *= attenuation;
+
+	}
+
+	return ((diff + spec) * shadow);
+}
+#endif
+
+vec3 indirectIllumination() {
 	vec3 result = vec3(0.0);
 	vec3 indirect = vec3(0.0);
 	// perform perspective divide: clip space-> normalized device coords (done automatically for gl_Position)
@@ -123,7 +205,7 @@ vec3 indirectIllumination(vec3 FragPos, vec4 LightSpacePos, vec3 Normal, vec3 Di
     	vec3 vplFlux = texture(fluxMap, coords.xy).rgb;
 
     	float dot1 = max(0.0, dot(vplN, FragPos - vplP));
-    	float dot2 = max(0.0, dot(normalize(Normal), vplP - FragPos));
+    	float dot2 = max(0.0, dot(normalize(N), vplP - FragPos));
 
     	float dist = length(vplP - FragPos);
 
@@ -145,82 +227,19 @@ vec3 indirectIllumination(vec3 FragPos, vec4 LightSpacePos, vec3 Normal, vec3 Di
 	return (result * Diffuse) * rsmIntensity;
 }
 
-vec3 directIllumination(vec3 FragPos, vec4 LightSpacePos, vec3 Normal, vec3 Diffuse, vec3 Specular) {
-	vec3 V = normalize(ViewPos - FragPos);
-	vec3 N = Normal;
-	vec3 L;
-
-	float shadow = 1.0;
-	vec3 retColor = vec3(0.0);
-
-	for(int i=0; i < NUM_LIGHTS; i++){
-
-		// Get Light Vector
-		if (lights[i].type == 0){
-			L = normalize(-lights[i].direction);
-
-			shadow = shadowFactor(LightSpacePos, N, L);
-		}
-		else {
-			L = normalize(lights[i].position - FragPos);
-		}
-
-		if (lights[i].type == 2){
-			float theta = dot(L, normalize(-lights[i].direction));
-			if(theta <= lights[i].cutoff){
-				continue;
-			}
-		}
-
-		vec3 H = normalize(L + V);
-
-		float NdotL = max(dot(N, L), 0.0);
-		float NdotH = max(dot(N, H), 0.0);
-
-		vec3 diff = vec3(0.0);
-		vec3 spec = vec3(0.0);
-
-		if (NdotL > 0.0){
-
-			diff = lights[i].emission * ( Diffuse * NdotL);
-			spec = lights[i].emission * ( Specular * pow(NdotH, shininess));
-
-			// if not directional light
-			if (lights[i].type != 0){
-				float distance = length(lights[i].position - FragPos);
-				float attenuation = 1.0 / (1.0 + lights[i].linear * distance + lights[i].quadratic * pow(distance, 2.0));
-
-				diff *= attenuation;
-				spec *= attenuation;
-			}
-		}
-
-		retColor += (diff + spec) * shadow;
-	}
-
-	return retColor;
-}
-
-/* ==============================================================================
-        Stage Outputs
- ============================================================================== */
-
-out vec4 outColor;
-
-// dist, dist weight, cos(angle), angle weight
-uniform vec4 indirectSampleParams;
-
 void main(void) {
 
-	vec3 pos      = texture(gPosition, texCoords).rgb;
-	vec3 N        = texture(gNormal, texCoords).rgb;
-	vec3 diffuse  = texture(gDiffuse, texCoords).rgb;
-	vec3 specular = texture(gSpecular, texCoords).rgb;
-	vec4 lightSpacePos = texture(gLightSpacePosition, texCoords);
+	FragPos       = texture(gPosition, texCoords).rgb;
+	N             = texture(gNormal, texCoords).rgb;
+	Diffuse       = texture(gDiffuse, texCoords).rgb;
+	Specular      = texture(gSpecular, texCoords).rgb;
+	LightSpacePos = texture(gLightSpacePosition, texCoords);
 
-	//outColor = vec4(directIllumination(pos, lightSpacePos, N, diffuse, specular) + indirectIllumination(pos, lightSpacePos, N, diffuse), 1.0);
+	//outColor = vec4(directIllumination(), 1.0);
 
-	//outColor = vec4(indirectIllumination(pos, lightSpacePos, N, diffuse), 1.0);
+	//outColor = vec4(indirectIllumination(), 1.0);
+
+	outColor = vec4(directIllumination() + indirectIllumination(), 1.0);
 
 	/** /
 	if(isnan(outColor.x))
@@ -236,7 +255,7 @@ void main(void) {
 	//outColor = vec4(directIllumination(pos, lightSpacePos, N, diffuse, specular), 1.0);
 	//outColor = vec4(texture(lowResIndirect, texCoords).rgb, 1.0);
 
-	/**/
+	/** /
 	vec3 direct = directIllumination(pos, lightSpacePos, N, diffuse, specular);
 
 	vec2 texSize = textureSize(lowResIndirect, 0);
