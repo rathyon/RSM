@@ -239,7 +239,7 @@ void main(void) {
 
 	//outColor = vec4(indirectIllumination(), 1.0);
 
-	outColor = vec4(directIllumination() + indirectIllumination(), 1.0);
+	//outColor = vec4(directIllumination() + indirectIllumination(), 1.0);
 
 	/** /
 	if(isnan(outColor.x))
@@ -256,7 +256,7 @@ void main(void) {
 	//outColor = vec4(texture(lowResIndirect, texCoords).rgb, 1.0);
 
 	/** /
-	vec3 direct = directIllumination(pos, lightSpacePos, N, diffuse, specular);
+	//vec3 direct = directIllumination(pos, lightSpacePos, N, diffuse, specular);
 
 	vec2 texSize = textureSize(lowResIndirect, 0);
 	vec2 texelSize = 1.0 / texSize;
@@ -275,7 +275,12 @@ void main(void) {
 
 	outColor = vec4(direct + indirect, 1.0);
 
-	/** /
+	/**/
+	vec3 direct = directIllumination();
+
+	vec2 texSize = textureSize(lowResIndirect, 0);
+	vec2 texelSize = 1.0 / texSize;
+
 	vec4 sampleX;
 	vec4 sampleY;
 	vec4 viable = vec4(0.0);
@@ -291,7 +296,8 @@ void main(void) {
 
 	for(int i = 0; i < 4; i++){
 		// use squared distance
-		if (length(pos - texture(gPosition, vec2(sampleX[i], sampleY[i])).rgb) < indirectSampleParams.x){
+		vec3 diff = FragPos - texture(gPosition, vec2(sampleX[i], sampleY[i])).rgb;
+		if (dot(diff, diff) < indirectSampleParams.x){
 			if(dot(N, texture(gNormal, vec2(sampleX[i], sampleY[i])).rgb) >= indirectSampleParams.z){
 				viable[i] = 1.0;
 				viableSamples += 1;
@@ -315,7 +321,7 @@ void main(void) {
 	}
 	//if not, do raw indirect illum call
 	else{
-		outColor = vec4(direct + indirectIllumination(pos, lightSpacePos, N, diffuse), 1.0);
+		outColor = vec4(direct + indirectIllumination(), 1.0);
 	}
 	/**/
 

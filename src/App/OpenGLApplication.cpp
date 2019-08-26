@@ -95,7 +95,7 @@ void OpenGLApplication::prepareDeferredShading() {
 	// - position color buffer
 	glGenTextures(1, &_gPosition);
 	glBindTexture(GL_TEXTURE_2D, _gPosition);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_HALF_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _gPosition, 0);
@@ -103,7 +103,7 @@ void OpenGLApplication::prepareDeferredShading() {
 	// - normal color buffer
 	glGenTextures(1, &_gNormal);
 	glBindTexture(GL_TEXTURE_2D, _gNormal);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_HALF_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, _gNormal, 0);
@@ -111,7 +111,7 @@ void OpenGLApplication::prepareDeferredShading() {
 	// diffuse
 	glGenTextures(1, &_gDiffuse);
 	glBindTexture(GL_TEXTURE_2D, _gDiffuse);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, _gDiffuse, 0);
@@ -119,7 +119,7 @@ void OpenGLApplication::prepareDeferredShading() {
 	// specular
 	glGenTextures(1, &_gSpecular);
 	glBindTexture(GL_TEXTURE_2D, _gSpecular);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, _gSpecular, 0);
@@ -127,7 +127,7 @@ void OpenGLApplication::prepareDeferredShading() {
 	// - light space position color buffer (need W component)
 	glGenTextures(1, &_gLightSpacePosition);
 	glBindTexture(GL_TEXTURE_2D, _gLightSpacePosition);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, _gBufferWidth, _gBufferHeight, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, _gBufferWidth, _gBufferHeight, 0, GL_RGBA, GL_HALF_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, _gLightSpacePosition, 0);
@@ -140,7 +140,7 @@ void OpenGLApplication::prepareDeferredShading() {
 	unsigned int rboDepth;
 	glGenRenderbuffers(1, &rboDepth);
 	glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32F, _gBufferWidth, _gBufferHeight);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, _gBufferWidth, _gBufferHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -200,7 +200,7 @@ void OpenGLApplication::prepareRSM() {
 	// prepare low res indirect illumination buffer
 
 	// max dist, dist weight, max "angle", angle weight
-	// dist = distance (world space) between frag pos and sample pos
+	// dist = SQUARED distance (world space) between frag pos and sample pos
 	// "angle" = cos( angle between two normals ) -> think of crease angle (answers question: "is it a hard edge or soft edge?")
 	// e.g max dist = 10 world space units; cos(45deg) 
 	_indirectSampleParams = glm::vec4(4.0f, 1.0f, glm::cos(glm::radians(45.0f)), 1.0f);
@@ -212,7 +212,7 @@ void OpenGLApplication::prepareRSM() {
 
 	glGenTextures(1, &_indirectLowResMap);
 	glBindTexture(GL_TEXTURE_2D, _indirectLowResMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, _indirectLowResWidth, _indirectLowResHeight, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, _indirectLowResWidth, _indirectLowResHeight, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _indirectLowResMap, 0);
