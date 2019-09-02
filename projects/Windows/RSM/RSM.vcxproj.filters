@@ -190,28 +190,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\src\Shaders\BlinnPhong.fs">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="..\..\..\src\Shaders\BlinnPhong.vs">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="..\..\..\src\Shaders\BlinnPhongTex.fs">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
     <None Include="..\..\..\src\Shaders\BlinnPhongTex.vs">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="..\..\..\src\Shaders\RSMGBuffer.fs">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="..\..\..\src\Shaders\RSMGBuffer.vs">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="..\..\..\src\Shaders\GBuffer.fs">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="..\..\..\src\Shaders\GBuffer.vs">
       <Filter>Source Files\Shaders</Filter>
     </None>
     <None Include="..\..\..\src\Shaders\DeferredShading.fs">
@@ -220,10 +199,31 @@
     <None Include="..\..\..\src\Shaders\DeferredShading.vs">
       <Filter>Source Files\Shaders</Filter>
     </None>
+    <None Include="..\..\..\src\Shaders\GBuffer.fs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\Shaders\GBuffer.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
     <None Include="..\..\..\src\Shaders\IndirectIllumination.fs">
       <Filter>Source Files\Shaders</Filter>
     </None>
     <None Include="..\..\..\src\Shaders\IndirectIllumination.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\Shaders\RSMGBuffer.fs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\Shaders\RSMGBuffer.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\Shaders\BlinnPhong.fs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\Shaders\BlinnPhong.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\Shaders\BlinnPhongTex.fs">
       <Filter>Source Files\Shaders</Filter>
     </None>
   </ItemGroup>

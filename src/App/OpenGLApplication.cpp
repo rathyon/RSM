@@ -116,25 +116,17 @@ void OpenGLApplication::prepareDeferredShading() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, _gDiffuse, 0);
 
-	// specular
-	glGenTextures(1, &_gSpecular);
-	glBindTexture(GL_TEXTURE_2D, _gSpecular);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, _gSpecular, 0);
-
 	// - light space position color buffer (need W component)
 	glGenTextures(1, &_gLightSpacePosition);
 	glBindTexture(GL_TEXTURE_2D, _gLightSpacePosition);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, _gBufferWidth, _gBufferHeight, 0, GL_RGBA, GL_HALF_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, _gLightSpacePosition, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, _gLightSpacePosition, 0);
 
 	// - tell OpenGL which color attachments we'll use (of this framebuffer) for rendering 
-	unsigned int attachments[5] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4 };
-	glDrawBuffers(5, attachments);
+	unsigned int attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+	glDrawBuffers(4, attachments);
 
 	// create and attach depth buffer (renderbuffer)
 	unsigned int rboDepth;
@@ -258,7 +250,7 @@ void OpenGLApplication::prepare() {
 	=====================================================================================*/
 
 	// def cam
-	/**/
+	/** /
 	_camera = make_sref<Perspective>(_width, _height,
 		vec3(-5.0f, 3.0f, -6.0f),
 		vec3(0.0f, 3.5f, 0.0f),
@@ -267,10 +259,10 @@ void OpenGLApplication::prepare() {
 	/**/
 
 	// sponza cam
-	/** /
+	/**/
     _camera = make_sref<Perspective>(_width, _height,
-         vec3(0.0f, 15.0f, 0.0f),
-         vec3(-15.0f, 15.0f, 0.0f),
+         vec3(0.0f, 0.0f, 0.0f),
+         vec3(10.0f, 0.0f, 0.0f),
          vec3(0.0f, 1.0f, 0.0f),
          0.1f, 100000.0f, 60.0f);
 	/**/
@@ -290,7 +282,7 @@ void OpenGLApplication::prepare() {
 			Models
 	=====================================================================================*/
 
-	/** /
+	/**/
 	sref<Model> sponza = RM.getModel("sponza");
 	sponza->prepare();
 	_scene.addModel(sponza);
@@ -304,7 +296,7 @@ void OpenGLApplication::prepare() {
 	_scene.addModel(demo_scene);
 	/**/
 
-	/**/
+	/** /
 	sref<Model> Lucy = RM.getModel("Lucy");
 	Lucy->prepare();
 	_scene.addModel(Lucy);
@@ -501,10 +493,6 @@ void OpenGLApplication::uploadDeferredShadingData() {
 		glActiveTexture(OpenGLTextureUnits[TextureUnit::G_DIFFUSE]);
 		glBindTexture(GL_TEXTURE_2D, _gDiffuse);
 		glUniform1i(glGetUniformLocation(prog, "gDiffuse"), TextureUnit::G_DIFFUSE);
-
-		glActiveTexture(OpenGLTextureUnits[TextureUnit::G_SPECULAR]);
-		glBindTexture(GL_TEXTURE_2D, _gSpecular);
-		glUniform1i(glGetUniformLocation(prog, "gSpecular"), TextureUnit::G_SPECULAR);
 
 		glActiveTexture(OpenGLTextureUnits[TextureUnit::G_LIGHTSPACEPOSITION]);
 		glBindTexture(GL_TEXTURE_2D, _gLightSpacePosition);

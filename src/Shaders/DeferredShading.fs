@@ -39,7 +39,7 @@ uniform float rsmIntensity;
 uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gDiffuse;
-uniform sampler2D gSpecular;
+//uniform sampler2D gSpecular;
 uniform sampler2D gLightSpacePosition;
 
 // assuming global value for shininess for now...
@@ -204,8 +204,8 @@ vec3 indirectIllumination() {
     	vec3 vplN = normalize(texture(normalMap, coords.xy)).xyz;
     	vec3 vplFlux = texture(fluxMap, coords.xy).rgb;
 
-    	float dot1 = max(0.0, dot(vplN, FragPos - vplP));
-    	float dot2 = max(0.0, dot(normalize(N), vplP - FragPos));
+		float dot1 = max(0.0, dot(vplN, normalize(FragPos - vplP)));
+    	float dot2 = max(0.0, dot(N, normalize(vplP - FragPos)));
 
     	float dist = length(vplP - FragPos);
 
@@ -213,13 +213,15 @@ vec3 indirectIllumination() {
     	if(dist <= 0.0)
     		continue;
 
-    	indirect = vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
+    	//indirect = vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
+    	indirect = vplFlux * (dot1 * dot2);
 
     	float weight = rnd.x * rnd.x;
 
     	accumulatedWeight += weight;
 
     	indirect = indirect * weight;
+    	indirect = indirect * (1.0 / float(64));
     	result += indirect;
     }
 
@@ -232,8 +234,10 @@ void main(void) {
 	FragPos       = texture(gPosition, texCoords).rgb;
 	N             = texture(gNormal, texCoords).rgb;
 	Diffuse       = texture(gDiffuse, texCoords).rgb;
-	Specular      = texture(gSpecular, texCoords).rgb;
+	//Specular      = texture(gSpecular, texCoords).rgb;
+	Specular = vec3(1.0f);
 	LightSpacePos = texture(gLightSpacePosition, texCoords);
+
 
 	//outColor = vec4(directIllumination(), 1.0);
 

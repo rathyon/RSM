@@ -76,8 +76,8 @@ vec3 indirectIllumination(vec3 FragPos, vec4 LightSpacePos, vec3 Normal, vec3 Di
     	vec3 vplN = normalize(texture(normalMap, coords.xy)).xyz;
     	vec3 vplFlux = texture(fluxMap, coords.xy).rgb;
 
-    	float dot1 = max(0.0, dot(vplN, FragPos - vplP));
-    	float dot2 = max(0.0, dot(normalize(Normal), vplP - FragPos));
+    	float dot1 = max(0.0, dot(vplN, normalize(FragPos - vplP)));
+    	float dot2 = max(0.0, dot(Normal, normalize(vplP - FragPos)));
 
     	float dist = length(vplP - FragPos);
 
@@ -85,13 +85,15 @@ vec3 indirectIllumination(vec3 FragPos, vec4 LightSpacePos, vec3 Normal, vec3 Di
     	if(dist <= 0.0)
     		continue;
 
-    	indirect = vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
+    	//indirect = vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
+        indirect = vplFlux * (dot1 * dot2);
 
     	float weight = rnd.x * rnd.x;
 
     	accumulatedWeight += weight;
 
     	indirect = indirect * weight;
+        indirect = indirect * (1.0 / float(64));
     	result += indirect;
     }
 

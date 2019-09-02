@@ -68,7 +68,7 @@ namespace rsm {
 		int _gBufferWidth;
 		int _gBufferHeight;
 		GLuint _gBuffer;
-		GLuint _gPosition, _gNormal, _gDiffuse, _gSpecular, _gLightSpacePosition;
+		GLuint _gPosition, _gNormal, _gDiffuse, _gLightSpacePosition;
 
 		GLuint _screenQuadVAO;
 		GLuint _screenQuadVBO;
