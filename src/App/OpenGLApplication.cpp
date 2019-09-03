@@ -250,7 +250,7 @@ void OpenGLApplication::prepare() {
 	=====================================================================================*/
 
 	// def cam
-	/** /
+	/**/
 	_camera = make_sref<Perspective>(_width, _height,
 		vec3(-5.0f, 3.0f, -6.0f),
 		vec3(0.0f, 3.5f, 0.0f),
@@ -259,7 +259,7 @@ void OpenGLApplication::prepare() {
 	/**/
 
 	// sponza cam
-	/**/
+	/** /
     _camera = make_sref<Perspective>(_width, _height,
          vec3(0.0f, 0.0f, 0.0f),
          vec3(10.0f, 0.0f, 0.0f),
@@ -282,7 +282,7 @@ void OpenGLApplication::prepare() {
 			Models
 	=====================================================================================*/
 
-	/**/
+	/** /
 	sref<Model> sponza = RM.getModel("sponza");
 	sponza->prepare();
 	_scene.addModel(sponza);
@@ -296,7 +296,7 @@ void OpenGLApplication::prepare() {
 	_scene.addModel(demo_scene);
 	/**/
 
-	/** /
+	/**/
 	sref<Model> Lucy = RM.getModel("Lucy");
 	Lucy->prepare();
 	_scene.addModel(Lucy);

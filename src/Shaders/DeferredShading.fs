@@ -42,9 +42,6 @@ uniform sampler2D gDiffuse;
 //uniform sampler2D gSpecular;
 uniform sampler2D gLightSpacePosition;
 
-// assuming global value for shininess for now...
-const float shininess = 16.0f;
-
 /* ==============================================================================
         Directional / Spot Lights
  ============================================================================== */
@@ -62,14 +59,19 @@ float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
     if(projCoords.z > 1.0)
         return 1.0;
 
-    float currentDepth = projCoords.z; 
+    float currentDepth = projCoords.z;  
 
     float bias = baseBias * tan(acos(dot(N,L)));
     bias = clamp(bias, 0.0, 0.0005f);
 
-    //float shadow = currentDepth - bias > closestDepth  ? 0.0 : 1.0;
 
     float shadow = 0.0;
+    /** /
+    float closestDepth = texture(depthMap, projCoords.xy).r; 
+    shadow = currentDepth - bias > closestDepth  ? 0.0 : 1.0;
+    /**/
+
+    /**/
     vec2 texelSize = 1.0 / vec2(textureSize(depthMap, 0));
     for(int x = -1; x <= 1; x++){
     	for(int y = -1; y <= 1; y++){
@@ -77,8 +79,8 @@ float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
     		shadow += currentDepth - bias > depth ? 0.0 : 1.0;
     	}
     }
-
     shadow = shadow / 9.0;
+    /**/
 
     return shadow;
 }
@@ -91,12 +93,15 @@ out vec4 outColor;
 
 // dist, dist weight, cos(angle), angle weight
 uniform vec4 indirectSampleParams;
- uniform sampler2D lowResIndirect;
+uniform sampler2D lowResIndirect;
+
+// assuming global value for shininess and specular
+const float shininess = 16.0f;
+const vec3 Specular = vec3(1.0f);
 
 vec3 FragPos;
 vec3 N;
 vec3 Diffuse;
-vec3 Specular;
 vec4 LightSpacePos;
 
 
@@ -194,8 +199,6 @@ vec3 indirectIllumination() {
     // bring from [-1,1] to [0,1]
     projCoords = projCoords * 0.5 + 0.5;
 
-    float accumulatedWeight = 0;
-
     for(int i=0; i < NUM_VPL; i++){
     	vec2 rnd = VPLSamples[i];
     	vec2 coords = vec2(projCoords.x + rsmRMax*rnd.x*sin(TWO_PI*rnd.y), projCoords.y + rsmRMax*rnd.x*cos(TWO_PI*rnd.y));
@@ -204,28 +207,32 @@ vec3 indirectIllumination() {
     	vec3 vplN = normalize(texture(normalMap, coords.xy)).xyz;
     	vec3 vplFlux = texture(fluxMap, coords.xy).rgb;
 
-		float dot1 = max(0.0, dot(vplN, normalize(FragPos - vplP)));
+        // long ver
+        /** /
+    	float dot1 = max(0.0, dot(vplN, normalize(FragPos - vplP)));
     	float dot2 = max(0.0, dot(N, normalize(vplP - FragPos)));
+        indirect = vplFlux * (dot1 * dot2);
+        /**/
 
-    	float dist = length(vplP - FragPos);
+        // original ver
+        /**/
+        float dot1 = max(0.0, dot(vplN, FragPos - vplP));
+        float dot2 = max(0.0, dot(N, vplP - FragPos));
+        float dist = length(vplP - FragPos);
+        indirect = vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
+        /**/
 
     	// frag == vpl pos???
-    	if(dist <= 0.0)
-    		continue;
-
-    	//indirect = vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
-    	indirect = vplFlux * (dot1 * dot2);
+    	//if(dist <= 0.0)
+    	//	continue;
 
     	float weight = rnd.x * rnd.x;
 
-    	accumulatedWeight += weight;
-
     	indirect = indirect * weight;
-    	indirect = indirect * (1.0 / float(64));
+    	//indirect = indirect * (1.0 / float(NUM_VPL));
     	result += indirect;
     }
-
-    //result /= accumulatedWeight;
+    //result = result * (1.0 / float(NUM_VPL));
 	return (result * Diffuse) * rsmIntensity;
 }
 
@@ -235,7 +242,6 @@ void main(void) {
 	N             = texture(gNormal, texCoords).rgb;
 	Diffuse       = texture(gDiffuse, texCoords).rgb;
 	//Specular      = texture(gSpecular, texCoords).rgb;
-	Specular = vec3(1.0f);
 	LightSpacePos = texture(gLightSpacePosition, texCoords);
 
 
@@ -326,6 +332,9 @@ void main(void) {
 	//if not, do raw indirect illum call
 	else{
 		outColor = vec4(direct + indirectIllumination(), 1.0);
+
+		//tag non reconstructible
+		//outColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
 	}
 	/**/
 
