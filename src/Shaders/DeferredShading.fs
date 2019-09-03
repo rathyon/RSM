@@ -246,88 +246,71 @@ void main(void) {
 
 
 	//outColor = vec4(directIllumination(), 1.0);
-
 	//outColor = vec4(indirectIllumination(), 1.0);
-
 	//outColor = vec4(directIllumination() + indirectIllumination(), 1.0);
-
-	/** /
-	if(isnan(outColor.x))
-		outColor = vec4(1.0);
-
-	if(isnan(outColor.y))
-		outColor = vec4(1.0);
-
-	if(isnan(outColor.z))
-		outColor = vec4(1.0);
-	/**/
-
-	//outColor = vec4(directIllumination(pos, lightSpacePos, N, diffuse, specular), 1.0);
 	//outColor = vec4(texture(lowResIndirect, texCoords).rgb, 1.0);
 
-	/** /
-	//vec3 direct = directIllumination(pos, lightSpacePos, N, diffuse, specular);
-
-	vec2 texSize = textureSize(lowResIndirect, 0);
-	vec2 texelSize = 1.0 / texSize;
-
-	vec3 indirect = vec3(0.0);
-
-	vec2 f = fract( texCoords * texSize );
-    uv += ( .5 - f ) * texelSize;    // move uv to texel centre
-    vec2 tl = texCoords;
-    vec2 tr = texCoords + vec2(texelSize.x, 0.0);
-    vec2 bl = texCoords + vec2(0.0, texelSize.y);
-    vec2 br = texCoords + vec2(texelSize.x, texelSize.y);
-
-    vec3 tA = mix( tl, tr, f.x );
-    vec3 tB = mix( bl, br, f.x );
-
-	outColor = vec4(direct + indirect, 1.0);
-
-	/**/
 	vec3 direct = directIllumination();
 
 	vec2 texSize = textureSize(lowResIndirect, 0);
 	vec2 texelSize = 1.0 / texSize;
 
-	vec4 sampleX;
-	vec4 sampleY;
-	vec4 viable = vec4(0.0);
-	int viableSamples = 0;
+	vec2 uv = texCoords;
+	vec2 f = fract( uv * texSize );
+    uv += ( .5 - f ) * texelSize;    // move uv to texel centre
 
-	// left up down right
-	sampleX[0] = texCoords.x - texelSize.x ; sampleY[0] = texCoords.y;
-	sampleX[1] = texCoords.x               ; sampleY[1] = texCoords.y + texelSize.y;
-	sampleX[2] = texCoords.x               ; sampleY[2] = texCoords.y - texelSize.y;
-	sampleX[3] = texCoords.x + texelSize.x ; sampleY[3] = texCoords.y;
+    vec2 tl_uv = uv;
+	vec2 tr_uv = uv + vec2(texelSize.x, 0.0);
+	vec2 bl_uv = uv + vec2(0.0, texelSize.y);
+	vec2 br_uv = uv + vec2(texelSize.x, texelSize.y);
+
+    vec3 tl = texture(lowResIndirect, tl_uv).rgb;
+    vec3 tr = texture(lowResIndirect, tr_uv).rgb;
+    vec3 bl = texture(lowResIndirect, bl_uv).rgb;
+    vec3 br = texture(lowResIndirect, br_uv).rgb;
+
+	int viableSamples = 0;
 
 	vec3 indirect = vec3(0.0);
 
-	for(int i = 0; i < 4; i++){
-		// use squared distance
-		vec3 diff = FragPos - texture(gPosition, vec2(sampleX[i], sampleY[i])).rgb;
-		if (dot(diff, diff) < indirectSampleParams.x){
-			if(dot(N, texture(gNormal, vec2(sampleX[i], sampleY[i])).rgb) >= indirectSampleParams.z){
-				viable[i] = 1.0;
-				viableSamples += 1;
-			}
-		}
+	// top left
+	vec3 diff = FragPos - texture(gPosition, tl_uv).rgb;
+	if ((dot(diff, diff) < indirectSampleParams.x) && (dot(N, texture(gNormal, tl_uv).rgb) >= indirectSampleParams.z)){
+		viableSamples += 1;
+	}
+	else{
+		tl = tr;
+	}
+	// top right
+	diff = FragPos - texture(gPosition, tr_uv).rgb;
+	if ((dot(diff, diff) < indirectSampleParams.x) && (dot(N, texture(gNormal, tr_uv).rgb) >= indirectSampleParams.z)){
+		viableSamples += 1;
+	}
+	else{
+		tr = tl;
+	}
+	// bottom left
+	diff = FragPos - texture(gPosition, bl_uv).rgb;
+	if ((dot(diff, diff) < indirectSampleParams.x) && (dot(N, texture(gNormal, bl_uv).rgb) >= indirectSampleParams.z)){
+		viableSamples += 1;
+	}
+	else{
+		bl = br;
+	}
+	// bottom right
+	diff = FragPos - texture(gPosition, br_uv).rgb;
+	if ((dot(diff, diff) < indirectSampleParams.x) && (dot(N, texture(gNormal, br_uv).rgb) >= indirectSampleParams.z)){
+		viableSamples += 1;
+	}
+	else{
+		br = bl;
 	}
 
+	// basically its always linear interpolation with 4, I just do a cheat when the 4th one is invalid...
 	if(viableSamples >= 3){
-
-		for(int i = 0; i < 4; i++){
-			if(viable[i] == 1.0){
-				indirect += texture(lowResIndirect, vec2(sampleX[i], sampleY[i])).rgb;
-			}
-		}
-
-		// TEMPORARY "NORMALIZATION"
-		indirect = indirect / float(viableSamples);
-		outColor = vec4(direct + indirect, 1.0);
-		//outColor = vec4(0.0, 1.0, 1.0, 1.0);
-
+	    vec3 tA = mix( tl, tr, f.x );
+	    vec3 tB = mix( bl, br, f.x );
+		outColor = vec4(direct + mix( tA, tB, f.y ), 1.0);
 	}
 	//if not, do raw indirect illum call
 	else{

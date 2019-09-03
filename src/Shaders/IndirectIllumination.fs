@@ -39,7 +39,6 @@ uniform float rsmIntensity;
 uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gDiffuse;
-uniform sampler2D gSpecular;
 uniform sampler2D gLightSpacePosition;
 
 // assuming global value for shininess for now...
