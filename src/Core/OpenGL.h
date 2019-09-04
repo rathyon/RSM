@@ -20,10 +20,11 @@
 // ive decided I will only have 1 light AT ANY TIME
 //#define NUM_LIGHTS 1
 
-#define NUM_VPL 64
+#define NUM_VPL 100
 
-#define VPL_DIST_MAX 0.5f
-#define RSM_INTENSITY 1.0f
+// Lucy Test Scene:
+#define VPL_DIST_MAX 0.3f
+#define RSM_INTENSITY 3.0f
 
 
 enum TextureUnit {

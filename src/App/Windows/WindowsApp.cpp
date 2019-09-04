@@ -200,10 +200,16 @@ void rsm::init(int argc, char* argv[]) {
 	RM.addModel("demo_scene", demo_scene);
 	/**/
 
-	/**/
+	/** /
 	sref<Model> Lucy = make_sref<Model>("Lucy");
 	Lucy->loadFromFile("../../../assets/models/Lucy/Lucy.obj", "../../../assets/models/Lucy/");
 	RM.addModel("Lucy", Lucy);	
+	/**/
+
+	/**/
+	sref<Model> CB = make_sref<Model>("CB");
+	CB->loadFromFile("../../../assets/models/CornellBox/CornellBox-Original.obj", "../../../assets/models/CornellBox/");
+	RM.addModel("CB", CB);
 	/**/
 
 	/** /

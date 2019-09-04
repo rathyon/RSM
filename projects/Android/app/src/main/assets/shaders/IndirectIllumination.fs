@@ -23,7 +23,7 @@ uniform cameraBlock {
 	vec3 ViewPos;
 };
 
-uniform Light lights[NUM_LIGHTS];
+uniform Light light;
 
 // Shadow filtering
 const float baseBias = 0.005f;
@@ -39,7 +39,6 @@ uniform float rsmIntensity;
 uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gDiffuse;
-uniform sampler2D gSpecular;
 uniform sampler2D gLightSpacePosition;
 
 // assuming global value for shininess for now...
@@ -74,19 +73,31 @@ vec3 indirectIllumination(vec3 FragPos, vec4 LightSpacePos, vec3 Normal, vec3 Di
     	vec3 vplN = normalize(texture(normalMap, coords.xy)).xyz;
     	vec3 vplFlux = texture(fluxMap, coords.xy).rgb;
 
-    	float dot1 = max(0.0, dot(vplN, FragPos - vplP));
-    	float dot2 = max(0.0, dot(normalize(Normal), vplP - FragPos));
+        // long ver
+        /** /
+    	float dot1 = max(0.0, dot(vplN, normalize(FragPos - vplP)));
+    	float dot2 = max(0.0, dot(Normal, normalize(vplP - FragPos)));
+        indirect = vplFlux * (dot1 * dot2);
+        /**/
 
-    	float dist = length(vplP - FragPos);
+        // original ver
+        /**/
+        float dot1 = max(0.0, dot(vplN, FragPos - vplP));
+        float dot2 = max(0.0, dot(Normal, vplP - FragPos));
+        float dist = length(vplP - FragPos);
+        indirect = vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
+        /**/
 
-    	indirect += vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
+    	// frag == vpl pos???
+    	//if(dist <= 0.0)
+    	//	continue;
 
     	float weight = rnd.x * rnd.x;
-
     	indirect = indirect * weight;
+        //indirect = indirect * (1.0 / float(NUM_VPL));
     	result += indirect;
     }
-
+    //result = result * (1.0 / float(NUM_VPL));
 	return (result * Diffuse) * rsmIntensity;
 }
 

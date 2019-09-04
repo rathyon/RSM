@@ -33,7 +33,14 @@ void loadTextures(std::string directory, std::string extension, std::string pref
 
 void init() {
 
-    glApp = new OpenGLApplication(1920, 1080);
+    // Screen resolutions are:
+    // HD+ 1480x720
+    glApp = new OpenGLApplication(1480, 720);
+    // FHD+ 2220x1080
+    //glApp = new OpenGLApplication(2220, 1080);
+    // WQHD+ 2960x1440
+    //glApp = new OpenGLApplication(2960, 1440);
+
 
     LOG("Initializing AndroidApp...\n");
 
@@ -43,12 +50,25 @@ void init() {
     glApp->init();
     RM.init();
 
+    glApp->prepareLights();
+    const sref<Light>& light = glApp->getScene().lights()[0];
+    LightData data;
+    light->toData(data);
+    const int lightType = data.type;
+
     checkOpenGLError("Error during engine initialization!");
     LOG("Init successful...\n");
 
-    /** ==================================================================================
-				Shaders
-	=====================================================================================*/
+    /* ===================================================================================
+                Shaders
+    =====================================================================================*/
+    /**/
+
+    std::string lightDef;
+    if (lightType == LightType::LIGHTYPE_DIR)
+        lightDef = "#define DIRECTIONAL\n";
+    else
+        lightDef = "#define SPOTLIGHT\n";
 
     ShaderSource vBP = ShaderSource(VERTEX_SHADER, "vBP", getAssetSource("shaders/BlinnPhong.vs"));
     ShaderSource fBP = ShaderSource(FRAGMENT_SHADER, "fBP", getAssetSource("shaders/BlinnPhong.fs"));
@@ -57,8 +77,8 @@ void init() {
 
     fBP.inject(std::string("#version 320 es\n") +
                std::string("#extension GL_EXT_shader_io_blocks : enable\n") +
+               lightDef +
                std::string("precision highp float;\n") +
-               std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n" +
                std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
     vBP.compile();
     fBP.compile();
@@ -70,8 +90,8 @@ void init() {
 
     fBPT.inject(std::string("#version 320 es\n") +
                std::string("#extension GL_EXT_shader_io_blocks : enable\n") +
+               lightDef +
                std::string("precision highp float;\n") +
-               std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n" +
                std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
     vBPT.compile();
     fBPT.compile();
@@ -82,8 +102,8 @@ void init() {
                std::string("#extension GL_EXT_shader_io_blocks : enable\n"));
     fDS.inject(std::string("#version 320 es\n") +
                std::string("#extension GL_EXT_shader_io_blocks : enable\n") +
+               lightDef +
                std::string("precision highp float;\n") +
-               std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n" +
                std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
     vDS.compile();
     fDS.compile();
@@ -95,7 +115,6 @@ void init() {
     fII.inject(std::string("#version 320 es\n") +
                std::string("#extension GL_EXT_shader_io_blocks : enable\n") +
                std::string("precision highp float;\n") +
-               std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n" +
                std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
     vII.compile();
     fII.compile();
@@ -116,8 +135,7 @@ void init() {
                std::string("#extension GL_EXT_shader_io_blocks : enable\n"));
     fRGB.inject(std::string("#version 320 es\n") +
                std::string("#extension GL_EXT_shader_io_blocks : enable\n") +
-               std::string("precision highp float;\n") +
-               std::string("const int NUM_LIGHTS = ") + std::to_string(NUM_LIGHTS) + ";\n");
+               std::string("precision highp float;\n"));
     vRGB.compile();
     fRGB.compile();
 
@@ -179,10 +197,16 @@ void init() {
             Models
 	=====================================================================================*/
 
-    /**/
+    /** /
     sref<Model> Lucy = make_sref<Model>("Lucy");
     Lucy->loadFromMemory(getAssetSource("models/Lucy/Lucy.obj"), getAssetSource("models/Lucy/Lucy.mtl"));
     RM.addModel("Lucy", Lucy);
+    /**/
+
+    /**/
+    sref<Model> CB = make_sref<Model>("CB");
+    CB->loadFromMemory(getAssetSource("models/CornellBox/CornellBox-Original.obj"), getAssetSource("models/CornellBox/CornellBox-Original.mtl"));
+    RM.addModel("CB", CB);
     /**/
 
     /** /

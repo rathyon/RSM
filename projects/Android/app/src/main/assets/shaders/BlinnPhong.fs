@@ -29,7 +29,7 @@ uniform cameraBlock {
 };
 
 uniform float far;
-uniform Light lights[NUM_LIGHTS];
+uniform Light light;
 
 //Material parameters
 uniform vec3 ambient;
@@ -91,24 +91,6 @@ float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
 
     return shadow;
 }
-/* ==============================================================================
-        Point Lights
- ============================================================================== */
-
-uniform samplerCube depthCubeMap;
-uniform samplerCube positionCubeMap;
-uniform samplerCube normalCubeMap;
-uniform samplerCube fluxCubeMap;
-
-float shadowFactor(vec3 fragPos, vec3 lightPos){
-	vec3 fragToLight = fragPos - lightPos;
-	float closestDepth = texture(depthCubeMap, fragToLight).r;
-	closestDepth *= far;
-	float currentDepth = length(fragToLight);
-
-	float shadow = currentDepth > closestDepth  ? 0.0 : 1.0;
-    return shadow;
-}
 
 /* ==============================================================================
         Stage Outputs
@@ -116,6 +98,7 @@ float shadowFactor(vec3 fragPos, vec3 lightPos){
 
 out vec4 outColor;
 
+#ifdef DIRECTIONAL
 vec3 directIllumination() {
 	vec3 V = normalize(ViewPos - vsIn.position);
 	vec3 N = vsIn.normal;
@@ -124,56 +107,69 @@ vec3 directIllumination() {
 	float shadow = 1.0;
 	vec3 retColor = vec3(0.0);
 
-	for(int i=0; i < NUM_LIGHTS; i++){
+	L = normalize(-light.direction);
+	shadow = shadowFactor(vsIn.lightSpacePosition, N, L);
 
-		// Get Light Vector
-		if (lights[i].type == 0){
-			L = normalize(-lights[i].direction);
+	vec3 H = normalize(L + V);
 
-			shadow = shadowFactor(vsIn.lightSpacePosition, N, L);
-		}
-		else {
-			L = normalize(lights[i].position - vsIn.position);
+	float NdotL = max(dot(N, L), 0.0);
+	float NdotH = max(dot(N, H), 0.0);
 
-			shadow = shadowFactor(vsIn.position, lights[i].position);
-		}
+	vec3 diff = vec3(0.0);
+	vec3 spec = vec3(0.0);
 
-		if (lights[i].type == 2){
-			float theta = dot(L, normalize(-lights[i].direction));
-			if(theta <= lights[i].cutoff){
-				continue;
-			}
-			shadow = shadowFactor(vsIn.lightSpacePosition, N, L);
-		}
-
-		vec3 H = normalize(L + V);
-
-		float NdotL = max(dot(N, L), 0.0);
-		float NdotH = max(dot(N, H), 0.0);
-
-		vec3 diff = vec3(0.0);
-		vec3 spec = vec3(0.0);
-
-		if (NdotL > 0.0){
-
-			diff = lights[i].emission * ( diffuse * NdotL);
-			spec = lights[i].emission * ( specular * pow(NdotH, shininess));
-
-			// if not directional light
-			if (lights[i].type != 0){
-				float distance = length(lights[i].position - vsIn.position);
-				float attenuation = 1.0 / (1.0 + lights[i].linear * distance + lights[i].quadratic * pow(distance, 2.0));
-
-				diff *= attenuation;
-				spec *= attenuation;
-			}
-		}
-
-		retColor += (diff + spec) * shadow;
+	if (NdotL > 0.0){
+		diff = light.emission * ( diffuse * NdotL);
+		spec = light.emission * ( specular * pow(NdotH, shininess));
 	}
 
-	return retColor;
+	return ((diff + spec) * shadow);
 }
+#endif
+
+#ifdef SPOTLIGHT
+vec3 directIllumination() {
+	vec3 V = normalize(ViewPos - vsIn.position);
+	vec3 N = vsIn.normal;
+	vec3 L;
+
+	float shadow = 1.0;
+	vec3 retColor = vec3(0.0);
+
+
+	// Get Light Vector
+	L = normalize(light.position - vsIn.position);
+	shadow = shadowFactor(vsIn.lightSpacePosition, N, L);
+
+	float theta = dot(L, normalize(-light.direction));
+	if(theta <= light.cutoff){
+		return vec3(0.0);
+	}
+
+	vec3 H = normalize(L + V);
+
+	float NdotL = max(dot(N, L), 0.0);
+	float NdotH = max(dot(N, H), 0.0);
+
+	vec3 diff = vec3(0.0);
+	vec3 spec = vec3(0.0);
+
+	if (NdotL > 0.0){
+
+		diff = light.emission * ( diffuse * NdotL);
+		spec = light.emission * ( specular * pow(NdotH, shininess));
+
+		float distance = length(light.position - FragPos);
+		float attenuation = 1.0 / (1.0 + light.linear * distance + light.quadratic * pow(distance, 2.0));
+
+		diff *= attenuation;
+		spec *= attenuation;
+
+	}
+
+	return ((diff + spec) * shadow);
+}
+#endif
 
 vec3 indirectIllumination() {
 	vec3 result = vec3(0.0);

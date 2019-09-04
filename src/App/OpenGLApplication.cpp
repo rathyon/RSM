@@ -250,7 +250,7 @@ void OpenGLApplication::prepare() {
 	=====================================================================================*/
 
 	// def cam
-	/**/
+	/** /
 	_camera = make_sref<Perspective>(_width, _height,
 		vec3(-5.0f, 3.0f, -6.0f),
 		vec3(0.0f, 3.5f, 0.0f),
@@ -276,6 +276,15 @@ void OpenGLApplication::prepare() {
 		0.1f, 10000.0f, 60.0f);
 	/**/
 
+	// Cornell Cam
+	/**/
+	_camera = make_sref<Perspective>(_width, _height,
+		vec3(0.0f, 3.0f, 6.0f),
+		vec3(0.0f, 3.0f, 0.0f),
+		vec3(0.0f, 1.0f, 0.0f),
+		0.1f, 1000.0f, 60.0f);
+	/**/
+
 	_scene.addCamera(_camera);
 
 	/* ===================================================================================
@@ -296,10 +305,18 @@ void OpenGLApplication::prepare() {
 	_scene.addModel(demo_scene);
 	/**/
 
-	/**/
+	/** /
 	sref<Model> Lucy = RM.getModel("Lucy");
 	Lucy->prepare();
 	_scene.addModel(Lucy);
+	/**/
+
+	/**/
+	sref<Model> CB = RM.getModel("CB");
+	CB->prepare();
+	_scene.addModel(CB);
+
+	CB->setScale(3.0f, 3.0f, 3.0f);
 	/**/
 
 	// Prepare shared buffers
@@ -337,7 +354,7 @@ void OpenGLApplication::geometryPass() {
 
 	glUseProgram(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	reshape(_width, _height);
+	glViewport(0, 0 ,_width, _height);
 }
 
 void OpenGLApplication::genRSMaps() {
@@ -359,7 +376,7 @@ void OpenGLApplication::genRSMaps() {
 	glUseProgram(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	// reset viewport
-	reshape(_width, _height);
+	glViewport(0, 0, _width, _height);
 }
 
 void OpenGLApplication::renderLowResIndirect() {

@@ -245,14 +245,17 @@ void main(void) {
 	LightSpacePos = texture(gLightSpacePosition, texCoords);
 
 
+	//outColor = vec4(Diffuse, 1.0f);
 	//outColor = vec4(directIllumination(), 1.0);
 	//outColor = vec4(indirectIllumination(), 1.0);
 	//outColor = vec4(directIllumination() + indirectIllumination(), 1.0);
 	//outColor = vec4(texture(lowResIndirect, texCoords).rgb, 1.0);
 
+	/**/
 	vec3 direct = directIllumination();
 
-	vec2 texSize = textureSize(lowResIndirect, 0);
+	ivec2 texSizei = textureSize(lowResIndirect, 0);
+	vec2 texSize = vec2(float(texSizei.x), float(texSizei.y));
 	vec2 texelSize = 1.0 / texSize;
 
 	vec2 uv = texCoords;
