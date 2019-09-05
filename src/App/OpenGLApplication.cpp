@@ -249,7 +249,7 @@ void OpenGLApplication::prepare() {
 			Cameras
 	=====================================================================================*/
 
-	// def cam
+	// Lucy cam
 	/** /
 	_camera = make_sref<Perspective>(_width, _height,
 		vec3(-5.0f, 3.0f, -6.0f),
@@ -322,7 +322,7 @@ void OpenGLApplication::prepare() {
 	// Prepare shared buffers
 	prepareCameraBuffer();
 
-	prepareDeferredShading();
+	//prepareDeferredShading();
 
 	prepareRSM();
 
@@ -414,14 +414,14 @@ void OpenGLApplication::render() {
 	checkOpenGLError("Error generating depth maps!");
 
 	// Geometry Pass (Deferred Shading) GBuffer...
-	geometryPass();
+	//geometryPass();
 	checkOpenGLError("Error in geometry pass!");
 
 	// Clear framebuffer...
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Upload deferred shading data...
-	uploadDeferredShadingData();
+	//uploadDeferredShadingData();
 	checkOpenGLError("Error uploading deferred shading data!");
 
 	// Upload shadow mapping data...
@@ -429,14 +429,14 @@ void OpenGLApplication::render() {
     checkOpenGLError("Error uploading shadow mapping data!");
 
 	// render low res indirect illumination
-	renderLowResIndirect();
+	//renderLowResIndirect();
 
-	uploadLowResIndirect();
+	//uploadLowResIndirect();
+
+    //renderScreenQuad();
 
 	// Render scene...
-	//_scene.render();
-
-	renderScreenQuad();
+	_scene.render();
 
 	checkOpenGLError("Error in render loop!");
 }

@@ -250,6 +250,7 @@ void main(void) {
 	//outColor = vec4(directIllumination() + indirectIllumination(), 1.0);
 	//outColor = vec4(texture(lowResIndirect, texCoords).rgb, 1.0);
 
+	/**/
 	vec3 direct = directIllumination();
 
 	ivec2 texSizei = textureSize(lowResIndirect, 0);

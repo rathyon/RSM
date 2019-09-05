@@ -170,7 +170,7 @@ vec3 directIllumination() {
 #endif
 
 vec3 indirectIllumination() {
-	vec3 retColor = vec3(0.0);
+	vec3 result = vec3(0.0);
 	vec3 indirect = vec3(0.0);
 	// perform perspective divide: clip space-> normalized device coords (done automatically for gl_Position)
 
@@ -187,19 +187,27 @@ vec3 indirectIllumination() {
     	vec3 vplN = normalize(texture(normalMap, coords.xy)).xyz;
     	vec3 vplFlux = texture(fluxMap, coords.xy).rgb;
 
-    	float dot1 = max(0.0, dot(vplN, vsIn.position - vplP));
-    	float dot2 = max(0.0, dot(normalize(vsIn.normal), vplP - vsIn.position));
+        // long ver
+        /** /
+    	float dot1 = max(0.0, dot(vplN, normalize(vsIn.position - vplP)));
+    	float dot2 = max(0.0, dot(N, normalize(vplP - vsIn.position)));
+        indirect = vplFlux * (dot1 * dot2);
+        /**/
 
-    	float dist = length(vplP - vsIn.position);
+        // original ver
+        /**/
+        float dot1 = max(0.0, dot(vplN, vsIn.position - vplP));
+        float dot2 = max(0.0, dot(vsIn.normal, vplP - vsIn.position));
+        float dist = length(vplP - vsIn.position);
+        indirect = vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
+        /**/
 
-    	indirect += vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
-    	indirect = indirect * rnd.x * rnd.x;
+    	float weight = rnd.x * rnd.x;
 
-    	retColor += indirect;
+    	indirect = indirect * weight;
+    	result += indirect;
     }
-	
-	//return clamp(retColor, 0.0, 1.0) * fetchDiffuse();
-	return (retColor * fetchDiffuse()) * rsmIntensity;
+	return (result * fetchDiffuse()) * rsmIntensity;
 }
 
 void main(void) {

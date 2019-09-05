@@ -189,12 +189,20 @@ vec3 indirectIllumination() {
     	vec3 vplN = normalize(texture(normalMap, coords.xy)).xyz;
     	vec3 vplFlux = texture(fluxMap, coords.xy).rgb;
 
-    	float dot1 = max(0.0, dot(vplN, vsIn.position - vplP));
-    	float dot2 = max(0.0, dot(normalize(vsIn.normal), vplP - vsIn.position));
+        // long ver
+        /** /
+    	float dot1 = max(0.0, dot(vplN, normalize(vsIn.position - vplP)));
+    	float dot2 = max(0.0, dot(N, normalize(vplP - vsIn.position)));
+        indirect = vplFlux * (dot1 * dot2);
+        /**/
 
-    	float dist = length(vplP - vsIn.position);
-
-    	indirect += vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
+        // original ver
+        /**/
+        float dot1 = max(0.0, dot(vplN, vsIn.position - vplP));
+        float dot2 = max(0.0, dot(vsIn.normal, vplP - vsIn.position));
+        float dist = length(vplP - vsIn.position);
+        indirect = vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
+        /**/
 
     	float weight = rnd.x * rnd.x;
 
@@ -213,11 +221,6 @@ void main(void) {
 	// deferred shading testing
 	//outColor = vec4(texture(gPosition, vsIn.texCoords).rgb, 1.0);
 
-	// point light gbuffer testing
-	/** /
-	vec3 fragToLight = vsIn.position - lights[0].position;
-	vec3 pos = texture(fluxCubeMap, fragToLight).rgb;
-
-	outColor = vec4(pos, 1.0);
-	/**/
+	// rsm maps testing
+	//outColor = vec4(texture(positionMap, vsIn.texCoords).rgb, 1.0);
 }

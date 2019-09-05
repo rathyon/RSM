@@ -245,7 +245,6 @@ void main(void) {
 	LightSpacePos = texture(gLightSpacePosition, texCoords);
 
 
-	//outColor = vec4(Diffuse, 1.0f);
 	//outColor = vec4(directIllumination(), 1.0);
 	//outColor = vec4(indirectIllumination(), 1.0);
 	//outColor = vec4(directIllumination() + indirectIllumination(), 1.0);
