@@ -57,7 +57,7 @@ namespace rsm {
 		GLuint fluxMap() const;
 
 		virtual GLenum depthMapType() = 0;
-		virtual void prepare(int width, int height) = 0;
+		//virtual void prepare(int width, int height);
 		virtual void uploadSpatialData(GLuint program) = 0;
 		virtual void uploadShadowMapData(GLuint program) = 0;
 

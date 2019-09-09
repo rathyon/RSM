@@ -29,6 +29,7 @@ uniform Light light;
 const float baseBias = 0.005f;
 
 // RSM Variables
+uniform float VPLWeights[NUM_VPL];
 uniform vec2 VPLSamples[NUM_VPL];
 uniform float rsmRMax;
 uniform float rsmIntensity;
@@ -223,10 +224,10 @@ vec3 indirectIllumination() {
         /**/
 
     	// frag == vpl pos???
-    	//if(dist <= 0.0)
-    	//	continue;
+    	if(dist <= 0.0)
+    		continue;
 
-    	float weight = rnd.x * rnd.x;
+    	float weight = VPLWeights[i];
 
     	indirect = indirect * weight;
     	//indirect = indirect * (1.0 / float(NUM_VPL));
@@ -235,6 +236,9 @@ vec3 indirectIllumination() {
     //result = result * (1.0 / float(NUM_VPL));
 	return (result * Diffuse) * rsmIntensity;
 }
+
+uniform vec2 lowResIndirectSize;
+uniform vec2 texelSize;
 
 void main(void) {
 
@@ -247,15 +251,16 @@ void main(void) {
 
 	//outColor = vec4(directIllumination(), 1.0);
 	//outColor = vec4(indirectIllumination(), 1.0);
-	//outColor = vec4(directIllumination() + indirectIllumination(), 1.0);
+	outColor = vec4(directIllumination() + indirectIllumination(), 1.0);
 	//outColor = vec4(texture(lowResIndirect, texCoords).rgb, 1.0);
 
-	/**/
+	/** /
 	vec3 direct = directIllumination();
 
-	ivec2 texSizei = textureSize(lowResIndirect, 0);
-	vec2 texSize = vec2(float(texSizei.x), float(texSizei.y));
-	vec2 texelSize = 1.0 / texSize;
+	//ivec2 texSizei = textureSize(lowResIndirect, 0);
+	//vec2 texSize = vec2(float(texSizei.x), float(texSizei.y));
+	vec2 texSize = lowResIndirectSize;
+	//vec2 texelSize = 1.0 / texSize;
 
 	vec2 uv = texCoords;
 	vec2 f = fract( uv * texSize );

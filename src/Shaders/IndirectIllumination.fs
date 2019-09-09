@@ -30,6 +30,7 @@ const float baseBias = 0.005f;
 
 // RSM Variables
 uniform vec2 VPLSamples[NUM_VPL];
+uniform float VPLWeights[NUM_VPL];
 uniform float rsmRMax;
 uniform float rsmIntensity;
 
@@ -92,7 +93,7 @@ vec3 indirectIllumination(vec3 FragPos, vec4 LightSpacePos, vec3 Normal, vec3 Di
     	//if(dist <= 0.0)
     	//	continue;
 
-    	float weight = rnd.x * rnd.x;
+    	float weight = VPLWeights[i];
     	indirect = indirect * weight;
         //indirect = indirect * (1.0 / float(NUM_VPL));
     	result += indirect;

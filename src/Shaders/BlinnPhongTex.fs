@@ -48,6 +48,7 @@ const float baseBias = 0.005f;
 
 // RSM Variables
 uniform vec2 VPLSamples[NUM_VPL];
+uniform float VPLWeights[NUM_VPL];
 uniform float rsmRMax;
 uniform float rsmIntensity;
 
@@ -157,7 +158,7 @@ vec3 directIllumination() {
 		diff = light.emission * ( fetchDiffuse() * NdotL);
 		spec = light.emission * ( specular * pow(NdotH, shininess));
 
-		float distance = length(light.position - FragPos);
+		float distance = length(light.position - vsIn.position);
 		float attenuation = 1.0 / (1.0 + light.linear * distance + light.quadratic * pow(distance, 2.0));
 
 		diff *= attenuation;
@@ -202,7 +203,7 @@ vec3 indirectIllumination() {
         indirect = vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
         /**/
 
-    	float weight = rnd.x * rnd.x;
+    	float weight = VPLWeights[i];
 
     	indirect = indirect * weight;
     	result += indirect;

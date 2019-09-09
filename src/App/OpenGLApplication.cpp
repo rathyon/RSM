@@ -60,12 +60,16 @@ void OpenGLApplication::reshape(int w, int h) {
 	// TODO: RESET GBUFFER PARAMS! -> is it needed?
 }
 
-Scene OpenGLApplication::getScene() {
-	return _scene;
+Scene* OpenGLApplication::getScene() {
+	return &_scene;
 }
 
 sref<Camera> OpenGLApplication::getCamera() {
 	return _camera;
+}
+
+void OpenGLApplication::setCamera(const sref<Camera>& camera) {
+	_camera = camera;
 }
 
 std::vector<GLuint> OpenGLApplication::programs() {
@@ -175,6 +179,7 @@ void OpenGLApplication::prepareRSM() {
 		double* sample = hammersley(i, 2, NUM_VPL);
 		VPLSamples[i][0] = (float)sample[0];
 		VPLSamples[i][1] = (float)sample[1];
+		VPLWeights[i] = VPLSamples[i][0] * VPLSamples[i][0];
 	}
 
 	// upload RSM data
@@ -183,9 +188,14 @@ void OpenGLApplication::prepareRSM() {
 		for (int i = 0; i < NUM_VPL; i++) {
 			std::string name = "VPLSamples[" + std::to_string(i) + "]";
 			glUniform2fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(glm::vec2(VPLSamples[i][0], VPLSamples[i][1])));
+			name = "VPLWeights[" + std::to_string(i) + "]";
+			glUniform1f(glGetUniformLocation(prog, name.c_str()), VPLWeights[i]);
 		}
 		glUniform1f(glGetUniformLocation(prog, "rsmRMax"), _rsmRMax);
 		glUniform1f(glGetUniformLocation(prog, "rsmIntensity"), _rsmIntensity);
+
+		glUniform2f(glGetUniformLocation(prog, "lowResIndirectSize"), (float)LOW_RES_INDIRECT_WIDTH, (float)LOW_RES_INDIRECT_HEIGHT);
+		glUniform2f(glGetUniformLocation(prog, "texelSize"), 1.0f / (float)LOW_RES_INDIRECT_WIDTH, 1.0f / (float)LOW_RES_INDIRECT_HEIGHT);
 	}
 	glUseProgram(0);
 
@@ -197,8 +207,8 @@ void OpenGLApplication::prepareRSM() {
 	// e.g max dist = 10 world space units; cos(45deg) 
 	_indirectSampleParams = glm::vec4(4.0f, 1.0f, glm::cos(glm::radians(45.0f)), 1.0f);
 
-	_indirectLowResWidth = 256;
-	_indirectLowResHeight = 256;
+	_indirectLowResWidth = LOW_RES_INDIRECT_WIDTH;
+	_indirectLowResHeight = LOW_RES_INDIRECT_HEIGHT;
 	glGenFramebuffers(1, &_indirectLowResFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, _indirectLowResFBO);
 
@@ -219,110 +229,14 @@ void OpenGLApplication::prepareRSM() {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void OpenGLApplication::prepareLights() {
-	/* ===================================================================================
-			Lights
-	=====================================================================================*/
-
-	/** /
-	sref<SpotLight> spot = make_sref<SpotLight>(glm::vec3(1.0f, 1.0f, 1.0f), 3.0f, 30.0f, glm::vec3(-0.5f, -1.0f, -0.5f), glm::vec3(2.0f, 8.0f, 2.0f));
-	_scene.addLight(spot);
-	spot->prepare(1024);
-	/**/
-
-	/** /
-	sref<Light> candle = make_sref<PointLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 7.0f, 2.0f));
-	_scene.addLight(candle);
-	candle->prepare(1024, 1024);
-	/**/
-
-	/**/
-	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
-	_scene.addLight(sun);
-	sun->prepare(_width, _height);
-	/**/
-}
-
 void OpenGLApplication::prepare() {
-
-	/* ===================================================================================
-			Cameras
-	=====================================================================================*/
-
-	// Lucy cam
-	/** /
-	_camera = make_sref<Perspective>(_width, _height,
-		vec3(-5.0f, 3.0f, -6.0f),
-		vec3(0.0f, 3.5f, 0.0f),
-		vec3(0.0f, 1.0f, 0.0f),
-		0.1f, 1000.0f, 60.0f);
-	/**/
-
-	// sponza cam
-	/** /
-    _camera = make_sref<Perspective>(_width, _height,
-         vec3(0.0f, 0.0f, 0.0f),
-         vec3(10.0f, 0.0f, 0.0f),
-         vec3(0.0f, 1.0f, 0.0f),
-         0.1f, 100000.0f, 60.0f);
-	/**/
-
-	// sponza dir light cam
-	/** /
-	_camera = make_sref<Perspective>(_width, _height,
-		vec3(100.0f, 100.0f, 0.0f),
-		vec3(0.0f, 0.0f, 0.0f),
-		vec3(0.0f, 1.0f, 0.0f),
-		0.1f, 10000.0f, 60.0f);
-	/**/
-
-	// Cornell Cam
-	/**/
-	_camera = make_sref<Perspective>(_width, _height,
-		vec3(0.0f, 3.0f, 6.0f),
-		vec3(0.0f, 3.0f, 0.0f),
-		vec3(0.0f, 1.0f, 0.0f),
-		0.1f, 1000.0f, 60.0f);
-	/**/
-
-	_scene.addCamera(_camera);
-
-	/* ===================================================================================
-			Models
-	=====================================================================================*/
-
-	/** /
-	sref<Model> sponza = RM.getModel("sponza");
-	sponza->prepare();
-	_scene.addModel(sponza);
-
-	sponza->setScale(0.05f, 0.05f, 0.05f);
-	/**/
-
-	/** /
-	sref<Model> demo_scene = RM.getModel("demo_scene");
-	demo_scene->prepare();
-	_scene.addModel(demo_scene);
-	/**/
-
-	/** /
-	sref<Model> Lucy = RM.getModel("Lucy");
-	Lucy->prepare();
-	_scene.addModel(Lucy);
-	/**/
-
-	/**/
-	sref<Model> CB = RM.getModel("CB");
-	CB->prepare();
-	_scene.addModel(CB);
-
-	CB->setScale(3.0f, 3.0f, 3.0f);
-	/**/
 
 	// Prepare shared buffers
 	prepareCameraBuffer();
 
-	//prepareDeferredShading();
+#ifdef RSM_DEFERRED
+	prepareDeferredShading();
+#endif
 
 	prepareRSM();
 
@@ -413,30 +327,44 @@ void OpenGLApplication::render() {
 	genRSMaps();
 	checkOpenGLError("Error generating depth maps!");
 
+#ifdef RSM_NAIVE
+	// Clear framebuffer...
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Upload shadow mapping data...
+	uploadShadowMappingData();
+	checkOpenGLError("Error uploading shadow mapping data!");
+
+	// Render scene...
+	_scene.render();
+#endif
+
+#ifdef RSM_DEFERRED
 	// Geometry Pass (Deferred Shading) GBuffer...
-	//geometryPass();
+	geometryPass();
 	checkOpenGLError("Error in geometry pass!");
 
 	// Clear framebuffer...
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Upload deferred shading data...
-	//uploadDeferredShadingData();
+	uploadDeferredShadingData();
+	checkOpenGLError("Error uploading deferred shading data!");
+
+	// Upload deferred shading data...
+	uploadDeferredShadingData();
 	checkOpenGLError("Error uploading deferred shading data!");
 
 	// Upload shadow mapping data...
 	uploadShadowMappingData();
-    checkOpenGLError("Error uploading shadow mapping data!");
+	checkOpenGLError("Error uploading shadow mapping data!");
 
-	// render low res indirect illumination
-	//renderLowResIndirect();
+	renderLowResIndirect();
 
-	//uploadLowResIndirect();
+	uploadLowResIndirect();
 
-    //renderScreenQuad();
-
-	// Render scene...
-	_scene.render();
+	renderScreenQuad();
+#endif
 
 	checkOpenGLError("Error in render loop!");
 }

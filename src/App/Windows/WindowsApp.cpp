@@ -64,8 +64,47 @@ void rsm::init(int argc, char* argv[]) {
 	glApp->init();
 	RM.init();
 
-	glApp->prepareLights();
-	const sref<Light>& light = glApp->getScene().lights()[0];
+	/* ===================================================================================
+				Lucy
+	=====================================================================================*/
+
+	/** /
+	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
+	glApp->getScene()->addLight(sun);
+	sun->prepare(width, height, 10.0f, 0.1f, 1000.0f);
+	/**/
+
+	/* ===================================================================================
+				Crytek Sponza
+	=====================================================================================*/
+
+	/** /
+	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
+	glApp->getScene()->addLight(sun);
+	sun->prepare(width, height, 100.0f, 0.1f, 10000.0f);
+	/**/
+
+	/* ===================================================================================
+				Cornell Box
+	=====================================================================================*/
+
+	/**/
+	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
+	glApp->getScene()->addLight(sun);
+	sun->prepare(width, height, 10.0f, 0.1f, 1000.0f);
+	/**/
+
+	/* ===================================================================================
+				Unused...
+	=====================================================================================*/
+	/** /
+	// emission, cutoff, direction, position
+	sref<SpotLight> spot = make_sref<SpotLight>(glm::vec3(2.0f, 2.0f, 2.0f), 20.0f, glm::vec3(-1.0f, -0.5f, -1.0f), glm::vec3(8.0f, 8.0f, 8.0f));
+	_scene.addLight(spot);
+	spot->prepare(_width, _height);
+	/**/
+
+	const sref<Light>& light = glApp->getScene()->lights()[0];
 	LightData data;
 	light->toData(data);
 	const int lightType = data.type;
@@ -171,54 +210,74 @@ void rsm::init(int argc, char* argv[]) {
 	RM.addShader("RSMGBuffer", RSMGBuffer);
 
 	/* ===================================================================================
-				Materials
+				Test Scenes
+	=====================================================================================*/
+
+	/* ===================================================================================
+				Lucy
 	=====================================================================================*/
 
 	/** /
-	sref<BlinnPhongMaterial> bp_red = make_sref<BlinnPhongMaterial>();
-	bp_red->setDiffuse(glm::vec3(1.0f, 0.0f, 0.0f));
-	bp_red->setSpecular(glm::vec3(1.0f));
-	bp_red->setShininess(32.0f);
-	bp_red->setProgram(BlinnPhong->id());
+	sref<Model> Lucy = make_sref<Model>("Lucy");
+	Lucy->loadFromFile("../../../assets/models/Lucy/Lucy.obj", "../../../assets/models/Lucy/");
+	RM.addModel("Lucy", Lucy);
+	Lucy->prepare();
+	glApp->getScene()->addModel(Lucy);
+
+	sref<Camera> camera = make_sref<Perspective>(width, height,
+		vec3(-5.0f, 3.0f, -6.0f),
+		vec3(0.0f, 3.5f, 0.0f),
+		vec3(0.0f, 1.0f, 0.0f),
+		0.1f, 1000.0f, 60.0f);
+
+	glApp->setCamera(camera);
+	glApp->getScene()->addCamera(camera);
 	/**/
 
 	/* ===================================================================================
-				Models
+				Crytek Sponza
 	=====================================================================================*/
-	/**/
-
 
 	/** /
 	sref<Model> sponza = make_sref<Model>("sponza");
 	sponza->loadFromFile("../../../assets/models/crytek sponza/sponza.obj", "../../../assets/models/crytek sponza/");
 	RM.addModel("sponza", sponza);
+	sponza->prepare();
+	sponza->setScale(0.05f, 0.05f, 0.05f);
+	glApp->getScene()->addModel(sponza);
+
+	sref<Camera> camera = make_sref<Perspective>(width, height,
+		vec3(0.0f, 0.0f, 0.0f),
+		vec3(10.0f, 0.0f, 0.0f),
+		vec3(0.0f, 1.0f, 0.0f),
+		0.1f, 100000.0f, 60.0f);
+
+	glApp->setCamera(camera);
+	glApp->getScene()->addCamera(camera);
 	/**/
 
-	/** /
-	sref<Model> demo_scene = make_sref<Model>("demo_scene");
-	demo_scene->loadFromFile("../../../assets/models/demo scene open/demo_scene.obj", "../../../assets/models/demo scene open/");
-	RM.addModel("demo_scene", demo_scene);
-	/**/
+	/* ===================================================================================
+				Cornell Box
+	=====================================================================================*/
 
 	/**/
-	sref<Model> Lucy = make_sref<Model>("Lucy");
-	Lucy->loadFromFile("../../../assets/models/Lucy/Lucy.obj", "../../../assets/models/Lucy/");
-	RM.addModel("Lucy", Lucy);	
-	/**/
-
-	/** /
 	sref<Model> CB = make_sref<Model>("CB");
 	CB->loadFromFile("../../../assets/models/CornellBox/CornellBox-Original.obj", "../../../assets/models/CornellBox/");
 	RM.addModel("CB", CB);
+	CB->prepare();
+	CB->setScale(3.0f, 3.0f, 3.0f);
+	glApp->getScene()->addModel(CB);
+
+	sref<Camera> camera = make_sref<Perspective>(width, height,
+		vec3(0.0f, 3.0f, 6.0f),
+		vec3(0.0f, 3.0f, 0.0f),
+		vec3(0.0f, 1.0f, 0.0f),
+		0.1f, 1000.0f, 60.0f);
+
+	glApp->setCamera(camera);
+	glApp->getScene()->addCamera(camera);
 	/**/
 
-	/** /
-	sref<Model> Lucy = make_sref<Model>("Lucy");
-	Lucy->loadFromFile("../../../assets/models/Lucy2/Lucy2.obj", "../../../assets/models/Lucy2/");
-	RM.addModel("Lucy", Lucy);
-	/**/
-
-	/**/
 
 	checkOpenGLError("Error during loading and setup!");
 
@@ -369,9 +428,6 @@ void rsm::mouseMotion(int x, int y) {
 
 void rsm::keyPress(unsigned char key, int x, int y) {
 	keys[key] = true;
-
-	if (keys['f'])
-		glApp->getCamera()->info();
 }
 
 void rsm::keyUp(unsigned char key, int x, int y) {

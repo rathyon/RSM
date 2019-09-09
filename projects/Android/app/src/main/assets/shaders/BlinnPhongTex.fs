@@ -204,8 +204,8 @@ vec3 indirectIllumination() {
 
 void main(void) {
 
-	outColor = vec4( directIllumination() + indirectIllumination(), 1.0);
-	//outColor = vec4( directIllumination(), 1.0);
+	//outColor = vec4( directIllumination() + indirectIllumination(), 1.0);
+	outColor = vec4( directIllumination(), 1.0);
 	//outColor = vec4( indirectIllumination(), 1.0);
 
 	/** /

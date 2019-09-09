@@ -24,7 +24,6 @@ namespace rsm {
 		OpenGLApplication(int width, int height);
 
 		void init();
-		void prepareLights(); // this allows shaders to compile based on light type
 		void prepare();
 		void cleanup();
 
@@ -38,8 +37,9 @@ namespace rsm {
 		int getWidth();
 		int getHeight();
 
-		Scene getScene();
+		Scene* getScene();
 		sref<Camera> getCamera();
+		void setCamera(const sref<Camera>& camera);
 		std::vector<GLuint> programs();
 
 		// RSM
@@ -82,6 +82,7 @@ namespace rsm {
 		float _rsmRMax;
 		float _rsmIntensity;
 		GLfloat VPLSamples[NUM_VPL][2];
+		GLfloat VPLWeights[NUM_VPL];
 
 		int _indirectLowResWidth;
 		int _indirectLowResHeight;

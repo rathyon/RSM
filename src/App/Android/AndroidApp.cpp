@@ -35,9 +35,9 @@ void init() {
 
     // Screen resolutions are:
     // HD+ 1480x720
-    glApp = new OpenGLApplication(1480, 720);
+    //glApp = new OpenGLApplication(1480, 720);
     // FHD+ 2220x1080
-    //glApp = new OpenGLApplication(2220, 1080);
+    glApp = new OpenGLApplication(2220, 1080);
     // WQHD+ 2960x1440
     //glApp = new OpenGLApplication(2960, 1440);
 
@@ -186,7 +186,7 @@ void init() {
             Textures
     =====================================================================================*/
 
-    /** /
+    /**/
     loadTextures("models/crytek sponza/textures", "png", "textures\\");
     /**/
 
@@ -203,7 +203,7 @@ void init() {
     RM.addModel("Lucy", Lucy);
     /**/
 
-    /**/
+    /** /
     sref<Model> CB = make_sref<Model>("CB");
     CB->loadFromMemory(getAssetSource("models/CornellBox/CornellBox-Original.obj"), getAssetSource("models/CornellBox/CornellBox-Original.mtl"));
     RM.addModel("CB", CB);
@@ -221,7 +221,8 @@ void init() {
     RM.addModel("demo_scene", demo_scene);
     /**/
 
-    /** /
+    // Remember to load textures manually!!!
+    /**/
     sref<Model> sponza = make_sref<Model>("sponza");
     sponza->loadFromMemory(getAssetSource("models/crytek sponza/sponza.obj"), getAssetSource("models/crytek sponza/sponza.mtl"));
     RM.addModel("sponza", sponza);

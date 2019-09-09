@@ -18,9 +18,13 @@
 #endif
 
 // ive decided I will only have 1 light AT ANY TIME
-//#define NUM_LIGHTS 1
+//#define RSM_NAIVE
+#define RSM_DEFERRED
 
 #define NUM_VPL 100
+
+#define LOW_RES_INDIRECT_WIDTH 256
+#define LOW_RES_INDIRECT_HEIGHT 256
 
 // Lucy Test Scene:
 #define VPL_DIST_MAX 0.3f
