@@ -18,10 +18,10 @@
 #endif
 
 // ive decided I will only have 1 light AT ANY TIME
-//#define RSM_NAIVE
-#define RSM_DEFERRED
+#define RSM_NAIVE
+//#define RSM_DEFERRED
 
-#define NUM_VPL 100
+#define NUM_VPL 224
 
 #define LOW_RES_INDIRECT_WIDTH 256
 #define LOW_RES_INDIRECT_HEIGHT 256

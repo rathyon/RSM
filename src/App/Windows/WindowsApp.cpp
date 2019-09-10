@@ -13,8 +13,8 @@
 // 1600 x 900
 // 800 x 450
 
-#define WND_W 1600
-#define WND_H 900
+#define WND_W 800
+#define WND_H 450
 
 using namespace rsm;
 
@@ -65,10 +65,30 @@ void rsm::init(int argc, char* argv[]) {
 	RM.init();
 
 	/* ===================================================================================
-				Lucy
+				Conference
+	=====================================================================================*/
+
+	/** /
+	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-25.0f, -15.0f, 0.0f));
+	glApp->getScene()->addLight(sun);
+	sun->prepare(width, height, 15.0f, 0.1f, 10000.0f, glm::vec3(20.0f, 16.f, -3.f), glm::vec3(-5.0f, 1.0f, -3.0f));
+	/**/
+
+	/* ===================================================================================
+				Sphere and Cube
 	=====================================================================================*/
 
 	/**/
+	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(10.0f, -7.5f, -18.0f));
+	glApp->getScene()->addLight(sun);
+	sun->prepare(width, height, 10.0f, 0.1f, 1000.0f, glm::vec3(-7.0f, 10.f, 15.f), glm::vec3(3.0f, 2.5f, -3.0f));
+	/**/
+
+	/* ===================================================================================
+				Lucy
+	=====================================================================================*/
+
+	/** /
 	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
 	glApp->getScene()->addLight(sun);
 	sun->prepare(width, height, 10.0f, 0.1f, 1000.0f, glm::vec3(10.f, 10.f, 10.f), glm::vec3(0.f, 0.f, 0.f));
@@ -124,110 +144,154 @@ void rsm::init(int argc, char* argv[]) {
 	=====================================================================================*/
 	/**/
 
-	std::string lightDef;
-	if (lightType == LightType::LIGHTYPE_DIR)
-		lightDef = "#define DIRECTIONAL\n";
-	else
-		lightDef = "#define SPOTLIGHT\n";
+	{
+		std::string lightDef;
+		if (lightType == LightType::LIGHTYPE_DIR)
+			lightDef = "#define DIRECTIONAL\n";
+		else
+			lightDef = "#define SPOTLIGHT\n";
 
-	ShaderSource vBP = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/BlinnPhong.vs");
-	ShaderSource fBP = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/BlinnPhong.fs");
-	vBP.inject(std::string("#version 330 core\n"));
-	fBP.inject(std::string("#version 330 core\n") +
-		lightDef +
-		std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
-	vBP.compile();
-	fBP.compile();
+		ShaderSource vBP = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/BlinnPhong.vs");
+		ShaderSource fBP = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/BlinnPhong.fs");
+		vBP.inject(std::string("#version 330 core\n"));
+		fBP.inject(std::string("#version 330 core\n") +
+			lightDef +
+			std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
+		vBP.compile();
+		fBP.compile();
 
-	ShaderSource vBPT = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/BlinnPhongTex.vs");
-	ShaderSource fBPT = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/BlinnPhongTex.fs");
-	vBPT.inject(std::string("#version 330 core\n"));
-	fBPT.inject(std::string("#version 330 core\n") +
-		lightDef +
-		std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
-	vBPT.compile();
-	fBPT.compile();
+		ShaderSource vBPT = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/BlinnPhongTex.vs");
+		ShaderSource fBPT = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/BlinnPhongTex.fs");
+		vBPT.inject(std::string("#version 330 core\n"));
+		fBPT.inject(std::string("#version 330 core\n") +
+			lightDef +
+			std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
+		vBPT.compile();
+		fBPT.compile();
 
-	ShaderSource vDS = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/DeferredShading.vs");
-	ShaderSource fDS = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/DeferredShading.fs");
-	vDS.inject(std::string("#version 330 core\n"));
-	fDS.inject(std::string("#version 330 core\n") +
-		lightDef +
-		std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
-	vDS.compile();
-	fDS.compile();
+		ShaderSource vDS = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/DeferredShading.vs");
+		ShaderSource fDS = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/DeferredShading.fs");
+		vDS.inject(std::string("#version 330 core\n"));
+		fDS.inject(std::string("#version 330 core\n") +
+			lightDef +
+			std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
+		vDS.compile();
+		fDS.compile();
 
-	ShaderSource vII = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/IndirectIllumination.vs");
-	ShaderSource fII = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/IndirectIllumination.fs");
-	vII.inject(std::string("#version 330 core\n"));
-	fII.inject(std::string("#version 330 core\n") +
-		std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
-	vII.compile();
-	fII.compile();
+		ShaderSource vII = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/IndirectIllumination.vs");
+		ShaderSource fII = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/IndirectIllumination.fs");
+		vII.inject(std::string("#version 330 core\n"));
+		fII.inject(std::string("#version 330 core\n") +
+			std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
+		vII.compile();
+		fII.compile();
 
-	ShaderSource vGB = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/GBuffer.vs");
-	ShaderSource fGB = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/GBuffer.fs");
-	vGB.inject(std::string("#version 330 core\n"));
-	fGB.inject(std::string("#version 330 core\n"));
-	vGB.compile();
-	fGB.compile();
+		ShaderSource vGB = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/GBuffer.vs");
+		ShaderSource fGB = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/GBuffer.fs");
+		vGB.inject(std::string("#version 330 core\n"));
+		fGB.inject(std::string("#version 330 core\n"));
+		vGB.compile();
+		fGB.compile();
 
-	ShaderSource vRGB = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/RSMGBuffer.vs");
-	ShaderSource fRGB = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/RSMGBuffer.fs");
-	vRGB.inject(std::string("#version 330 core\n"));
-	fRGB.inject(std::string("#version 330 core\n"));
-	vRGB.compile();
-	fRGB.compile();
+		ShaderSource vRGB = ShaderSource(VERTEX_SHADER, "../../../src/Shaders/RSMGBuffer.vs");
+		ShaderSource fRGB = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/RSMGBuffer.fs");
+		vRGB.inject(std::string("#version 330 core\n"));
+		fRGB.inject(std::string("#version 330 core\n"));
+		vRGB.compile();
+		fRGB.compile();
 
-	sref<Shader> BlinnPhong = make_sref<Shader>("BlinnPhong");
-	BlinnPhong->addShader(vBP);
-	BlinnPhong->addShader(fBP);
-	BlinnPhong->link();
-	RM.addShader("BlinnPhong", BlinnPhong);
-	glApp->addProgram(BlinnPhong->id());
+		sref<Shader> BlinnPhong = make_sref<Shader>("BlinnPhong");
+		BlinnPhong->addShader(vBP);
+		BlinnPhong->addShader(fBP);
+		BlinnPhong->link();
+		RM.addShader("BlinnPhong", BlinnPhong);
+		glApp->addProgram(BlinnPhong->id());
 
-	sref<Shader> BlinnPhongTex = make_sref<Shader>("BlinnPhongTex");
-	BlinnPhongTex->addShader(vBPT);
-	BlinnPhongTex->addShader(fBPT);
-	BlinnPhongTex->link();
-	RM.addShader("BlinnPhongTex", BlinnPhongTex);
-	glApp->addProgram(BlinnPhongTex->id());
+		sref<Shader> BlinnPhongTex = make_sref<Shader>("BlinnPhongTex");
+		BlinnPhongTex->addShader(vBPT);
+		BlinnPhongTex->addShader(fBPT);
+		BlinnPhongTex->link();
+		RM.addShader("BlinnPhongTex", BlinnPhongTex);
+		glApp->addProgram(BlinnPhongTex->id());
 
-	sref<Shader> DeferredShading = make_sref<Shader>("DeferredShading");
-	DeferredShading->addShader(vDS);
-	DeferredShading->addShader(fDS);
-	DeferredShading->link();
-	RM.addShader("DeferredShading", DeferredShading);
-	glApp->addProgram(DeferredShading->id());
+		sref<Shader> DeferredShading = make_sref<Shader>("DeferredShading");
+		DeferredShading->addShader(vDS);
+		DeferredShading->addShader(fDS);
+		DeferredShading->link();
+		RM.addShader("DeferredShading", DeferredShading);
+		glApp->addProgram(DeferredShading->id());
 
-	sref<Shader> IndirectIllumination = make_sref<Shader>("IndirectIllumination");
-	IndirectIllumination->addShader(vII);
-	IndirectIllumination->addShader(fII);
-	IndirectIllumination->link();
-	RM.addShader("IndirectIllumination", IndirectIllumination);
-	glApp->addProgram(IndirectIllumination->id());
+		sref<Shader> IndirectIllumination = make_sref<Shader>("IndirectIllumination");
+		IndirectIllumination->addShader(vII);
+		IndirectIllumination->addShader(fII);
+		IndirectIllumination->link();
+		RM.addShader("IndirectIllumination", IndirectIllumination);
+		glApp->addProgram(IndirectIllumination->id());
 
-	sref<Shader> GBuffer = make_sref<Shader>("GBuffer");
-	GBuffer->addShader(vGB);
-	GBuffer->addShader(fGB);
-	GBuffer->link();
-	RM.addShader("GBuffer", GBuffer);
+		sref<Shader> GBuffer = make_sref<Shader>("GBuffer");
+		GBuffer->addShader(vGB);
+		GBuffer->addShader(fGB);
+		GBuffer->link();
+		RM.addShader("GBuffer", GBuffer);
 
-	sref<Shader> RSMGBuffer = make_sref<Shader>("RSMGBuffer");
-	RSMGBuffer->addShader(vRGB);
-	RSMGBuffer->addShader(fRGB);
-	RSMGBuffer->link();
-	RM.addShader("RSMGBuffer", RSMGBuffer);
+		sref<Shader> RSMGBuffer = make_sref<Shader>("RSMGBuffer");
+		RSMGBuffer->addShader(vRGB);
+		RSMGBuffer->addShader(fRGB);
+		RSMGBuffer->link();
+		RM.addShader("RSMGBuffer", RSMGBuffer);
+	}
 
 	/* ===================================================================================
 				Test Scenes
 	=====================================================================================*/
 
 	/* ===================================================================================
-				Lucy
+				Conference
+	=====================================================================================*/
+
+	/** /
+	sref<Model> Conference = make_sref<Model>("Conference");
+	Conference->loadFromFile("../../../assets/models/Conference Modified/conference.obj", "../../../assets/models/Conference Modified/");
+	RM.addModel("Conference", Conference);
+	Conference->prepare();
+	glApp->getScene()->addModel(Conference);
+
+	sref<Camera> camera = make_sref<Perspective>(width, height,
+		vec3(6.5f, 4.0f, -10.0f),
+		vec3(-5.0f, 2.0f, -1.0f),
+		vec3(0.0f, 1.0f, 0.0f),
+		0.1f, 1000.0f, 60.0f);
+
+	glApp->setCamera(camera);
+	glApp->getScene()->addCamera(camera);
+	/**/
+
+	/* ===================================================================================
+				Sphere and Cube
 	=====================================================================================*/
 
 	/**/
+	sref<Model> SphereCube = make_sref<Model>("SphereCube");
+	SphereCube->loadFromFile("../../../assets/models/Sphere and Cube/spherecube.obj", "../../../assets/models/Sphere and Cube/");
+	RM.addModel("SphereCube", SphereCube);
+	SphereCube->prepare();
+	glApp->getScene()->addModel(SphereCube);
+
+	sref<Camera> camera = make_sref<Perspective>(width, height,
+		vec3(0.0f, 5.0f, 12.0f),
+		vec3(0.0f, 2.5f, -1.0f),
+		vec3(0.0f, 1.0f, 0.0f),
+		0.1f, 1000.0f, 60.0f);
+
+	glApp->setCamera(camera);
+	glApp->getScene()->addCamera(camera);
+	/**/
+
+	/* ===================================================================================
+				Lucy
+	=====================================================================================*/
+
+	/** /
 	sref<Model> Lucy = make_sref<Model>("Lucy");
 	Lucy->loadFromFile("../../../assets/models/Lucy/Lucy.obj", "../../../assets/models/Lucy/");
 	RM.addModel("Lucy", Lucy);
@@ -301,8 +365,8 @@ void rsm::init(int argc, char* argv[]) {
 	glApp->getScene()->addModel(sibenik);
 
 	sref<Camera> camera = make_sref<Perspective>(width, height,
-		vec3(0.0f, 0.0f, 0.0f),
-		vec3(10.0f, 0.0f, 0.0f),
+		vec3(-2.0f, 5.0f, 1.5f),
+		vec3(13.0f, 2.0f, -1.0f),
 		vec3(0.0f, 1.0f, 0.0f),
 		0.1f, 100000.0f, 60.0f);
 
