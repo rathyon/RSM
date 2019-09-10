@@ -251,10 +251,10 @@ void main(void) {
 
 	//outColor = vec4(directIllumination(), 1.0);
 	//outColor = vec4(indirectIllumination(), 1.0);
-	outColor = vec4(directIllumination() + indirectIllumination(), 1.0);
+	//outColor = vec4(directIllumination() + indirectIllumination(), 1.0);
 	//outColor = vec4(texture(lowResIndirect, texCoords).rgb, 1.0);
 
-	/** /
+	/**/
 	vec3 direct = directIllumination();
 
 	//ivec2 texSizei = textureSize(lowResIndirect, 0);
@@ -280,6 +280,45 @@ void main(void) {
 
 	vec3 indirect = vec3(0.0);
 
+	// Home made "Average" interpolation
+	/** /
+		vec3 diff = FragPos - texture(gPosition, tl_uv).rgb;
+	if ((dot(diff, diff) < indirectSampleParams.x) && (dot(N, texture(gNormal, tl_uv).rgb) >= indirectSampleParams.z)){
+		viableSamples += 1;
+		indirect += tl;
+	}
+	// top right
+	diff = FragPos - texture(gPosition, tr_uv).rgb;
+	if ((dot(diff, diff) < indirectSampleParams.x) && (dot(N, texture(gNormal, tr_uv).rgb) >= indirectSampleParams.z)){
+		viableSamples += 1;
+		indirect += tr;
+	}
+	// bottom left
+	diff = FragPos - texture(gPosition, bl_uv).rgb;
+	if ((dot(diff, diff) < indirectSampleParams.x) && (dot(N, texture(gNormal, bl_uv).rgb) >= indirectSampleParams.z)){
+		viableSamples += 1;
+		indirect += bl;
+	}
+	// bottom right
+	diff = FragPos - texture(gPosition, br_uv).rgb;
+	if ((dot(diff, diff) < indirectSampleParams.x) && (dot(N, texture(gNormal, br_uv).rgb) >= indirectSampleParams.z)){
+		viableSamples += 1;
+		indirect += br;
+	}
+
+	if(viableSamples >= 3) {
+		indirect = indirect / viableSamples;
+		outColor = vec4(direct + indirect, 1.0f);
+	}
+	else{
+		outColor = vec4(direct + indirectIllumination(), 1.0);
+
+		//tag non reconstructible
+		//outColor = vec4(0.0f, 1.0f, 1.0f, 1.0f);
+	}
+
+	// Bilinear Screen Space Interpolation
+	/**/
 	// top left
 	vec3 diff = FragPos - texture(gPosition, tl_uv).rgb;
 	if ((dot(diff, diff) < indirectSampleParams.x) && (dot(N, texture(gNormal, tl_uv).rgb) >= indirectSampleParams.z)){
@@ -313,7 +352,7 @@ void main(void) {
 		br = bl;
 	}
 
-	// basically its always linear interpolation with 4, I just do a cheat when the 4th one is invalid...
+	// basically its always bilinear interpolation with 4, I just do a cheat when the 4th one is invalid...
 	if(viableSamples >= 3){
 	    vec3 tA = mix( tl, tr, f.x );
 	    vec3 tB = mix( bl, br, f.x );
@@ -324,7 +363,7 @@ void main(void) {
 		outColor = vec4(direct + indirectIllumination(), 1.0);
 
 		//tag non reconstructible
-		//outColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+		//outColor = vec4(0.0f, 1.0f, 1.0f, 1.0f);
 	}
 	/**/
 

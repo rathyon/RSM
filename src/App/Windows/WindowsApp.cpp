@@ -13,8 +13,8 @@
 // 1600 x 900
 // 800 x 450
 
-#define WND_W 800	
-#define WND_H 450
+#define WND_W 1600
+#define WND_H 900
 
 using namespace rsm;
 
@@ -68,10 +68,10 @@ void rsm::init(int argc, char* argv[]) {
 				Lucy
 	=====================================================================================*/
 
-	/** /
+	/**/
 	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
 	glApp->getScene()->addLight(sun);
-	sun->prepare(width, height, 10.0f, 0.1f, 1000.0f);
+	sun->prepare(width, height, 10.0f, 0.1f, 1000.0f, glm::vec3(10.f, 10.f, 10.f), glm::vec3(0.f, 0.f, 0.f));
 	/**/
 
 	/* ===================================================================================
@@ -88,10 +88,20 @@ void rsm::init(int argc, char* argv[]) {
 				Cornell Box
 	=====================================================================================*/
 
-	/**/
+	/** /
 	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
 	glApp->getScene()->addLight(sun);
 	sun->prepare(width, height, 10.0f, 0.1f, 1000.0f);
+	/**/
+
+	/* ===================================================================================
+				Sibenik
+	=====================================================================================*/
+
+	/** /
+	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
+	glApp->getScene()->addLight(sun);
+	sun->prepare(width, height, 10.0f, 0.1f, 10000.0f, glm::vec3(-10.f, 10.f, 0.f), glm::vec3(15.f, 0.f, 0.f));
 	/**/
 
 	/* ===================================================================================
@@ -217,7 +227,7 @@ void rsm::init(int argc, char* argv[]) {
 				Lucy
 	=====================================================================================*/
 
-	/** /
+	/**/
 	sref<Model> Lucy = make_sref<Model>("Lucy");
 	Lucy->loadFromFile("../../../assets/models/Lucy/Lucy.obj", "../../../assets/models/Lucy/");
 	RM.addModel("Lucy", Lucy);
@@ -260,7 +270,7 @@ void rsm::init(int argc, char* argv[]) {
 				Cornell Box
 	=====================================================================================*/
 
-	/**/
+	/** /
 	sref<Model> CB = make_sref<Model>("CB");
 	CB->loadFromFile("../../../assets/models/CornellBox/CornellBox-Original.obj", "../../../assets/models/CornellBox/");
 	RM.addModel("CB", CB);
@@ -273,6 +283,28 @@ void rsm::init(int argc, char* argv[]) {
 		vec3(0.0f, 3.0f, 0.0f),
 		vec3(0.0f, 1.0f, 0.0f),
 		0.1f, 1000.0f, 60.0f);
+
+	glApp->setCamera(camera);
+	glApp->getScene()->addCamera(camera);
+	/**/
+
+	/* ===================================================================================
+				Sibenik
+	=====================================================================================*/
+
+	/** /
+	sref<Model> sibenik = make_sref<Model>("sibenik");
+	sibenik->loadFromFile("../../../assets/models/Sibenik Modified/sibenik.obj", "../../../assets/models/Sibenik Modified/");
+	RM.addModel("sibenik", sibenik);
+	sibenik->prepare();
+	//sibenik->setScale(0.05f, 0.05f, 0.05f);
+	glApp->getScene()->addModel(sibenik);
+
+	sref<Camera> camera = make_sref<Perspective>(width, height,
+		vec3(0.0f, 0.0f, 0.0f),
+		vec3(10.0f, 0.0f, 0.0f),
+		vec3(0.0f, 1.0f, 0.0f),
+		0.1f, 100000.0f, 60.0f);
 
 	glApp->setCamera(camera);
 	glApp->getScene()->addCamera(camera);

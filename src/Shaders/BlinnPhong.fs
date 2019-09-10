@@ -205,9 +205,7 @@ vec3 indirectIllumination() {
         indirect = vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
         /**/
 
-    	float weight = VPLWeights[i];
-
-    	indirect = indirect * weight;
+    	indirect = indirect * VPLWeights[i];
     	result += indirect;
     }
 	return result * diffuse * rsmIntensity;
@@ -215,6 +213,7 @@ vec3 indirectIllumination() {
 
 void main(void) {
 
+	//outColor = vec4(diffuse, 1.0f);
 	outColor = vec4( directIllumination() + indirectIllumination(), 1.0);
 	//outColor = vec4( directIllumination(), 1.0);
 	//outColor = vec4( indirectIllumination(), 1.0);

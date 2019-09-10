@@ -29,14 +29,16 @@ GLenum DirectionalLight::depthMapType() {
 	return OpenGLTexTargets[IMG_2D];
 }
 
-void DirectionalLight::prepare(int width, int height, float orthoDim, float nearP, float farP) {
+void DirectionalLight::prepare(int width, int height, float orthoDim, float nearP, float farP, glm::vec3 eye, glm::vec3 at) {
 	_gBufferWidth = width;
 	_gBufferHeight = height;
 
 	// shadow mapping for directional lights is weird, they need a "position" for generating the depth map...
 	_projMatrix = glm::ortho(-orthoDim, orthoDim, -orthoDim, orthoDim, nearP, farP);
-	_viewMatrix = glm::lookAt(_direction * -orthoDim,
-		glm::vec3(0.0f, 0.0f, 0.0f),
+	//_viewMatrix = glm::lookAt(_direction * -orthoDim,
+		//glm::vec3(0.0f, 0.0f, 0.0f),
+		//glm::vec3(0.0f, 1.0f, 0.0f));
+	_viewMatrix = glm::lookAt(eye, at,
 		glm::vec3(0.0f, 1.0f, 0.0f));
 	_viewProjMatrix = _projMatrix * _viewMatrix;
 

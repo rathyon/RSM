@@ -18,7 +18,7 @@ namespace rsm {
 
 		// shadow mapping
 		GLenum depthMapType() override;
-		void prepare(int width, int height, float orthoDim, float nearP, float farP);
+		void prepare(int width, int height, float orthoDim, float nearP, float farP, glm::vec3 eye, glm::vec3 at);
 		void uploadSpatialData(GLuint program) override;
 		void uploadShadowMapData(GLuint program) override;
 
