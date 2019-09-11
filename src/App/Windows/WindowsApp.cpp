@@ -99,9 +99,10 @@ void rsm::init(int argc, char* argv[]) {
 	=====================================================================================*/
 
 	/** /
-	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
+	glDisable(GL_CULL_FACE);
+	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-89.5f, -85.0f, -15.0f));
 	glApp->getScene()->addLight(sun);
-	sun->prepare(width, height, 100.0f, 0.1f, 10000.0f);
+	sun->prepare(width, height, 100.0f, 0.1f, 100000.0f, glm::vec3(50.f, 85.f, 5.f), glm::vec3(-39.5f, 0.f, -10.f));
 	/**/
 
 	/* ===================================================================================
@@ -109,9 +110,9 @@ void rsm::init(int argc, char* argv[]) {
 	=====================================================================================*/
 
 	/** /
-	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
+	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-0.5f, -0.4f, -1.0f));
 	glApp->getScene()->addLight(sun);
-	sun->prepare(width, height, 10.0f, 0.1f, 1000.0f);
+	sun->prepare(width, height, 10.0f, 0.1f, 1000.0f, glm::vec3(5.f, 4.f, 10.f), glm::vec3(0.f, 0.f, 0.f));
 	/**/
 
 	/* ===================================================================================
@@ -321,8 +322,8 @@ void rsm::init(int argc, char* argv[]) {
 	glApp->getScene()->addModel(sponza);
 
 	sref<Camera> camera = make_sref<Perspective>(width, height,
-		vec3(0.0f, 0.0f, 0.0f),
-		vec3(10.0f, 0.0f, 0.0f),
+		vec3(2.0f, 11.0f, -2.0f),
+		vec3(-71.0f, 14.0f, -4.0f),
 		vec3(0.0f, 1.0f, 0.0f),
 		0.1f, 100000.0f, 60.0f);
 

@@ -272,6 +272,7 @@ void OpenGLApplication::geometryPass() {
 }
 
 void OpenGLApplication::genRSMaps() {
+	glDisable(GL_CULL_FACE);
 	GLuint GB = RM.getShader("RSMGBuffer")->id();
 	uploadLights(GB);
 
@@ -291,6 +292,7 @@ void OpenGLApplication::genRSMaps() {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	// reset viewport
 	glViewport(0, 0, _width, _height);
+	glEnable(GL_CULL_FACE);
 }
 
 void OpenGLApplication::renderLowResIndirect() {
