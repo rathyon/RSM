@@ -21,10 +21,10 @@
 #define RSM_NAIVE
 //#define RSM_DEFERRED
 
-#define NUM_VPL 224
+#define NUM_VPL 128
 
-#define LOW_RES_INDIRECT_WIDTH 256
-#define LOW_RES_INDIRECT_HEIGHT 256
+#define LOW_RES_INDIRECT_WIDTH 128
+#define LOW_RES_INDIRECT_HEIGHT 128
 
 // Lucy Test Scene:
 #define VPL_DIST_MAX 0.3f

@@ -300,8 +300,8 @@ void rsm::init(int argc, char* argv[]) {
 	glApp->getScene()->addModel(Lucy);
 
 	sref<Camera> camera = make_sref<Perspective>(width, height,
-		vec3(-5.0f, 3.0f, -6.0f),
-		vec3(0.0f, 3.5f, 0.0f),
+		vec3(7.75f, 5.0f, 2.0f),
+		vec3(-4.6f, 2.4f, -2.2f),
 		vec3(0.0f, 1.0f, 0.0f),
 		0.1f, 1000.0f, 60.0f);
 

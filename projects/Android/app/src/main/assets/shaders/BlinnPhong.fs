@@ -42,6 +42,7 @@ const float baseBias = 0.005f;
 
 // RSM Variables
 uniform vec2 VPLSamples[NUM_VPL];
+uniform float VPLWeights[NUM_VPL];
 uniform float rsmRMax;
 uniform float rsmIntensity;
 
@@ -159,7 +160,7 @@ vec3 directIllumination() {
 		diff = light.emission * ( diffuse * NdotL);
 		spec = light.emission * ( specular * pow(NdotH, shininess));
 
-		float distance = length(light.position - FragPos);
+		float distance = length(light.position - vsIn.position);
 		float attenuation = 1.0 / (1.0 + light.linear * distance + light.quadratic * pow(distance, 2.0));
 
 		diff *= attenuation;
@@ -204,18 +205,17 @@ vec3 indirectIllumination() {
         indirect = vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
         /**/
 
-    	float weight = rnd.x * rnd.x;
-
-    	indirect = indirect * weight;
+    	indirect = indirect * VPLWeights[i];
     	result += indirect;
     }
-	return (result * diffuse) * rsmIntensity;
+	return result * diffuse * rsmIntensity;
 }
 
 void main(void) {
 
-	//outColor = vec4( directIllumination() + indirectIllumination(), 1.0);
-	outColor = vec4( directIllumination(), 1.0);
+	//outColor = vec4(diffuse, 1.0f);
+	outColor = vec4( directIllumination() + indirectIllumination(), 1.0);
+	//outColor = vec4( directIllumination(), 1.0);
 	//outColor = vec4( indirectIllumination(), 1.0);
 
 	// deferred shading testing
@@ -223,4 +223,7 @@ void main(void) {
 
 	// rsm maps testing
 	//outColor = vec4(texture(positionMap, vsIn.texCoords).rgb, 1.0);
+
+	//artifact testing
+	//...
 }
