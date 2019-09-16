@@ -280,45 +280,7 @@ void main(void) {
 
 	vec3 indirect = vec3(0.0);
 
-	// Home made "Average" interpolation
-	/** /
-		vec3 diff = FragPos - texture(gPosition, tl_uv).rgb;
-	if ((dot(diff, diff) < indirectSampleParams.x) && (dot(N, texture(gNormal, tl_uv).rgb) >= indirectSampleParams.z)){
-		viableSamples += 1;
-		indirect += tl;
-	}
-	// top right
-	diff = FragPos - texture(gPosition, tr_uv).rgb;
-	if ((dot(diff, diff) < indirectSampleParams.x) && (dot(N, texture(gNormal, tr_uv).rgb) >= indirectSampleParams.z)){
-		viableSamples += 1;
-		indirect += tr;
-	}
-	// bottom left
-	diff = FragPos - texture(gPosition, bl_uv).rgb;
-	if ((dot(diff, diff) < indirectSampleParams.x) && (dot(N, texture(gNormal, bl_uv).rgb) >= indirectSampleParams.z)){
-		viableSamples += 1;
-		indirect += bl;
-	}
-	// bottom right
-	diff = FragPos - texture(gPosition, br_uv).rgb;
-	if ((dot(diff, diff) < indirectSampleParams.x) && (dot(N, texture(gNormal, br_uv).rgb) >= indirectSampleParams.z)){
-		viableSamples += 1;
-		indirect += br;
-	}
-
-	if(viableSamples >= 3) {
-		indirect = indirect / viableSamples;
-		outColor = vec4(direct + indirect, 1.0f);
-	}
-	else{
-		outColor = vec4(direct + indirectIllumination(), 1.0);
-
-		//tag non reconstructible
-		//outColor = vec4(0.0f, 1.0f, 1.0f, 1.0f);
-	}
-
 	// Bilinear Screen Space Interpolation
-	/**/
 	// top left
 	vec3 diff = FragPos - texture(gPosition, tl_uv).rgb;
 	if ((dot(diff, diff) < indirectSampleParams.x) && (dot(N, texture(gNormal, tl_uv).rgb) >= indirectSampleParams.z)){
@@ -374,3 +336,41 @@ void main(void) {
 	outColor = vec4(direct + indirect, 1.0);
 	/**/
 }
+
+	// Home made "Average" interpolation
+    /** /
+		vec3 diff = FragPos - texture(gPosition, tl_uv).rgb;
+	if ((dot(diff, diff) < indirectSampleParams.x) && (dot(N, texture(gNormal, tl_uv).rgb) >= indirectSampleParams.z)){
+		viableSamples += 1;
+		indirect += tl;
+	}
+	// top right
+	diff = FragPos - texture(gPosition, tr_uv).rgb;
+	if ((dot(diff, diff) < indirectSampleParams.x) && (dot(N, texture(gNormal, tr_uv).rgb) >= indirectSampleParams.z)){
+		viableSamples += 1;
+		indirect += tr;
+	}
+	// bottom left
+	diff = FragPos - texture(gPosition, bl_uv).rgb;
+	if ((dot(diff, diff) < indirectSampleParams.x) && (dot(N, texture(gNormal, bl_uv).rgb) >= indirectSampleParams.z)){
+		viableSamples += 1;
+		indirect += bl;
+	}
+	// bottom right
+	diff = FragPos - texture(gPosition, br_uv).rgb;
+	if ((dot(diff, diff) < indirectSampleParams.x) && (dot(N, texture(gNormal, br_uv).rgb) >= indirectSampleParams.z)){
+		viableSamples += 1;
+		indirect += br;
+	}
+
+	if(viableSamples >= 3) {
+		indirect = indirect / viableSamples;
+		outColor = vec4(direct + indirect, 1.0f);
+	}
+	else{
+		outColor = vec4(direct + indirectIllumination(), 1.0);
+
+		//tag non reconstructible
+		//outColor = vec4(0.0f, 1.0f, 1.0f, 1.0f);
+	}
+    /**/

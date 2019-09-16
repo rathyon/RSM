@@ -90,8 +90,8 @@ vec3 indirectIllumination(vec3 FragPos, vec4 LightSpacePos, vec3 Normal, vec3 Di
         /**/
 
     	// frag == vpl pos???
-    	//if(dist <= 0.0)
-    	//	continue;
+    	if(dist <= 0.0)
+    		continue;
 
     	indirect = indirect * VPLWeights[i];
         //indirect = indirect * (1.0 / float(NUM_VPL));

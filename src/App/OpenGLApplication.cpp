@@ -57,7 +57,6 @@ void OpenGLApplication::reshape(int w, int h) {
 	_height = h;
 	_camera->updateProjMatrix(w, h);
 	glViewport(0, 0, w, h);
-	// TODO: RESET GBUFFER PARAMS! -> is it needed?
 }
 
 Scene* OpenGLApplication::getScene() {
@@ -136,7 +135,7 @@ void OpenGLApplication::prepareDeferredShading() {
 	unsigned int rboDepth;
 	glGenRenderbuffers(1, &rboDepth);
 	glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, _gBufferWidth, _gBufferHeight);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32F, _gBufferWidth, _gBufferHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -234,7 +233,11 @@ void OpenGLApplication::prepare() {
 	// Prepare shared buffers
 	prepareCameraBuffer();
 
-#ifdef RSM_DEFERRED
+#ifdef RSM_DEFERRED_NAIVE
+	prepareDeferredShading();
+#endif
+
+#ifdef RSM_DEFERRED_INTERPOLATED
 	prepareDeferredShading();
 #endif
 
@@ -341,7 +344,30 @@ void OpenGLApplication::render() {
 	_scene.render();
 #endif
 
-#ifdef RSM_DEFERRED
+#ifdef RSM_DEFERRED_NAIVE
+	// Geometry Pass (Deferred Shading) GBuffer...
+	geometryPass();
+	checkOpenGLError("Error in geometry pass!");
+
+	// Clear framebuffer...
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Upload deferred shading data...
+	uploadDeferredShadingData();
+	checkOpenGLError("Error uploading deferred shading data!");
+
+	// Upload deferred shading data...
+	uploadDeferredShadingData();
+	checkOpenGLError("Error uploading deferred shading data!");
+
+	// Upload shadow mapping data...
+	uploadShadowMappingData();
+	checkOpenGLError("Error uploading shadow mapping data!");
+
+	renderScreenQuad();
+#endif
+
+#ifdef RSM_DEFERRED_INTERPOLATED
 	// Geometry Pass (Deferred Shading) GBuffer...
 	geometryPass();
 	checkOpenGLError("Error in geometry pass!");

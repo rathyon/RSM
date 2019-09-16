@@ -33,8 +33,8 @@ void init() {
     // FHD+ 2220x1080
     // WQHD+ 2960x1440
 
-    //width = 1480; height = 720;
-    width = 2220; height = 1080;
+    width = 1480; height = 720;
+    //width = 2220; height = 1080;
     //width = 2960; height = 1440;
 
     glApp = new OpenGLApplication(width, height);
@@ -61,7 +61,7 @@ void init() {
                 Sphere and Cube
     =====================================================================================*/
 
-    /**/
+    /** /
     sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(10.0f, -7.5f, -18.0f));
     glApp->getScene()->addLight(sun);
     sun->prepare(width, height, 10.0f, 0.1f, 1000.0f, glm::vec3(-7.0f, 10.f, 15.f), glm::vec3(3.0f, 2.5f, -3.0f));
@@ -81,10 +81,10 @@ void init() {
                 Crytek Sponza
     =====================================================================================*/
 
-    /** /
+    /**/
     sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-89.5f, -85.0f, -15.0f));
     glApp->getScene()->addLight(sun);
-    sun->prepare(width, height, 100.0f, 0.1f, 100000.0f, glm::vec3(50.f, 85.f, 5.f), glm::vec3(-39.5f, 0.f, -10.f));
+    sun->prepare(width/2, height/2, 100.0f, 0.1f, 100000.0f, glm::vec3(50.f, 85.f, 5.f), glm::vec3(-39.5f, 0.f, -10.f));
     /**/
 
     /* ===================================================================================
@@ -278,7 +278,7 @@ void init() {
                 Sphere and Cube
     =====================================================================================*/
 
-    /**/
+    /** /
     sref<Model> SphereCube = make_sref<Model>("SphereCube");
     SphereCube->loadFromMemory(getAssetSource("models/Sphere and Cube/spherecube.obj"), getAssetSource("models/Sphere and Cube/spherecube.mtl"));
     RM.addModel("SphereCube", SphereCube);
@@ -320,7 +320,7 @@ void init() {
                 Crytek Sponza
     =====================================================================================*/
 
-    /** /
+    /**/
     loadTextures("models/crytek sponza/textures", "png", "textures\\");
     checkOpenGLError("Error during texture loading!");
     LOG("Textures loaded...\n");

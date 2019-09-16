@@ -13,7 +13,7 @@
 // 1600 x 900
 // 800 x 450
 
-#define WND_W 800
+#define WND_W 800		
 #define WND_H 450
 
 using namespace rsm;
@@ -78,7 +78,7 @@ void rsm::init(int argc, char* argv[]) {
 				Sphere and Cube
 	=====================================================================================*/
 
-	/**/
+	/** /
 	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(10.0f, -7.5f, -18.0f));
 	glApp->getScene()->addLight(sun);
 	sun->prepare(width, height, 10.0f, 0.1f, 1000.0f, glm::vec3(-7.0f, 10.f, 15.f), glm::vec3(3.0f, 2.5f, -3.0f));
@@ -98,8 +98,7 @@ void rsm::init(int argc, char* argv[]) {
 				Crytek Sponza
 	=====================================================================================*/
 
-	/** /
-	glDisable(GL_CULL_FACE);
+	/**/
 	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-89.5f, -85.0f, -15.0f));
 	glApp->getScene()->addLight(sun);
 	sun->prepare(width, height, 100.0f, 0.1f, 100000.0f, glm::vec3(50.f, 85.f, 5.f), glm::vec3(-39.5f, 0.f, -10.f));
@@ -271,7 +270,7 @@ void rsm::init(int argc, char* argv[]) {
 				Sphere and Cube
 	=====================================================================================*/
 
-	/**/
+	/** /
 	sref<Model> SphereCube = make_sref<Model>("SphereCube");
 	SphereCube->loadFromFile("../../../assets/models/Sphere and Cube/spherecube.obj", "../../../assets/models/Sphere and Cube/");
 	RM.addModel("SphereCube", SphereCube);
@@ -313,7 +312,7 @@ void rsm::init(int argc, char* argv[]) {
 				Crytek Sponza
 	=====================================================================================*/
 
-	/** /
+	/**/
 	sref<Model> sponza = make_sref<Model>("sponza");
 	sponza->loadFromFile("../../../assets/models/crytek sponza/sponza.obj", "../../../assets/models/crytek sponza/");
 	RM.addModel("sponza", sponza);
