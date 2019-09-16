@@ -74,7 +74,7 @@ void DirectionalLight::prepare(int width, int height, float orthoDim, float near
 	// normals buffer
 	glGenTextures(1, &_normalMap);
 	glBindTexture(GL_TEXTURE_2D, _normalMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_HALF_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);

@@ -243,7 +243,7 @@ uniform vec2 texelSize;
 void main(void) {
 
 	FragPos       = texture(gPosition, texCoords).rgb;
-	N             = texture(gNormal, texCoords).rgb;
+	N             = texture(gNormal, texCoords).rgb * 2.0 - 1.0;
 	Diffuse       = texture(gDiffuse, texCoords).rgb;
 	//Specular      = texture(gSpecular, texCoords).rgb;
 	LightSpacePos = texture(gLightSpacePosition, texCoords);

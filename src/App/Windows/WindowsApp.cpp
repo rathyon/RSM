@@ -88,7 +88,7 @@ void rsm::init(int argc, char* argv[]) {
 				Lucy
 	=====================================================================================*/
 
-	/** /
+	/**/
 	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
 	glApp->getScene()->addLight(sun);
 	sun->prepare(width, height, 10.0f, 0.1f, 1000.0f, glm::vec3(10.f, 10.f, 10.f), glm::vec3(0.f, 0.f, 0.f));
@@ -98,7 +98,7 @@ void rsm::init(int argc, char* argv[]) {
 				Crytek Sponza
 	=====================================================================================*/
 
-	/**/
+	/** /
 	sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-89.5f, -85.0f, -15.0f));
 	glApp->getScene()->addLight(sun);
 	sun->prepare(width, height, 100.0f, 0.1f, 100000.0f, glm::vec3(50.f, 85.f, 5.f), glm::vec3(-39.5f, 0.f, -10.f));
@@ -291,7 +291,7 @@ void rsm::init(int argc, char* argv[]) {
 				Lucy
 	=====================================================================================*/
 
-	/** /
+	/**/
 	sref<Model> Lucy = make_sref<Model>("Lucy");
 	Lucy->loadFromFile("../../../assets/models/Lucy/Lucy.obj", "../../../assets/models/Lucy/");
 	RM.addModel("Lucy", Lucy);
@@ -312,7 +312,7 @@ void rsm::init(int argc, char* argv[]) {
 				Crytek Sponza
 	=====================================================================================*/
 
-	/**/
+	/** /
 	sref<Model> sponza = make_sref<Model>("sponza");
 	sponza->loadFromFile("../../../assets/models/crytek sponza/sponza.obj", "../../../assets/models/crytek sponza/");
 	RM.addModel("sponza", sponza);

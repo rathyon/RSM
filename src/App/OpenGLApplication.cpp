@@ -106,7 +106,7 @@ void OpenGLApplication::prepareDeferredShading() {
 	// - normal color buffer
 	glGenTextures(1, &_gNormal);
 	glBindTexture(GL_TEXTURE_2D, _gNormal);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_HALF_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, _gNormal, 0);
