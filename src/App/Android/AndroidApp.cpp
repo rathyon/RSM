@@ -321,7 +321,7 @@ void init() {
     =====================================================================================*/
 
     /**/
-    loadTextures("models/crytek sponza/textures", "png", "textures\\");
+    loadTextures("models/crytek sponza/textures", "astc", "textures\\");
     checkOpenGLError("Error during texture loading!");
     LOG("Textures loaded...\n");
 

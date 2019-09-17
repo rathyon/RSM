@@ -14,6 +14,7 @@ Texture::Texture(Image img) {
 
 	}
 	else if (_type == IMG_2D) {
+		/** /
 		glTexImage2D(OpenGLTexTargets[_type],
 			0, 
 			OpenGLInternalPixelFormats[img.channels()],
@@ -27,6 +28,21 @@ Texture::Texture(Image img) {
 
 		glGenerateMipmap(OpenGLTexTargets[_type]);
 		checkOpenGLError("Error in generating mipmaps");
+		/**/
+
+		glCompressedTexImage2D(GL_TEXTURE_2D,
+			0,
+			COMPRESSION_FORMAT,
+			img.width(),
+			img.height(),
+			0,
+			img.size(),
+			(const GLvoid*)img.data());
+
+		checkOpenGLError("Error in glCompressedTexImage2D");
+
+		//glGenerateMipmap(OpenGLTexTargets[_type]);
+		//checkOpenGLError("Error in generating mipmaps");
 	}
 	else if (_type == IMG_3D) {
 
@@ -37,7 +53,9 @@ Texture::Texture(Image img) {
 
 	glTexParameteri(OpenGLTexTargets[_type], GL_TEXTURE_WRAP_S, OpenGLTexWrapping[REPEAT]);
 	glTexParameteri(OpenGLTexTargets[_type], GL_TEXTURE_WRAP_T, OpenGLTexWrapping[REPEAT]);
-	glTexParameteri(OpenGLTexTargets[_type], GL_TEXTURE_MIN_FILTER, OpenGLTexFilters[LINEAR_MIPMAP_LINEAR]);
+	// Mipmapping with compressed textures only works on desktop version!
+	//glTexParameteri(OpenGLTexTargets[_type], GL_TEXTURE_MIN_FILTER, OpenGLTexFilters[LINEAR_MIPMAP_LINEAR]);
+	glTexParameteri(OpenGLTexTargets[_type], GL_TEXTURE_MIN_FILTER, OpenGLTexFilters[LINEAR]);
 	glTexParameteri(OpenGLTexTargets[_type], GL_TEXTURE_MAG_FILTER, OpenGLTexFilters[LINEAR]);
 
 	glBindTexture(OpenGLTexTargets[_type], 0);

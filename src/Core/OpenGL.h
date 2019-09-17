@@ -9,12 +9,13 @@
 #include <GLES3/gl32.h>
 #include <GLES3/gl3ext.h>
 #include <EGL/egl.h>
+#define COMPRESSION_FORMAT GL_COMPRESSED_RGBA_ASTC_12x12
 
 #else
 #include <iostream>
 #include <GL/glew.h>
 #include <GL/freeglut.h>
-
+#define COMPRESSION_FORMAT GL_COMPRESSED_RGBA_ASTC_12x12_KHR
 #endif
 
 // just for viewing convenience, and to not forget!

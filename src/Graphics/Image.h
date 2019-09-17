@@ -18,6 +18,18 @@ namespace rsm {
 		IMG_CUBE = 3
 	};
 
+	/* ASTC header declaration. */
+	typedef struct
+	{
+		unsigned char magic[4];
+		unsigned char blockdim_x;
+		unsigned char blockdim_y;
+		unsigned char blockdim_z;
+		unsigned char xsize[3];
+		unsigned char ysize[3];
+		unsigned char zsize[3];
+	} astc_header;
+
 	class Image {
 	public:
 		Image();
@@ -32,6 +44,7 @@ namespace rsm {
 		const int channels() const;
 		const ImageType type() const;
 		unsigned char* data() const;
+		const int size() const;
 
 	private:
 		int _width;
@@ -39,6 +52,9 @@ namespace rsm {
 		int _channels;
 		ImageType _type;
 		unsigned char* _data;
+
+		//ASTC additions
+		int _size; //size in bytes
 	};
 }
 
