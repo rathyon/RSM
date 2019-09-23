@@ -71,27 +71,19 @@ vec3 indirectIllumination(vec3 FragPos, vec4 LightSpacePos, vec3 Normal, vec3 Di
     	vec2 coords = vec2(projCoords.x + rsmRMax*rnd.x*sin(TWO_PI*rnd.y), projCoords.y + rsmRMax*rnd.x*cos(TWO_PI*rnd.y));
 
     	vec3 vplP = texture(positionMap, coords.xy).xyz;
-    	vec3 vplN = normalize(texture(normalMap, coords.xy)).xyz;
+    	vec3 vplN = texture(normalMap, coords.xy).xyz;
     	vec3 vplFlux = texture(fluxMap, coords.xy).rgb;
 
-        // long ver
-        /** /
-    	float dot1 = max(0.0, dot(vplN, normalize(FragPos - vplP)));
-    	float dot2 = max(0.0, dot(Normal, normalize(vplP - FragPos)));
-        indirect = vplFlux * (dot1 * dot2);
-        /**/
-
-        // original ver
-        /**/
         float dot1 = max(0.0, dot(vplN, FragPos - vplP));
         float dot2 = max(0.0, dot(Normal, vplP - FragPos));
+
         float dist = length(vplP - FragPos);
+        // frag == vpl pos???
+        //if(dist <= 0.0)
+        //    continue;
+
         indirect = vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
         /**/
-
-    	// frag == vpl pos???
-    	if(dist <= 0.0)
-    		continue;
 
     	indirect = indirect * VPLWeights[i];
         //indirect = indirect * (1.0 / float(NUM_VPL));

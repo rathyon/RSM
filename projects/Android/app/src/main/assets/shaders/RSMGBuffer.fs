@@ -41,6 +41,6 @@ layout(location = 2) out vec4 flux;
 
 void main(void) {
 	position = vec4(vsIn.position, 1.0);
-	normal = vec4(normalize(vsIn.normal), 1.0);
+	normal = vec4(vsIn.normal, 1.0);
 	flux = vec4(light.emission * fetchDiffuse(), 1.0);
 }

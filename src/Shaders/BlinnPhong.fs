@@ -187,7 +187,7 @@ vec3 indirectIllumination() {
     	vec2 coords = vec2(projCoords.x + rsmRMax*rnd.x*sin(TWO_PI*rnd.y), projCoords.y + rsmRMax*rnd.x*cos(TWO_PI*rnd.y));
 
     	vec3 vplP = texture(positionMap, coords.xy).xyz;
-    	vec3 vplN = normalize(texture(normalMap, coords.xy)).xyz * 2.0 - 1.0;
+    	vec3 vplN = texture(normalMap, coords.xy).rgb;
     	vec3 vplFlux = texture(fluxMap, coords.xy).rgb;
 
         // long ver

@@ -30,7 +30,7 @@ layout(location = 3) out vec4 gLightSpacePosition;
 
 void main(void) {
 	gPosition = vec4(vsIn.position, 1.0);
-	gNormal = vec4(normalize(vsIn.normal), 1.0);
+	gNormal = vec4(vsIn.normal, 1.0);
 	gDiffuse = vec4(fetchDiffuse(), 1.0);
 	gLightSpacePosition = vsIn.lightSpacePosition;
 }

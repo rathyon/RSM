@@ -33,8 +33,8 @@ void init() {
     // FHD+ 2220x1080
     // WQHD+ 2960x1440
 
-    width = 1480; height = 720;
-    //width = 2220; height = 1080;
+    //width = 1480; height = 720;
+    width = 2220; height = 1080;
     //width = 2960; height = 1440;
 
     glApp = new OpenGLApplication(width, height);
@@ -64,7 +64,7 @@ void init() {
     /** /
     sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(10.0f, -7.5f, -18.0f));
     glApp->getScene()->addLight(sun);
-    sun->prepare(width, height, 10.0f, 0.1f, 1000.0f, glm::vec3(-7.0f, 10.f, 15.f), glm::vec3(3.0f, 2.5f, -3.0f));
+    sun->prepare(width, height, 10.0f, 0.1f, 1000.0f, glm::vec3(-7.0f + 6, 10.f, 15.f + 6), glm::vec3(3.0f + 6, 2.5f, -3.0f + 6));
     /**/
 
     /* ===================================================================================
@@ -74,7 +74,7 @@ void init() {
     /** /
     sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
     glApp->getScene()->addLight(sun);
-    sun->prepare(width, height, 10.0f, 0.1f, 1000.0f, glm::vec3(10.f, 10.f, 10.f), glm::vec3(0.f, 0.f, 0.f));
+    sun->prepare(width, height, 10.0f, 0.1f, 1000.0f, glm::vec3(10.f + 6, 10.f, 10.f + 6), glm::vec3(0.f + 6, 0.f, 0.f + 6));
     /**/
 
     /* ===================================================================================
@@ -84,7 +84,7 @@ void init() {
     /**/
     sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-89.5f, -85.0f, -15.0f));
     glApp->getScene()->addLight(sun);
-    sun->prepare(width/2, height/2, 100.0f, 0.1f, 100000.0f, glm::vec3(50.f, 85.f, 5.f), glm::vec3(-39.5f, 0.f, -10.f));
+    sun->prepare(width, height, 100.0f, 0.1f, 100000.0f, glm::vec3(50.f + 150, 85.f, 5.f + 100), glm::vec3(-39.5f + 150, 0.f, -10.f + 100));
     /**/
 
     /* ===================================================================================
@@ -94,7 +94,7 @@ void init() {
     /** /
     sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-0.5f, -0.4f, -1.0f));
     glApp->getScene()->addLight(sun);
-    sun->prepare(width, height, 10.0f, 0.1f, 1000.0f, glm::vec3(5.f, 4.f, 10.f), glm::vec3(0.f, 0.f, 0.f));
+    sun->prepare(width, height, 10.0f, 0.1f, 1000.0f, glm::vec3(5.f + 6, 4.f, 10.f + 6), glm::vec3(0.f + 6, 0.f, 0.f + 6));
     /**/
 
     /* ===================================================================================
@@ -104,7 +104,7 @@ void init() {
     /** /
     sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
     glApp->getScene()->addLight(sun);
-    sun->prepare(width, height, 10.0f, 0.1f, 10000.0f, glm::vec3(-10.f, 10.f, 0.f), glm::vec3(15.f, 0.f, 0.f));
+    sun->prepare(width, height, 10.0f, 0.1f, 10000.0f, glm::vec3(-10.f + 10, 10.f, 0.f + 10), glm::vec3(15.f + 10, 0.f, 0.f + 10));
     /**/
 
     /* ===================================================================================
@@ -283,13 +283,14 @@ void init() {
     SphereCube->loadFromMemory(getAssetSource("models/Sphere and Cube/spherecube.obj"), getAssetSource("models/Sphere and Cube/spherecube.mtl"));
     RM.addModel("SphereCube", SphereCube);
     SphereCube->prepare();
+    SphereCube->setPosition(glm::vec3(6.0f, 0.0f, 6.0f));
     glApp->getScene()->addModel(SphereCube);
 
-    sref<Camera> camera = make_sref<Perspective>(width, height,
-                                                 vec3(0.0f, 5.0f, 12.0f),
-                                                 vec3(0.0f, 2.5f, -1.0f),
-                                                 vec3(0.0f, 1.0f, 0.0f),
-                                                 0.1f, 1000.0f, 60.0f);
+	sref<Camera> camera = make_sref<Perspective>(width, height,
+		vec3(0.0f + 6, 5.0f, 12.0f + 6),
+		vec3(0.0f + 6, 2.5f, -1.0f + 6),
+		vec3(0.0f, 1.0f, 0.0f),
+		0.1f, 1000.0f, 60.0f);
 
     glApp->setCamera(camera);
     glApp->getScene()->addCamera(camera);
@@ -304,13 +305,14 @@ void init() {
     Lucy->loadFromMemory(getAssetSource("models/Lucy/Lucy.obj"), getAssetSource("models/Lucy/Lucy.mtl"));
     RM.addModel("Lucy", Lucy);
     Lucy->prepare();
+    Lucy->setPosition(glm::vec3(6.0f, 0.0f, 6.0f));
     glApp->getScene()->addModel(Lucy);
 
-    sref<Camera> camera = make_sref<Perspective>(width, height,
-        vec3(-5.0f, 3.0f, -6.0f),
-        vec3(0.0f, 3.5f, 0.0f),
-        vec3(0.0f, 1.0f, 0.0f),
-        0.1f, 1000.0f, 60.0f);
+	sref<Camera> camera = make_sref<Perspective>(width, height,
+		vec3(7.75f + 6, 5.0f, 2.0f + 6),
+		vec3(-4.6f + 6, 2.4f, -2.2f + 6),
+		vec3(0.0f, 1.0f, 0.0f),
+		0.1f, 1000.0f, 60.0f);
 
     glApp->setCamera(camera);
     glApp->getScene()->addCamera(camera);
@@ -330,13 +332,14 @@ void init() {
     RM.addModel("sponza", sponza);
     sponza->prepare();
     sponza->setScale(0.05f, 0.05f, 0.05f);
+    sponza->setPosition(glm::vec3(150.0f, 0.0f, 100.0f));
     glApp->getScene()->addModel(sponza);
 
     sref<Camera> camera = make_sref<Perspective>(width, height,
-        vec3(2.0f, 11.0f, -2.0f),
-        vec3(-71.0f, 14.0f, -4.0f),
-        vec3(0.0f, 1.0f, 0.0f),
-        0.1f, 100000.0f, 60.0f);
+         vec3(2.0f + 150, 11.0f, -2.0f + 100),
+         vec3(-71.0f + 150, 14.0f, -4.0f + 100),
+         vec3(0.0f, 1.0f, 0.0f),
+         0.1f, 100000.0f, 60.0f);
 
     glApp->setCamera(camera);
     glApp->getScene()->addCamera(camera);
@@ -352,13 +355,14 @@ void init() {
     RM.addModel("CB", CB);
     CB->prepare();
     CB->setScale(3.0f, 3.0f, 3.0f);
+    CB->setPosition(glm::vec3(6.0f, 0.0f, 6.0f));
     glApp->getScene()->addModel(CB);
 
     sref<Camera> camera = make_sref<Perspective>(width, height,
-        vec3(0.0f, 3.0f, 8.5f),
-        vec3(0.0f, 3.0f, 0.0f),
-        vec3(0.0f, 1.0f, 0.0f),
-        0.1f, 1000.0f, 60.0f);
+		vec3(0.0f + 6, 3.0f, 6.0f + 6),
+		vec3(0.0f + 6, 3.0f, 0.0f + 6),
+		vec3(0.0f, 1.0f, 0.0f),
+		0.1f, 1000.0f, 60.0f);
 
     glApp->setCamera(camera);
     glApp->getScene()->addCamera(camera);
@@ -378,13 +382,14 @@ void init() {
     RM.addModel("sibenik", sibenik);
     sibenik->prepare();
     //sibenik->setScale(0.05f, 0.05f, 0.05f);
+    sibenik->setPosition(glm::vec3(10.0f, 0.0f, 10.0f));
     glApp->getScene()->addModel(sibenik);
 
     sref<Camera> camera = make_sref<Perspective>(width, height,
-        vec3(-2.0f, 5.0f, 1.5f),
-        vec3(13.0f, 2.0f, -1.0f),
-        vec3(0.0f, 1.0f, 0.0f),
-        0.1f, 100000.0f, 60.0f);
+		vec3(-2.0f + 10, 5.0f, 1.5f + 10),
+		vec3(13.0f + 10, 2.0f, -1.0f + 10),
+		vec3(0.0f, 1.0f, 0.0f),
+		0.1f, 100000.0f, 60.0f);
 
     glApp->setCamera(camera);
     glApp->getScene()->addCamera(camera);
