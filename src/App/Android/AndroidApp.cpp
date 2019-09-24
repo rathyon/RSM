@@ -33,8 +33,8 @@ void init() {
     // FHD+ 2220x1080
     // WQHD+ 2960x1440
 
-    //width = 1480; height = 720;
-    width = 2220; height = 1080;
+    width = 1480; height = 720;
+    //width = 2220; height = 1080;
     //width = 2960; height = 1440;
 
     glApp = new OpenGLApplication(width, height);
@@ -84,7 +84,7 @@ void init() {
     /**/
     sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-89.5f, -85.0f, -15.0f));
     glApp->getScene()->addLight(sun);
-    sun->prepare(width, height, 100.0f, 0.1f, 100000.0f, glm::vec3(50.f + 150, 85.f, 5.f + 100), glm::vec3(-39.5f + 150, 0.f, -10.f + 100));
+    sun->prepare(width / 2, height / 2, 100.0f, 0.1f, 100000.0f, glm::vec3(50.f + 150, 85.f, 5.f + 100), glm::vec3(-39.5f + 150, 0.f, -10.f + 100));
     /**/
 
     /* ===================================================================================

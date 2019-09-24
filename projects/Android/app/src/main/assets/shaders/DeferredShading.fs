@@ -31,6 +31,7 @@ const float baseBias = 0.005f;
 // RSM Variables
 uniform float VPLWeights[NUM_VPL];
 uniform vec2 VPLSamples[NUM_VPL];
+uniform vec2 VPLCoords[NUM_VPL];
 uniform float rsmRMax;
 uniform float rsmIntensity;
 
@@ -60,19 +61,24 @@ float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
     if(projCoords.z > 1.0)
         return 1.0;
 
-    float currentDepth = projCoords.z;  
+	/**/
+    float closestDepth = texture(depthMap, projCoords.xy).r;
+    float currentDepth = projCoords.z; 
+
+    float bias = baseBias * tan(acos(dot(N,L)));
+    bias = clamp(bias, 0.0, 0.0005f);
+
+    float shadow = currentDepth - bias > closestDepth  ? 0.0 : 1.0;
+    /**/
+
+    /** /
+    float currentDepth = projCoords.z; 
 
     float bias = baseBias * tan(acos(dot(N,L)));
     bias = clamp(bias, 0.0, 0.0005f);
 
 
     float shadow = 0.0;
-    /** /
-    float closestDepth = texture(depthMap, projCoords.xy).r; 
-    shadow = currentDepth - bias > closestDepth  ? 0.0 : 1.0;
-    /**/
-
-    /**/
     vec2 texelSize = 1.0 / vec2(textureSize(depthMap, 0));
     for(int x = -1; x <= 1; x++){
     	for(int y = -1; y <= 1; y++){
@@ -80,6 +86,7 @@ float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
     		shadow += currentDepth - bias > depth ? 0.0 : 1.0;
     	}
     }
+
     shadow = shadow / 9.0;
     /**/
 
@@ -202,35 +209,26 @@ vec3 indirectIllumination() {
 
     for(int i=0; i < NUM_VPL; i++){
     	vec2 rnd = VPLSamples[i];
-    	vec2 coords = vec2(projCoords.x + rsmRMax*rnd.x*sin(TWO_PI*rnd.y), projCoords.y + rsmRMax*rnd.x*cos(TWO_PI*rnd.y));
+    	//vec2 coords = vec2(projCoords.x + rsmRMax*rnd.x*sin(TWO_PI*rnd.y), projCoords.y + rsmRMax*rnd.x*cos(TWO_PI*rnd.y));
+        vec2 coords = vec2(projCoords.x + VPLCoords[i].x, projCoords.y + VPLCoords[i].y);
 
     	vec3 vplP = texture(positionMap, coords.xy).xyz;
     	vec3 vplN = texture(normalMap, coords.xy).xyz;
-    	vec3 vplFlux = texture(fluxMap, coords.xy).rgb;
 
-        // long ver
-        /** /
-    	float dot1 = max(0.0, dot(vplN, normalize(FragPos - vplP)));
-    	float dot2 = max(0.0, dot(N, normalize(vplP - FragPos)));
-        indirect = vplFlux * (dot1 * dot2);
-        /**/
-
-        // original ver
-        /**/
-        float dot1 = max(0.0, dot(vplN, FragPos - vplP));
         float dot2 = max(0.0, dot(N, vplP - FragPos));
 
+        vec3 vplFlux = texture(fluxMap, coords.xy).rgb;
+
         float dist = length(vplP - FragPos);
+        float dot1 = max(0.0, dot(vplN, FragPos - vplP));
+
     	// frag == vpl pos???
-    	//if(dist <= 0.0)
-    	//	continue;
+    	if(dist <= 0.0)
+    		continue;
 
-        indirect = vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
-        /**/
+        indirect = (vplFlux * (dot1 * dot2) / (dist * dist * dist * dist)) * VPLWeights[i];
 
-    	float weight = VPLWeights[i];
-
-    	indirect = indirect * weight;
+    	//indirect = indirect * VPLWeights[i];
     	//indirect = indirect * (1.0 / float(NUM_VPL));
     	result += indirect;
     }

@@ -83,6 +83,7 @@ namespace rsm {
 		float _rsmIntensity;
 		GLfloat VPLSamples[NUM_VPL][2];
 		GLfloat VPLWeights[NUM_VPL];
+		GLfloat VPLCoords[NUM_VPL][2];
 
 		int _indirectLowResWidth;
 		int _indirectLowResHeight;

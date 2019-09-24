@@ -98,8 +98,8 @@ void OpenGLApplication::prepareDeferredShading() {
 	// - position color buffer
 	glGenTextures(1, &_gPosition);
 	glBindTexture(GL_TEXTURE_2D, _gPosition);
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_HALF_FLOAT, NULL);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R11F_G11F_B10F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_UNSIGNED_INT_10F_11F_11F_REV, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_HALF_FLOAT, NULL);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R11F_G11F_B10F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_UNSIGNED_INT_10F_11F_11F_REV, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _gPosition, 0);
@@ -180,6 +180,8 @@ void OpenGLApplication::prepareRSM() {
 		VPLSamples[i][0] = (float)sample[0];
 		VPLSamples[i][1] = (float)sample[1];
 		VPLWeights[i] = VPLSamples[i][0] * VPLSamples[i][0];
+		VPLCoords[i][0] = VPL_DIST_MAX * VPLSamples[i][0] * glm::sin(TWO_PI * VPLSamples[i][1]);
+		VPLCoords[i][1] = VPL_DIST_MAX * VPLSamples[i][0] * glm::cos(TWO_PI * VPLSamples[i][1]);
 	}
 
 	// upload RSM data
@@ -190,6 +192,8 @@ void OpenGLApplication::prepareRSM() {
 			glUniform2fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(glm::vec2(VPLSamples[i][0], VPLSamples[i][1])));
 			name = "VPLWeights[" + std::to_string(i) + "]";
 			glUniform1f(glGetUniformLocation(prog, name.c_str()), VPLWeights[i]);
+			name = "VPLCoords[" + std::to_string(i) + "]";
+			glUniform2fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(glm::vec2(VPLCoords[i][0], VPLCoords[i][1])));
 		}
 		glUniform1f(glGetUniformLocation(prog, "rsmRMax"), _rsmRMax);
 		glUniform1f(glGetUniformLocation(prog, "rsmIntensity"), _rsmIntensity);

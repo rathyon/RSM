@@ -49,6 +49,7 @@ const float baseBias = 0.005f;
 // RSM Variables
 uniform vec2 VPLSamples[NUM_VPL];
 uniform float VPLWeights[NUM_VPL];
+uniform vec2 VPLCoords[NUM_VPL];
 uniform float rsmRMax;
 uniform float rsmIntensity;
 
@@ -69,13 +70,22 @@ float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
     if(projCoords.z > 1.0)
         return 1.0;
 
-    //float closestDepth = texture(depthMap, projCoords.xy).r;
+	/**/
+    float closestDepth = texture(depthMap, projCoords.xy).r;
     float currentDepth = projCoords.z; 
 
     float bias = baseBias * tan(acos(dot(N,L)));
     bias = clamp(bias, 0.0, 0.0005f);
 
-    //float shadow = currentDepth - bias > closestDepth  ? 0.0 : 1.0;
+    float shadow = currentDepth - bias > closestDepth  ? 0.0 : 1.0;
+    /**/
+
+    /** /
+    float currentDepth = projCoords.z; 
+
+    float bias = baseBias * tan(acos(dot(N,L)));
+    bias = clamp(bias, 0.0, 0.0005f);
+
 
     float shadow = 0.0;
     vec2 texelSize = 1.0 / vec2(textureSize(depthMap, 0));
@@ -87,6 +97,7 @@ float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
     }
 
     shadow = shadow / 9.0;
+    /**/
 
     return shadow;
 }
@@ -182,28 +193,22 @@ vec3 indirectIllumination() {
 
     for(int i=0; i < NUM_VPL; i++){
     	vec2 rnd = VPLSamples[i];
-    	vec2 coords = vec2(projCoords.x + rsmRMax*rnd.x*sin(TWO_PI*rnd.y), projCoords.y + rsmRMax*rnd.x*cos(TWO_PI*rnd.y));
+    	//vec2 coords = vec2(projCoords.x + rsmRMax*rnd.x*sin(TWO_PI*rnd.y), projCoords.y + rsmRMax*rnd.x*cos(TWO_PI*rnd.y));
+        vec2 coords = vec2(projCoords.x + VPLCoords[i].x, projCoords.y + VPLCoords[i].y);
 
     	vec3 vplP = texture(positionMap, coords.xy).xyz;
-    	vec3 vplN = texture(normalMap, coords.xy).rgb;
-    	vec3 vplFlux = texture(fluxMap, coords.xy).rgb;
+    	vec3 vplN = texture(normalMap, coords.xy).xyz;
 
-        // long ver
-        /** /
-    	float dot1 = max(0.0, dot(vplN, normalize(vsIn.position - vplP)));
-    	float dot2 = max(0.0, dot(N, normalize(vplP - vsIn.position)));
-        indirect = vplFlux * (dot1 * dot2);
-        /**/
-
-        // original ver
-        /**/
-        float dot1 = max(0.0, dot(vplN, vsIn.position - vplP));
         float dot2 = max(0.0, dot(vsIn.normal, vplP - vsIn.position));
-        float dist = length(vplP - vsIn.position);
-        indirect = vplFlux * (dot1 * dot2) / (dist * dist * dist * dist);
-        /**/
 
-    	indirect = indirect * VPLWeights[i];
+        vec3 vplFlux = texture(fluxMap, coords.xy).rgb;
+
+        float dist = length(vplP - vsIn.position);
+        float dot1 = max(0.0, dot(vplN, vsIn.position - vplP));
+
+        indirect = (vplFlux * (dot1 * dot2) / (dist * dist * dist * dist)) * VPLWeights[i];
+
+    	//indirect = indirect * VPLWeights[i];
     	result += indirect;
     }
 	return (result * fetchDiffuse()) * rsmIntensity;
