@@ -31,8 +31,8 @@
 
 #define NUM_VPL 64
 
-#define LOW_RES_INDIRECT_WIDTH 256
-#define LOW_RES_INDIRECT_HEIGHT 256
+#define LOW_RES_INDIRECT_WIDTH 128
+#define LOW_RES_INDIRECT_HEIGHT 128
 
 // Sphere and Cube
 /** /

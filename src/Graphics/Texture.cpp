@@ -26,10 +26,11 @@ Texture::Texture(Image img) {
 			img.data());
 		checkOpenGLError("Error in glTexImage2D");
 
-		glGenerateMipmap(OpenGLTexTargets[_type]);
-		checkOpenGLError("Error in generating mipmaps");
+		//glGenerateMipmap(OpenGLTexTargets[_type]);
+		//checkOpenGLError("Error in generating mipmaps");
 		/**/
 
+		/**/
 		glCompressedTexImage2D(GL_TEXTURE_2D,
 			0,
 			COMPRESSION_FORMAT,
@@ -40,6 +41,7 @@ Texture::Texture(Image img) {
 			(const GLvoid*)img.data());
 
 		checkOpenGLError("Error in glCompressedTexImage2D");
+		/**/
 
 		//glGenerateMipmap(OpenGLTexTargets[_type]);
 		//checkOpenGLError("Error in generating mipmaps");
