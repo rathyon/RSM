@@ -35,12 +35,12 @@ vec3 fetchDiffuse(){
 	}
 }
 
-layout(location = 0) out vec4 position;
-layout(location = 1) out vec4 normal;
-layout(location = 2) out vec4 flux;
+layout(location = 0) out vec3 position;
+layout(location = 1) out vec3 normal;
+layout(location = 2) out vec3 flux;
 
 void main(void) {
-	position = vec4(vsIn.position, 1.0);
-	normal = vec4(vsIn.normal, 1.0);
-	flux = vec4(light.emission * fetchDiffuse(), 1.0);
+	position = vsIn.position;
+	normal = vsIn.normal;
+	flux = light.emission * fetchDiffuse();
 }
