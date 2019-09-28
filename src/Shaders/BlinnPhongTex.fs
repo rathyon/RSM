@@ -53,6 +53,8 @@ uniform vec2 VPLCoords[NUM_VPL];
 uniform float rsmRMax;
 uniform float rsmIntensity;
 
+vec3 projCoords;
+
 /* ==============================================================================
         Directional / Spot Lights
  ============================================================================== */
@@ -62,11 +64,6 @@ uniform sampler2D normalMap;
 uniform sampler2D fluxMap;
 
 float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
-	// perform perspective divide: clip space-> normalized device coords (done automatically for gl_Position)
-    vec3 projCoords = lightSpacePosition.xyz / lightSpacePosition.w;
-    // bring from [-1,1] to [0,1]
-    projCoords = projCoords * 0.5 + 0.5;
-
     if(projCoords.z > 1.0)
         return 1.0;
 
@@ -105,7 +102,6 @@ float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
 /* ==============================================================================
         Stage Outputs
  ============================================================================== */
-
 out vec4 outColor;
 
 #ifdef DIRECTIONAL
@@ -184,12 +180,6 @@ vec3 directIllumination() {
 vec3 indirectIllumination() {
 	vec3 result = vec3(0.0);
 	vec3 indirect = vec3(0.0);
-	// perform perspective divide: clip space-> normalized device coords (done automatically for gl_Position)
-
-    vec3 projCoords = vsIn.lightSpacePosition.xyz / vsIn.lightSpacePosition.w;
-
-    // bring from [-1,1] to [0,1]
-    projCoords = projCoords * 0.5 + 0.5;
 
     for(int i=0; i < NUM_VPL; i++){
     	vec2 rnd = VPLSamples[i];
@@ -215,6 +205,10 @@ vec3 indirectIllumination() {
 }
 
 void main(void) {
+	// perform perspective divide: clip space-> normalized device coords (done automatically for gl_Position)
+	projCoords = vsIn.lightSpacePosition.xyz / vsIn.lightSpacePosition.w;
+	// bring from [-1,1] to [0,1]
+    projCoords = projCoords * 0.5 + 0.5;
 
 	//outColor = vec4(fetchDiffuse(), 1.0f);
 	outColor = vec4( directIllumination() + indirectIllumination(), 1.0);

@@ -52,12 +52,9 @@ uniform sampler2D positionMap;
 uniform sampler2D normalMap;
 uniform sampler2D fluxMap;
 
-float shadowFactor(vec4 lightSpacePosition, vec3 N, vec3 L){
-	// perform perspective divide: clip space-> normalized device coords (done automatically for gl_Position)
-    vec3 projCoords = lightSpacePosition.xyz / lightSpacePosition.w;
-    // bring from [-1,1] to [0,1]
-    projCoords = projCoords * 0.5 + 0.5;
+vec3 projCoords;
 
+float shadowFactor(vec3 lightSpacePosition, vec3 N, vec3 L){
     if(projCoords.z > 1.0)
         return 1.0;
 
@@ -110,8 +107,7 @@ const vec3 Specular = vec3(1.0f);
 vec3 FragPos;
 vec3 N;
 vec3 Diffuse;
-vec4 LightSpacePos;
-
+vec3 LightSpacePos;
 
  vec3 texture2D_bilinear(sampler2D t, vec2 uv, vec2 textureSize, vec2 texelSize)
 {
@@ -202,10 +198,10 @@ vec3 indirectIllumination() {
 	vec3 indirect = vec3(0.0);
 	// perform perspective divide: clip space-> normalized device coords (done automatically for gl_Position)
 
-    vec3 projCoords = LightSpacePos.xyz / LightSpacePos.w;
+    //vec3 projCoords = LightSpacePos.xyz / LightSpacePos.w;
 
     // bring from [-1,1] to [0,1]
-    projCoords = projCoords * 0.5 + 0.5;
+    //projCoords = projCoords * 0.5 + 0.5;
 
     for(int i=0; i < NUM_VPL; i++){
     	vec2 rnd = VPLSamples[i];
@@ -213,7 +209,8 @@ vec3 indirectIllumination() {
         vec2 coords = vec2(projCoords.x + VPLCoords[i].x, projCoords.y + VPLCoords[i].y);
 
     	vec3 vplP = texture(positionMap, coords.xy).xyz;
-    	vec3 vplN = texture(normalMap, coords.xy).xyz;
+    	vec3 vplN = texture(normalMap, coords.xy).xyz * 2.0 - 1.0;
+    	//vec3 vplN = texture(normalMap, coords.xy).xyz;
 
         float dot2 = max(0.0, dot(N, vplP - FragPos));
 
@@ -242,10 +239,12 @@ uniform vec2 texelSize;
 void main(void) {
 
 	FragPos       = texture(gPosition, texCoords).rgb;
-	N             = texture(gNormal, texCoords).rgb;
+	N             = texture(gNormal, texCoords).rgb * 2.0 - 1.0;
+	//N             = texture(gNormal, texCoords).rgb;
 	Diffuse       = texture(gDiffuse, texCoords).rgb;
 	//Specular      = texture(gSpecular, texCoords).rgb;
-	LightSpacePos = texture(gLightSpacePosition, texCoords);
+	LightSpacePos = texture(gLightSpacePosition, texCoords).rgb;
+	projCoords = LightSpacePos;
 
 
 	//outColor = vec4(directIllumination(), 1.0);
