@@ -47,7 +47,8 @@ void main(void) {
 	/**/
 	/**/
 	gPosition = vsIn.position;
-	gNormal = vsIn.normal * 0.5 + 0.5;
+	//gNormal = vsIn.normal * 0.5 + 0.5;
+	gNormal = vsIn.normal;
 	gDiffuse = fetchDiffuse();
 	gLightSpacePosition = ( vsIn.lightSpacePosition.xyz / vsIn.lightSpacePosition.w ) * 0.5 + 0.5;
 	/**/

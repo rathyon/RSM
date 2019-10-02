@@ -209,8 +209,8 @@ vec3 indirectIllumination() {
         vec2 coords = vec2(projCoords.x + VPLCoords[i].x, projCoords.y + VPLCoords[i].y);
 
     	vec3 vplP = texture(positionMap, coords.xy).xyz;
-    	vec3 vplN = texture(normalMap, coords.xy).xyz * 2.0 - 1.0;
-    	//vec3 vplN = texture(normalMap, coords.xy).xyz;
+    	//vec3 vplN = texture(normalMap, coords.xy).xyz * 2.0 - 1.0;
+    	vec3 vplN = texture(normalMap, coords.xy).xyz;
 
         float dot2 = max(0.0, dot(N, vplP - FragPos));
 
@@ -239,8 +239,8 @@ uniform vec2 texelSize;
 void main(void) {
 
 	FragPos       = texture(gPosition, texCoords).rgb;
-	N             = texture(gNormal, texCoords).rgb * 2.0 - 1.0;
-	//N             = texture(gNormal, texCoords).rgb;
+	//N             = texture(gNormal, texCoords).rgb * 2.0 - 1.0;
+	N             = texture(gNormal, texCoords).rgb;
 	Diffuse       = texture(gDiffuse, texCoords).rgb;
 	//Specular      = texture(gSpecular, texCoords).rgb;
 	LightSpacePos = texture(gLightSpacePosition, texCoords).rgb;

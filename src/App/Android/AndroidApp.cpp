@@ -5,6 +5,7 @@
 #include <time.h>
 #include <sys/types.h>
 #include <dirent.h>
+#include <deque>
 
 using namespace rsm;
 
@@ -15,6 +16,8 @@ long oldTimeSinceStart;
 
 int totalFrames = 0;
 double totalTimePerFrame = 0.0f;
+
+std::deque<double> Last1000Frames;
 
 char* getAssetSource(const char* filepath);
 size_t getAssetLength(const char* filepath);
@@ -28,10 +31,10 @@ const enum TestScenes {
     LUCY          = 2,
     SPONZA        = 3,
     CORNELLBOX    = 4,
-    SIBENIX       = 5
+    SIBENIK       = 5
 };
 
-int TestScene = TestScenes::SPONZA;
+int TestScene = TestScenes::CORNELLBOX;
 
 void init() {
     int width, height;
@@ -70,7 +73,7 @@ void init() {
     if( TestScene == TestScenes::SPHEREANDCUBE){
         sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(10.0f, -7.5f, -18.0f));
         glApp->getScene()->addLight(sun);
-        sun->prepare(width, height, 10.0f, 0.1f, 1000.0f, glm::vec3(-7.0f + 6, 10.f, 15.f + 6), glm::vec3(3.0f + 6, 2.5f, -3.0f + 6));
+        sun->prepare(width/2, height/2, 10.0f, 0.1f, 1000.0f, glm::vec3(-7.0f + 6, 10.f, 15.f + 6), glm::vec3(3.0f + 6, 2.5f, -3.0f + 6));
     }
 
     /* ===================================================================================
@@ -79,7 +82,7 @@ void init() {
     if( TestScene == TestScenes::LUCY){
         sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
         glApp->getScene()->addLight(sun);
-        sun->prepare(width, height, 10.0f, 0.1f, 1000.0f, glm::vec3(10.f + 6, 10.f, 10.f + 6), glm::vec3(0.f + 6, 0.f, 0.f + 6));
+        sun->prepare(width/2, height/2, 10.0f, 0.1f, 1000.0f, glm::vec3(10.f + 6, 10.f, 10.f + 6), glm::vec3(0.f + 6, 0.f, 0.f + 6));
     }
 
     /* ===================================================================================
@@ -88,7 +91,7 @@ void init() {
     if( TestScene == TestScenes::SPONZA){
         sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-89.5f, -85.0f, -15.0f));
         glApp->getScene()->addLight(sun);
-        sun->prepare(width, height, 100.0f, 0.1f, 100000.0f, glm::vec3(50.f + 150, 85.f, 5.f + 100), glm::vec3(-39.5f + 150, 0.f, -10.f + 100));
+        sun->prepare(width/2, height/2, 100.0f, 0.1f, 100000.0f, glm::vec3(50.f + 150, 85.f, 5.f + 100), glm::vec3(-39.5f + 150, 0.f, -10.f + 100));
     }
 
     /* ===================================================================================
@@ -97,16 +100,16 @@ void init() {
     if( TestScene == TestScenes::CORNELLBOX){
         sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-0.5f, -0.4f, -1.0f));
         glApp->getScene()->addLight(sun);
-        sun->prepare(width, height, 10.0f, 0.1f, 1000.0f, glm::vec3(5.f + 6, 4.f, 10.f + 6), glm::vec3(0.f + 6, 0.f, 0.f + 6));
+        sun->prepare(width/2, height/2, 10.0f, 0.1f, 1000.0f, glm::vec3(5.f + 6, 3.f, 10.f + 6), glm::vec3(1.f + 6, 1.f, 1.f + 6));
     }
 
     /* ===================================================================================
                 Sibenik
     =====================================================================================*/
-    if( TestScene == TestScenes::SIBENIX){
+    if( TestScene == TestScenes::SIBENIK){
         sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
         glApp->getScene()->addLight(sun);
-        sun->prepare(width, height, 10.0f, 0.1f, 10000.0f, glm::vec3(-10.f + 10, 10.f, 0.f + 10), glm::vec3(15.f + 10, 0.f, 0.f + 10));
+        sun->prepare(width/2, height/2, 10.0f, 0.1f, 10000.0f, glm::vec3(-10.f + 10, 10.f, 0.f + 10), glm::vec3(15.f + 10, 0.f, 0.f + 10));
     }
 
     /* ===================================================================================
@@ -368,7 +371,7 @@ void init() {
     /* ===================================================================================
                 Sibenik
     =====================================================================================*/
-    if( TestScene == TestScenes::SIBENIX){
+    if( TestScene == TestScenes::SIBENIK){
         loadTextures("models/Sibenik Modified", "png", "");
         checkOpenGLError("Error during texture loading!");
         LOG("Textures loaded...\n");
@@ -415,10 +418,25 @@ void render() {
     float secs = dt / 1000000.0f;
     LOG("FPS: %f\n", 1.0f / secs);
 
+    if(Last1000Frames.size() < 1000) {
+        Last1000Frames.push_back(secs);
+        totalTimePerFrame += secs;
+    }
+    else{
+        totalTimePerFrame -= Last1000Frames.front();
+        Last1000Frames.pop_front();
+        Last1000Frames.push_back(secs);
+        totalTimePerFrame += secs;
+    }
+
+    LOG("AVG FPS: %f\n", 1.0f / ( totalTimePerFrame / (float) Last1000Frames.size()));
+
+    /** /
     totalFrames++;
-    totalTimePerFrame += secs ;
+    totalTimePerFrame += secs;
 
     LOG("AVG FPS: %f\n", 1.0f / (totalTimePerFrame / (float) totalFrames));
+    /**/
 
     if(dt > 0.25f)
         dt = 0.25f;

@@ -74,8 +74,8 @@ vec3 indirectIllumination(vec3 FragPos, vec3 LightSpacePos, vec3 Normal, vec3 Di
         vec2 coords = vec2(projCoords.x + VPLCoords[i].x, projCoords.y + VPLCoords[i].y);
 
     	vec3 vplP = texture(positionMap, coords.xy).xyz;
-        vec3 vplN = texture(normalMap, coords.xy).xyz * 2.0 - 1.0;
-        //vec3 vplN = texture(normalMap, coords.xy).xyz;
+        //vec3 vplN = texture(normalMap, coords.xy).xyz * 2.0 - 1.0;
+        vec3 vplN = texture(normalMap, coords.xy).xyz;
 
         float dot2 = max(0.0, dot(Normal, vplP - FragPos));
 
@@ -85,8 +85,8 @@ vec3 indirectIllumination(vec3 FragPos, vec3 LightSpacePos, vec3 Normal, vec3 Di
         float dot1 = max(0.0, dot(vplN, FragPos - vplP));
 
         // frag == vpl pos???
-        //if(dist <= 0.0)
-        //    continue;
+        if(dist <= 0.0)
+            continue;
 
         indirect = (vplFlux * (dot1 * dot2) / (dist * dist * dist * dist)) * VPLWeights[i];
 
@@ -107,8 +107,8 @@ layout(location = 0) out vec4 outColor;
 void main(void) {
 
 	vec3 pos      = texture(gPosition, texCoords).rgb;
-	vec3 N        = texture(gNormal, texCoords).rgb * 2.0 - 1.0;
-    //vec3 N        = texture(gNormal, texCoords).rgb;
+	//vec3 N        = texture(gNormal, texCoords).rgb * 2.0 - 1.0;
+    vec3 N        = texture(gNormal, texCoords).rgb;
 	vec3 diffuse  = texture(gDiffuse, texCoords).rgb;
 	vec3 lightSpacePos = texture(gLightSpacePosition, texCoords).rgb;
     projCoords = lightSpacePos;

@@ -37,7 +37,7 @@
 // Sphere and Cube
 /** /
 #define VPL_DIST_MAX 0.5f
-#define RSM_INTENSITY 3.0f
+#define RSM_INTENSITY 6.0f
 /**/
 
 // Lucy
@@ -47,13 +47,13 @@
 /**/
 
 // Crytek Sponza
-/**/
+/** /
 #define VPL_DIST_MAX 0.3f
 #define RSM_INTENSITY 400.0f
 /**/
 
 // Cornell Box
-/** /
+/**/
 #define VPL_DIST_MAX 0.3f
 #define RSM_INTENSITY 3.0f
 /**/

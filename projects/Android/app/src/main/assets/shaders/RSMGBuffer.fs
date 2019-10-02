@@ -41,7 +41,7 @@ layout(location = 2) out vec3 flux;
 
 void main(void) {
 	position = vsIn.position;
-	normal = vsIn.normal * 0.5 + 0.5;
-	//normal = vsIn.normal;
+	//normal = vsIn.normal * 0.5 + 0.5;
+	normal = vsIn.normal;
 	flux = light.emission * fetchDiffuse();
 }

@@ -22,7 +22,7 @@ void OpenGLApplication::init() {
 	srand(static_cast <unsigned> (time(0)));
 
 	// Initialize OpenGL state
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 	glDepthMask(GL_TRUE);
@@ -98,8 +98,8 @@ void OpenGLApplication::prepareDeferredShading() {
 	// - position color buffer
 	glGenTextures(1, &_gPosition);
 	glBindTexture(GL_TEXTURE_2D, _gPosition);
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_HALF_FLOAT, NULL);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R11F_G11F_B10F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_UNSIGNED_INT_10F_11F_11F_REV, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_HALF_FLOAT, NULL);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R11F_G11F_B10F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_UNSIGNED_INT_10F_11F_11F_REV, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _gPosition, 0);
@@ -107,8 +107,8 @@ void OpenGLApplication::prepareDeferredShading() {
 	// - normal color buffer
 	glGenTextures(1, &_gNormal);
 	glBindTexture(GL_TEXTURE_2D, _gNormal);
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_HALF_FLOAT, NULL);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R11F_G11F_B10F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_UNSIGNED_INT_10F_11F_11F_REV, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_HALF_FLOAT, NULL);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R11F_G11F_B10F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_UNSIGNED_INT_10F_11F_11F_REV, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, _gNormal, 0);
@@ -125,7 +125,8 @@ void OpenGLApplication::prepareDeferredShading() {
 	glGenTextures(1, &_gLightSpacePosition);
 	glBindTexture(GL_TEXTURE_2D, _gLightSpacePosition);
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, _gBufferWidth, _gBufferHeight, 0, GL_RGBA, GL_HALF_FLOAT, NULL);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R11F_G11F_B10F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_UNSIGNED_INT_10F_11F_11F_REV, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_HALF_FLOAT, NULL);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R11F_G11F_B10F, _gBufferWidth, _gBufferHeight, 0, GL_RGB, GL_UNSIGNED_INT_10F_11F_11F_REV, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, _gLightSpacePosition, 0);
