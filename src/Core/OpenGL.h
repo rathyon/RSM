@@ -9,13 +9,13 @@
 #include <GLES3/gl32.h>
 #include <GLES3/gl3ext.h>
 #include <EGL/egl.h>
-#define COMPRESSION_FORMAT GL_COMPRESSED_RGBA_ASTC_12x12
+#define COMPRESSION_FORMAT GL_COMPRESSED_RGBA_ASTC_6x6
 
 #else
 #include <iostream>
 #include <GL/glew.h>
 #include <GL/freeglut.h>
-#define COMPRESSION_FORMAT GL_COMPRESSED_RGBA_ASTC_12x12_KHR
+#define COMPRESSION_FORMAT GL_COMPRESSED_RGBA_ASTC_6x6_KHR
 #endif
 
 // just for viewing convenience, and to not forget!
@@ -34,29 +34,54 @@
 #define LOW_RES_INDIRECT_WIDTH 128
 #define LOW_RES_INDIRECT_HEIGHT 128
 
+//#define CONFERENCE
+
+//#define SPHEREANDCUBE
+//#define LUCY
+#define SPONZA
+
+//#define CORNELL
+//#define SIBENIK
+
 // Sphere and Cube
-/** /
-#define VPL_DIST_MAX 0.5f
-#define RSM_INTENSITY 6.0f
-/**/
+#ifdef SPHEREANDCUBE
+    #define VPL_DIST_MAX 0.5f
+    #define RSM_INTENSITY 6.0f
+    #define SPECULAR glm::vec3(0.5f, 0.5f, 0.5f)
+    #define SHININESS 225.0f
+#endif
 
 // Lucy
-/** /
-#define VPL_DIST_MAX 0.3f
-#define RSM_INTENSITY 3.0f
-/**/
+#ifdef LUCY
+    #define VPL_DIST_MAX 0.3f
+    #define RSM_INTENSITY 3.0f
+    #define SPECULAR glm::vec3(0.5f, 0.5f, 0.5f)
+    #define SHININESS 225.0f
+#endif
 
 // Crytek Sponza
-/** /
-#define VPL_DIST_MAX 0.3f
-#define RSM_INTENSITY 400.0f
-/**/
+#ifdef SPONZA
+    #define VPL_DIST_MAX 0.3f
+    #define RSM_INTENSITY 400.0f
+    #define SPECULAR glm::vec3(0.0f, 0.0f, 0.0f)
+    #define SHININESS 10.2f
+#endif
 
 // Cornell Box
-/**/
-#define VPL_DIST_MAX 0.3f
-#define RSM_INTENSITY 3.0f
-/**/
+#ifdef CORNELL
+    #define VPL_DIST_MAX 0.3f
+    #define RSM_INTENSITY 3.0f
+    #define SPECULAR glm::vec3(0.0f, 0.0f, 0.0f)
+    #define SHININESS 10.2f
+#endif
+
+// Sibenik
+#ifdef SIBENIK
+    #define VPL_DIST_MAX 0.3f
+    #define RSM_INTENSITY 6.0f
+    #define SPECULAR glm::vec3(0.0f, 0.0f, 0.0f)
+    #define SHININESS 8.0f
+#endif
 
 
 enum TextureUnit {

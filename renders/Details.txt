@@ -1,0 +1,3 @@
+All renders are at 1480x720 resolution
+Ground Truth (GT) Rendered in Blender (check blend files for exact render details)
+RSM renders are with 64 VPL, 128x128 indirect map, half res RSM maps

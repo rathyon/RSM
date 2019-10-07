@@ -100,9 +100,9 @@ out vec4 outColor;
 uniform vec4 indirectSampleParams;
 uniform sampler2D lowResIndirect;
 
-// assuming global value for shininess and specular
-const float shininess = 16.0f;
-const vec3 Specular = vec3(1.0f);
+// values manually imported per scene...
+uniform float shininess;
+uniform vec3 Specular;
 
 vec3 FragPos;
 vec3 N;
@@ -247,11 +247,16 @@ void main(void) {
 	projCoords = LightSpacePos;
 
 
+	// Testing
 	//outColor = vec4(directIllumination(), 1.0);
 	//outColor = vec4(indirectIllumination(), 1.0);
-	//outColor = vec4(directIllumination() + indirectIllumination(), 1.0);
 	//outColor = vec4(texture(lowResIndirect, texCoords).rgb, 1.0);
 
+
+	// Deferred Naive
+	//outColor = vec4(directIllumination() + indirectIllumination(), 1.0);
+
+	// Deferred Interpolated
 	/**/
 	vec3 direct = directIllumination();
 

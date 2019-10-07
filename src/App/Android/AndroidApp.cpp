@@ -17,6 +17,8 @@ long oldTimeSinceStart;
 int totalFrames = 0;
 double totalTimePerFrame = 0.0f;
 
+float timeSinceLastLog = 0.0f;
+
 std::deque<double> Last1000Frames;
 
 char* getAssetSource(const char* filepath);
@@ -25,6 +27,7 @@ long getCurrentTime();
 bool endsWith (std::string const &fullString, std::string const &ending);
 void loadTextures(std::string directory, std::string extension, std::string prefix);
 
+/** /
 const enum TestScenes {
     CONFERENCE    = 0,
     SPHEREANDCUBE = 1,
@@ -34,7 +37,8 @@ const enum TestScenes {
     SIBENIK       = 5
 };
 
-int TestScene = TestScenes::CORNELLBOX;
+int TestScene = TestScenes::SPHEREANDCUBE;
+/**/
 
 void init() {
     int width, height;
@@ -61,56 +65,56 @@ void init() {
                 Conference
     =====================================================================================*/
 
-    if( TestScene == CONFERENCE){
+#ifdef CONFERENCE
         sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-25.0f, -15.0f, 0.0f));
         glApp->getScene()->addLight(sun);
         sun->prepare(width, height, 15.0f, 0.1f, 10000.0f, glm::vec3(20.0f, 16.f, -3.f), glm::vec3(-5.0f, 1.0f, -3.0f));
-    }
+#endif
 
     /* ===================================================================================
                 Sphere and Cube
     =====================================================================================*/
-    if( TestScene == TestScenes::SPHEREANDCUBE){
+#ifdef SPHEREANDCUBE
         sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(10.0f, -7.5f, -18.0f));
         glApp->getScene()->addLight(sun);
         sun->prepare(width/2, height/2, 10.0f, 0.1f, 1000.0f, glm::vec3(-7.0f + 6, 10.f, 15.f + 6), glm::vec3(3.0f + 6, 2.5f, -3.0f + 6));
-    }
+#endif
 
     /* ===================================================================================
                 Lucy
     =====================================================================================*/
-    if( TestScene == TestScenes::LUCY){
+#ifdef LUCY
         sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
         glApp->getScene()->addLight(sun);
         sun->prepare(width/2, height/2, 10.0f, 0.1f, 1000.0f, glm::vec3(10.f + 6, 10.f, 10.f + 6), glm::vec3(0.f + 6, 0.f, 0.f + 6));
-    }
+#endif
 
     /* ===================================================================================
                 Crytek Sponza
     =====================================================================================*/
-    if( TestScene == TestScenes::SPONZA){
+#ifdef SPONZA
         sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-89.5f, -85.0f, -15.0f));
         glApp->getScene()->addLight(sun);
         sun->prepare(width/2, height/2, 100.0f, 0.1f, 100000.0f, glm::vec3(50.f + 150, 85.f, 5.f + 100), glm::vec3(-39.5f + 150, 0.f, -10.f + 100));
-    }
+#endif
 
     /* ===================================================================================
                 Cornell Box
     =====================================================================================*/
-    if( TestScene == TestScenes::CORNELLBOX){
+#ifdef CORNELL
         sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-0.5f, -0.4f, -1.0f));
         glApp->getScene()->addLight(sun);
         sun->prepare(width/2, height/2, 10.0f, 0.1f, 1000.0f, glm::vec3(5.f + 6, 3.f, 10.f + 6), glm::vec3(1.f + 6, 1.f, 1.f + 6));
-    }
+#endif
 
     /* ===================================================================================
                 Sibenik
     =====================================================================================*/
-    if( TestScene == TestScenes::SIBENIK){
+#ifdef SIBENIK
         sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
         glApp->getScene()->addLight(sun);
-        sun->prepare(width/2, height/2, 10.0f, 0.1f, 10000.0f, glm::vec3(-10.f + 10, 10.f, 0.f + 10), glm::vec3(15.f + 10, 0.f, 0.f + 10));
-    }
+        sun->prepare(width/2, height/2, 15.0f, 0.1f, 10000.0f, glm::vec3(-10.f + 10, 10.f, 0.f + 10), glm::vec3(15.f + 10, 0.f, 0.f + 10));
+#endif
 
     /* ===================================================================================
                 Unused...
@@ -261,7 +265,7 @@ void init() {
     /* ===================================================================================
                 Conference
     =====================================================================================*/
-    if( TestScene == TestScenes::CONFERENCE){
+#ifdef CONFERENCE
         sref<Model> Conference = make_sref<Model>("Conference");
         Conference->loadFromMemory(getAssetSource("models/Conference Modified/conference.obj"), getAssetSource("models/Conference Modified/conference.mtl"));
         RM.addModel("Conference", Conference);
@@ -276,12 +280,12 @@ void init() {
 
         glApp->setCamera(camera);
         glApp->getScene()->addCamera(camera);
-    }
+#endif
 
     /* ===================================================================================
                 Sphere and Cube
     =====================================================================================*/
-    if( TestScene == TestScenes::SPHEREANDCUBE){
+#ifdef SPHEREANDCUBE
         sref<Model> SphereCube = make_sref<Model>("SphereCube");
         SphereCube->loadFromMemory(getAssetSource("models/Sphere and Cube/spherecube.obj"), getAssetSource("models/Sphere and Cube/spherecube.mtl"));
         RM.addModel("SphereCube", SphereCube);
@@ -297,12 +301,12 @@ void init() {
 
         glApp->setCamera(camera);
         glApp->getScene()->addCamera(camera);
-    }
+#endif
 
     /* ===================================================================================
                 Lucy
     =====================================================================================*/
-    if( TestScene == TestScenes::LUCY){
+#ifdef LUCY
         sref<Model> Lucy = make_sref<Model>("Lucy");
         Lucy->loadFromMemory(getAssetSource("models/Lucy/Lucy.obj"), getAssetSource("models/Lucy/Lucy.mtl"));
         RM.addModel("Lucy", Lucy);
@@ -318,12 +322,12 @@ void init() {
 
         glApp->setCamera(camera);
         glApp->getScene()->addCamera(camera);
-    }
+#endif
 
     /* ===================================================================================
                 Crytek Sponza
     =====================================================================================*/
-    if( TestScene == TestScenes::SPONZA){
+#ifdef SPONZA
         loadTextures("models/crytek sponza/textures", "astc", "textures\\");
         checkOpenGLError("Error during texture loading!");
         LOG("Textures loaded...\n");
@@ -344,12 +348,12 @@ void init() {
 
         glApp->setCamera(camera);
         glApp->getScene()->addCamera(camera);
-    }
+#endif
 
     /* ===================================================================================
                 Cornell Box
     =====================================================================================*/
-    if( TestScene == TestScenes::CORNELLBOX){
+#ifdef CORNELL
         sref<Model> CB = make_sref<Model>("CB");
         CB->loadFromMemory(getAssetSource("models/CornellBox/CornellBox-Original.obj"), getAssetSource("models/CornellBox/CornellBox-Original.mtl"));
         RM.addModel("CB", CB);
@@ -366,13 +370,13 @@ void init() {
 
         glApp->setCamera(camera);
         glApp->getScene()->addCamera(camera);
-    }
+#endif
 
     /* ===================================================================================
                 Sibenik
     =====================================================================================*/
-    if( TestScene == TestScenes::SIBENIK){
-        loadTextures("models/Sibenik Modified", "png", "");
+#ifdef SIBENIK
+        loadTextures("models/Sibenik Modified", "astc", "");
         checkOpenGLError("Error during texture loading!");
         LOG("Textures loaded...\n");
 
@@ -392,7 +396,7 @@ void init() {
 
         glApp->setCamera(camera);
         glApp->getScene()->addCamera(camera);
-    }
+#endif
 
     checkOpenGLError("Error during model loading!");
     LOG("Meshes and models loaded...\n");
@@ -416,7 +420,7 @@ void render() {
     float dt = float(deltaTime) / 1000.0f;
 
     float secs = dt / 1000000.0f;
-    LOG("FPS: %f\n", 1.0f / secs);
+    //LOG("FPS: %f\n", 1.0f / secs);
 
     if(Last1000Frames.size() < 1000) {
         Last1000Frames.push_back(secs);
@@ -429,7 +433,12 @@ void render() {
         totalTimePerFrame += secs;
     }
 
-    LOG("AVG FPS: %f\n", 1.0f / ( totalTimePerFrame / (float) Last1000Frames.size()));
+    timeSinceLastLog += secs;
+    if (timeSinceLastLog >= 1.0f){
+        timeSinceLastLog = 0.0f;
+        LOG("AVG FPS: %f\n", 1.0f / ( totalTimePerFrame / (float) Last1000Frames.size()));
+    }
+
 
     /** /
     totalFrames++;

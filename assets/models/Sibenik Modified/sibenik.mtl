@@ -35,10 +35,10 @@ newmtl kamen_zid
 	Kd 0.734118 0.730588 0.674118
 	Ks 0.000000 0.000000 0.000000
 	Ke 0.000000 0.000000 0.000000
-	map_Ka kamen.png
-	map_Kd kamen.png
-        map_bump kamen-bump.png
-        bump kamen-bump.png
+	map_Ka kamen.astc
+	map_Kd kamen.astc
+        map_bump kamen-bump.astc
+        bump kamen-bump.astc
 
 newmtl stupovi
 	Ns 8.000000
@@ -51,8 +51,8 @@ newmtl stupovi
 	Kd 0.734118 0.730588 0.674118
 	Ks 0.000000 0.000000 0.000000
 	Ke 0.000000 0.000000 0.000000
-	map_Ka KAMEN-stup.png
-	map_Kd KAMEN-stup.png
+	map_Ka KAMEN-stup.astc
+	map_Kd KAMEN-stup.astc
 
 newmtl pod
 	Ns 8.000000
@@ -65,10 +65,10 @@ newmtl pod
 	Kd 0.734118 0.709412 0.674118
 	Ks 0.000000 0.000000 0.000000
 	Ke 0.000000 0.000000 0.000000
-	map_Ka mramor6x6.png
-	map_Kd mramor6x6.png
-	map_bump mramor6x6-bump.png
-	bump mramor6x6-bump.png
+	map_Ka mramor6x6.astc
+	map_Kd mramor6x6.astc
+	map_bump mramor6x6-bump.astc
+	bump mramor6x6-bump.astc
 
 newmtl pod_tepih
 	Ns 8.000000
@@ -93,10 +93,10 @@ newmtl pod_rub
 	Kd 0.734118 0.730588 0.674118
 	Ks 0.000000 0.000000 0.000000
 	Ke 0.000000 0.000000 0.000000
-	map_Ka kamen.png
-	map_Kd kamen.png
-        map_bump kamen-bump.png
-        bump kamen-bump.png
+	map_Ka kamen.astc
+	map_Kd kamen.astc
+        map_bump kamen-bump.astc
+        bump kamen-bump.astc
 
 newmtl kamen_zid_prozor
 	Ns 8.000000
@@ -109,10 +109,10 @@ newmtl kamen_zid_prozor
 	Kd 0.734118 0.730588 0.674118
 	Ks 0.000000 0.000000 0.000000
 	Ke 0.000000 0.000000 0.000000
-	map_Ka kamen.png
-	map_Kd kamen.png
-        map_bump kamen-bump.png
-        bump kamen-bump.png
+	map_Ka kamen.astc
+	map_Kd kamen.astc
+        map_bump kamen-bump.astc
+        bump kamen-bump.astc
 
 newmtl zid_vani
 	Ns 8.000000
@@ -125,10 +125,10 @@ newmtl zid_vani
 	Kd 0.734118 0.730588 0.674118
 	Ks 0.000000 0.000000 0.000000
 	Ke 0.000000 0.000000 0.000000
-	map_Ka kamen.png
-	map_Kd kamen.png
-        map_bump kamen-bump.png
-        bump kamen-bump.png
+	map_Ka kamen.astc
+	map_Kd kamen.astc
+        map_bump kamen-bump.astc
+        bump kamen-bump.astc
 
 newmtl kamen_zid_parapet
 	Ns 8.000000
@@ -141,8 +141,8 @@ newmtl kamen_zid_parapet
 	Kd 0.734118 0.730588 0.674118
 	Ks 0.000000 0.000000 0.000000
 	Ke 0.000000 0.000000 0.000000
-	map_Ka KAMEN-stup.png
-	map_Kd KAMEN-stup.png
+	map_Ka KAMEN-stup.astc
+	map_Kd KAMEN-stup.astc
 
 newmtl staklo_crveno
 	Ns 256.000000
@@ -167,8 +167,8 @@ newmtl rozeta
 	Kd 0.734118 0.730588 0.674118
 	Ks 0.000000 0.000000 0.000000
 	Ke 0.000000 0.000000 0.000000
-	map_Ka KAMEN-stup.png
-	map_Kd KAMEN-stup.png
+	map_Ka KAMEN-stup.astc
+	map_Kd KAMEN-stup.astc
 
 # Green window
 newmtl staklo_zeleno

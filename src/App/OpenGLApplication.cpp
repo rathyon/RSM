@@ -171,6 +171,12 @@ void OpenGLApplication::prepareDeferredShading() {
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+
+	GLuint prog = RM.getShader("DeferredShading")->id();
+	glUseProgram(prog);
+    glUniform3fv(glGetUniformLocation(prog, "Specular"), 1, glm::value_ptr(SPECULAR));
+    glUniform1f(glGetUniformLocation(prog, "shininess"), SHININESS);
+    glUseProgram(0);
 }
 
 void OpenGLApplication::prepareRSM() {
