@@ -36,9 +36,9 @@
 
 //#define CONFERENCE
 
-//#define SPHEREANDCUBE
+#define SPHEREANDCUBE
 //#define LUCY
-#define SPONZA
+//#define SPONZA
 
 //#define CORNELL
 //#define SIBENIK
