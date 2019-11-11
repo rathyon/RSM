@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#313131"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:layout_width="480sp"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textSceneSelect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Scenes"
+            android:textAlignment="center"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checkedButton="@id/radSNC">
+
+            <RadioButton
+                android:id="@+id/radSNC"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="SNC"
+                android:textAlignment="viewStart" />
+
+            <RadioButton
+                android:id="@+id/radLucy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Lucy" />
+
+            <RadioButton
+                android:id="@+id/radSponza"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sponza" />
+
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/textResolutionSelect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Resolution"
+            android:textAlignment="center"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checkedButton="@id/radHD"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/radHD"
+                android:layout_width="128dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="1480x720" />
+
+            <RadioButton
+                android:id="@+id/radFHD"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="2220x1080" />
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/textResolutionSelect2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="RSM Scale"
+            android:textAlignment="center"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checkedButton="@id/radFullRes"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/radFullRes"
+                android:layout_width="259dp"
+                android:layout_height="wrap_content"
+                android:text="1x" />
+
+            <RadioButton
+                android:id="@+id/radHalfRes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="0.5x" />
+
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Samples"
+            android:textAlignment="center"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="96dp"
+            android:checkedButton="@id/rad32">
+
+            <RadioButton
+                android:id="@+id/rad32"
+                android:layout_width="120sp"
+                android:layout_height="wrap_content"
+                android:text="32" />
+
+            <RadioButton
+                android:id="@+id/rad64"
+                android:layout_width="120sp"
+                android:layout_height="wrap_content"
+                android:text="64" />
+
+            <RadioButton
+                android:id="@+id/rad128"
+                android:layout_width="120sp"
+                android:layout_height="40sp"
+                android:text="128"
+                android:textAlignment="viewStart"
+                android:translationX="120sp"
+                android:translationY="-86sp" />
+
+            <RadioButton
+                android:id="@+id/rad256"
+                android:layout_width="120sp"
+                android:layout_height="40sp"
+                android:text="256"
+                android:translationX="120sp"
+                android:translationY="-84sp" />
+
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/textVersion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="RSM Version"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checkedButton="@id/radForward">
+
+            <RadioButton
+                android:id="@+id/radForward"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Forward" />
+
+            <RadioButton
+                android:id="@+id/radDeferred"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Deferred" />
+
+            <RadioButton
+                android:id="@+id/radAccelerated"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Accelerated" />
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/btStart"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="onStartButtonClick"
+            android:password="false"
+            android:text="Start"
+            android:textAlignment="center"
+            android:translationX="0sp"
+            android:translationY="30sp" />
+
+    </LinearLayout>
+
+</LinearLayout>
