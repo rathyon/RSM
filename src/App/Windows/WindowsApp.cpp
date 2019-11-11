@@ -13,21 +13,21 @@
 // 1600 x 900
 // 800 x 450
 
-#define WND_W 1480		
+#define WND_W 720		
 #define WND_H 720
 
 using namespace rsm;
 
 const enum TestScenes {
-	CONFERENCE = 0,		// not working well, dunno why, abandoned it
-	SPHEREANDCUBE = 1,
-	LUCY = 2,
-	SPONZA = 3,
-	CORNELLBOX = 4,
-	SIBENIK = 5
+	CONFERENCE_T = 0,		// not working well, dunno why, abandoned it
+	SNC_T = 1,
+	LUCY_T = 2,
+	SPONZA_T = 3,
+	CORNELLBOX_T = 4,
+	SIBENIK_T = 5
 };
 
-int TestScene = TestScenes::CORNELLBOX;
+int TestScene = TestScenes::LUCY_T;
 
 void rsm::init(int argc, char* argv[]) {
 	glApp = new OpenGLApplication(WND_W, WND_H);
@@ -79,7 +79,7 @@ void rsm::init(int argc, char* argv[]) {
 				  Conference
 	  =====================================================================================*/
 
-	if (TestScene == CONFERENCE) {
+	if (TestScene == CONFERENCE_T) {
 		sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-25.0f, -15.0f, -7.0f));
 		glApp->getScene()->addLight(sun);
 		sun->prepare(width, height, 15.0f, 0.1f, 10000.0f, glm::vec3(20.0f, 16.f, 4.f), glm::vec3(-5.0f, 1.0f, -3.0f));
@@ -88,7 +88,7 @@ void rsm::init(int argc, char* argv[]) {
 	/* ===================================================================================
 				Sphere and Cube
 	=====================================================================================*/
-	if (TestScene == TestScenes::SPHEREANDCUBE) {
+	if (TestScene == TestScenes::SNC_T) {
 		sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(10.0f, -7.5f, -18.0f));
 		glApp->getScene()->addLight(sun);
 		sun->prepare(width, height, 10.0f, 0.1f, 1000.0f, glm::vec3(-7.0f + 6, 10.f, 15.f + 6), glm::vec3(3.0f + 6, 2.5f, -3.0f + 6));
@@ -97,7 +97,7 @@ void rsm::init(int argc, char* argv[]) {
 	/* ===================================================================================
 				Lucy
 	=====================================================================================*/
-	if (TestScene == TestScenes::LUCY) {
+	if (TestScene == TestScenes::LUCY_T) {
 		sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
 		glApp->getScene()->addLight(sun);
 		sun->prepare(width, height, 10.0f, 0.1f, 1000.0f, glm::vec3(10.f + 6, 10.f, 10.f + 6), glm::vec3(0.f + 6, 0.f, 0.f + 6));
@@ -106,7 +106,7 @@ void rsm::init(int argc, char* argv[]) {
 	/* ===================================================================================
 				Crytek Sponza
 	=====================================================================================*/
-	if (TestScene == TestScenes::SPONZA) {
+	if (TestScene == TestScenes::SPONZA_T) {
 		sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-89.5f, -85.0f, -15.0f));
 		glApp->getScene()->addLight(sun);
 		sun->prepare(width, height, 100.0f, 0.1f, 100000.0f, glm::vec3(50.f + 150, 85.f, 5.f + 100), glm::vec3(-39.5f + 150, 0.f, -10.f + 100));
@@ -115,7 +115,7 @@ void rsm::init(int argc, char* argv[]) {
 	/* ===================================================================================
 				Cornell Box
 	=====================================================================================*/
-	if (TestScene == TestScenes::CORNELLBOX) {
+	if (TestScene == TestScenes::CORNELLBOX_T) {
 		sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-0.5f, -0.4f, -1.0f));
 		glApp->getScene()->addLight(sun);
 		sun->prepare(width, height, 10.0f, 0.1f, 1000.0f, glm::vec3(5.f + 6, 3.f, 10.f + 6), glm::vec3(1.f + 6, 1.f, 1.f + 6));
@@ -124,7 +124,7 @@ void rsm::init(int argc, char* argv[]) {
 	/* ===================================================================================
 				Sibenik
 	=====================================================================================*/
-	if (TestScene == TestScenes::SIBENIK) {
+	if (TestScene == TestScenes::SIBENIK_T) {
 		sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
 		glApp->getScene()->addLight(sun);
 		sun->prepare(width, height, 10.0f, 0.1f, 10000.0f, glm::vec3(-10.f + 10, 10.f, 0.f + 10), glm::vec3(15.f + 10, 0.f, 0.f + 10));
@@ -255,7 +255,7 @@ void rsm::init(int argc, char* argv[]) {
 				Conference
 	=====================================================================================*/
 
-	if (TestScene == TestScenes::CONFERENCE) {
+	if (TestScene == TestScenes::CONFERENCE_T) {
 		sref<Model> Conference = make_sref<Model>("Conference");
 		Conference->loadFromFile("../../../assets/models/Conference Modified/conference.obj", "../../../assets/models/Conference Modified/");
 		RM.addModel("Conference", Conference);
@@ -276,7 +276,7 @@ void rsm::init(int argc, char* argv[]) {
 				Sphere and Cube
 	=====================================================================================*/
 
-	if (TestScene == TestScenes::SPHEREANDCUBE) {
+	if (TestScene == TestScenes::SNC_T) {
 		sref<Model> SphereCube = make_sref<Model>("SphereCube");
 		SphereCube->loadFromFile("../../../assets/models/Sphere and Cube/spherecube.obj", "../../../assets/models/Sphere and Cube/");
 		RM.addModel("SphereCube", SphereCube);
@@ -298,7 +298,7 @@ void rsm::init(int argc, char* argv[]) {
 				Lucy
 	=====================================================================================*/
 
-	if (TestScene == TestScenes::LUCY) {
+	if (TestScene == TestScenes::LUCY_T) {
 		sref<Model> Lucy = make_sref<Model>("Lucy");
 		Lucy->loadFromFile("../../../assets/models/Lucy/Lucy.obj", "../../../assets/models/Lucy/");
 		RM.addModel("Lucy", Lucy);
@@ -320,7 +320,7 @@ void rsm::init(int argc, char* argv[]) {
 				Crytek Sponza
 	=====================================================================================*/
 
-	if (TestScene == TestScenes::SPONZA) {
+	if (TestScene == TestScenes::SPONZA_T) {
 		sref<Model> sponza = make_sref<Model>("sponza");
 		sponza->loadFromFile("../../../assets/models/crytek sponza/sponza.obj", "../../../assets/models/crytek sponza/");
 		RM.addModel("sponza", sponza);
@@ -343,7 +343,7 @@ void rsm::init(int argc, char* argv[]) {
 				Cornell Box
 	=====================================================================================*/
 
-	if (TestScene == TestScenes::CORNELLBOX) {
+	if (TestScene == TestScenes::CORNELLBOX_T) {
 		sref<Model> CB = make_sref<Model>("CB");
 		CB->loadFromFile("../../../assets/models/CornellBox/CornellBox-Original.obj", "../../../assets/models/CornellBox/");
 		RM.addModel("CB", CB);
@@ -366,7 +366,7 @@ void rsm::init(int argc, char* argv[]) {
 				Sibenik
 	=====================================================================================*/
 
-	if (TestScene == TestScenes::SIBENIK) {
+	if (TestScene == TestScenes::SIBENIK_T) {
 		sref<Model> sibenik = make_sref<Model>("sibenik");
 		sibenik->loadFromFile("../../../assets/models/Sibenik Modified/sibenik.obj", "../../../assets/models/Sibenik Modified/");
 		RM.addModel("sibenik", sibenik);

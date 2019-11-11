@@ -186,6 +186,9 @@ void OpenGLApplication::prepareRSM() {
 
 	for (int i = 0; i < NUM_VPL; i++) {
 		double* sample = hammersley(i, 2, NUM_VPL);
+		//double sample[2];
+		//sample[0] = randf();
+		//sample[1] = randf();
 		VPLSamples[i][0] = (float)sample[0];
 		VPLSamples[i][1] = (float)sample[1];
 		VPLWeights[i] = VPLSamples[i][0] * VPLSamples[i][0];
@@ -409,6 +412,20 @@ void OpenGLApplication::render() {
 #endif
 
 	checkOpenGLError("Error in render loop!");
+
+	// John Cormack's suggestion: it does nothing in my case lol
+	/** /
+	glBindFramebuffer(GL_FRAMEBUFFER, _gBuffer);
+	unsigned int attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+	glInvalidateFramebuffer(GL_FRAMEBUFFER, 4, attachments);
+
+    const sref<Light>& light = _scene.lights()[0];
+    glBindFramebuffer(GL_FRAMEBUFFER, light->gBuffer());
+	unsigned int attachments2[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+	glInvalidateFramebuffer(GL_FRAMEBUFFER, 3, attachments2);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	/**/
 }
 
 void OpenGLApplication::prepareCameraBuffer() {

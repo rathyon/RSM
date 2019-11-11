@@ -252,12 +252,14 @@ void main(void) {
 	//outColor = vec4(indirectIllumination(), 1.0);
 	//outColor = vec4(texture(lowResIndirect, texCoords).rgb, 1.0);
 
+	//outColor = vec4(texture(fluxMap, texCoords).rgb, 1.0);
+
 
 	// Deferred Naive
-	//outColor = vec4(directIllumination() + indirectIllumination(), 1.0);
+	outColor = vec4(directIllumination() + indirectIllumination(), 1.0);
 
 	// Deferred Interpolated
-	/**/
+	/** /
 	vec3 direct = directIllumination();
 
 	//ivec2 texSizei = textureSize(lowResIndirect, 0);
@@ -328,7 +330,7 @@ void main(void) {
 		outColor = vec4(direct + indirectIllumination(), 1.0);
 
 		//tag non reconstructible
-		//outColor = vec4(0.0f, 1.0f, 1.0f, 1.0f);
+		//outColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
 	}
 	/**/
 

@@ -47,6 +47,9 @@ void init() {
     // FHD+ 2220x1080
     // WQHD+ 2960x1440
 
+    // TESTING ONLY
+    //width = 740; height = 360;
+
     width = 1480; height = 720;
     //width = 2220; height = 1080;
     //width = 2960; height = 1440;
