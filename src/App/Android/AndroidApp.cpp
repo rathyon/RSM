@@ -16,6 +16,7 @@ long oldTimeSinceStart;
 
 int totalFrames = 0;
 double totalTimePerFrame = 0.0f;
+float instantFPS = 0.0f;
 
 float timeSinceLastLog = 0.0f;
 
@@ -50,8 +51,8 @@ void init() {
     // TESTING ONLY
     //width = 740; height = 360;
 
-    width = 1480; height = 720;
-    //width = 2220; height = 1080;
+    //width = 1480; height = 720;
+    width = 2220; height = 1080;
     //width = 2960; height = 1440;
 
     glApp = new OpenGLApplication(width, height);
@@ -423,8 +424,10 @@ void render() {
     float dt = float(deltaTime) / 1000.0f;
 
     float secs = dt / 1000000.0f;
-    //LOG("FPS: %f\n", 1.0f / secs);
+    instantFPS = 1.0f / secs;
+    //LOG("FPS: %f\n", instantFPS);
 
+    /** /
     if(Last1000Frames.size() < 1000) {
         Last1000Frames.push_back(secs);
         totalTimePerFrame += secs;
@@ -441,6 +444,7 @@ void render() {
         timeSinceLastLog = 0.0f;
         LOG("AVG FPS: %f\n", 1.0f / ( totalTimePerFrame / (float) Last1000Frames.size()));
     }
+    /**/
 
 
     /** /
@@ -458,6 +462,11 @@ void render() {
     glApp->update(dt);
 
     glApp->render();
+}
+
+int getInstantFPS() {
+    //LOG("FPS: %f\n", instantFPS);
+    return (int) instantFPS;
 }
 
 char* getAssetSource(const char* filepath) {
@@ -517,6 +526,7 @@ extern "C"
     JNIEXPORT void JNICALL Java_com_rbenjamim_rsm_AndroidApp_init(JNIEnv *env, jclass type, jobject aMgr);
     JNIEXPORT void JNICALL Java_com_rbenjamim_rsm_AndroidApp_resize(JNIEnv *env, jclass type, jint width, jint height);
     JNIEXPORT void JNICALL Java_com_rbenjamim_rsm_AndroidApp_render(JNIEnv *env, jclass type);
+    JNIEXPORT jint JNICALL Java_com_rbenjamim_rsm_AndroidApp_getInstantFPS(JNIEnv* env, jclass type);
 };
 
 JNIEXPORT void JNICALL Java_com_rbenjamim_rsm_AndroidApp_init(JNIEnv* env, jclass type, jobject aMgr) {
@@ -530,5 +540,9 @@ JNIEXPORT void JNICALL Java_com_rbenjamim_rsm_AndroidApp_resize(JNIEnv* env, jcl
 
 JNIEXPORT void JNICALL Java_com_rbenjamim_rsm_AndroidApp_render(JNIEnv* env, jclass type) {
     render();
+}
+
+JNIEXPORT jint JNICALL Java_com_rbenjamim_rsm_AndroidApp_getInstantFPS(JNIEnv* env, jclass type) {
+    return getInstantFPS();
 }
 

@@ -16,6 +16,8 @@ public class GLView extends GLSurfaceView {
 
     public static AssetManager assetManager;
 
+    private MainActivity mainActivity;
+
     public GLView(Context context, AssetManager aMgr){
         super(context);
         assetManager = aMgr;
@@ -25,9 +27,11 @@ public class GLView extends GLSurfaceView {
         //setEGLConfigChooser(new ConfigChooser());
         setEGLContextClientVersion(EGL_VERSION);
         setRenderer(new Renderer());
+
+        mainActivity = (MainActivity) context;
     }
 
-    private static class Renderer implements GLSurfaceView.Renderer{
+    private class Renderer implements GLSurfaceView.Renderer{
 
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -42,6 +46,7 @@ public class GLView extends GLSurfaceView {
         @Override
         public void onDrawFrame(GL10 gl) {
             AndroidApp.render();
+            mainActivity.setFPS(Math.min(AndroidApp.getInstantFPS(), 60));
         }
     }
 

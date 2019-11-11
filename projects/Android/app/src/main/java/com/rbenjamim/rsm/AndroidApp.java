@@ -10,5 +10,5 @@ public class AndroidApp {
     public static native void init(AssetManager assetManager);
     public static native void resize(int width, int height);
     public static native void render();
-
+    public static native int getInstantFPS();
 }
