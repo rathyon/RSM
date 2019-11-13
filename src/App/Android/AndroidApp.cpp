@@ -28,20 +28,15 @@ long getCurrentTime();
 bool endsWith (std::string const &fullString, std::string const &ending);
 void loadTextures(std::string directory, std::string extension, std::string prefix);
 
-/** /
+/**/
 const enum TestScenes {
-    CONFERENCE    = 0,
-    SPHEREANDCUBE = 1,
-    LUCY          = 2,
-    SPONZA        = 3,
-    CORNELLBOX    = 4,
-    SIBENIK       = 5
+    SPHEREANDCUBE = 0,
+    LUCY          = 1,
+    SPONZA        = 2
 };
-
-int TestScene = TestScenes::SPHEREANDCUBE;
 /**/
 
-void init() {
+void init(int scene, int rsmVersion, int numVPL, int indirectWidth, int indirectHeight, int gbufferResolution, int rsmBufferResolution) {
     int width, height;
     // Screen resolutions are:
     // HD+ 1480x720
@@ -51,11 +46,16 @@ void init() {
     // TESTING ONLY
     //width = 740; height = 360;
 
-    //width = 1480; height = 720;
-    width = 2220; height = 1080;
+    if(gbufferResolution == 0){
+        width = 1480; height = 720;
+    }
+    else{
+        width = 2220; height = 1080;
+    }
+
     //width = 2960; height = 1440;
 
-    glApp = new OpenGLApplication(width, height);
+    glApp = new OpenGLApplication(width, height, rsmVersion, numVPL, indirectWidth, indirectHeight);
 
     LOG("Initializing AndroidApp...\n");
 
@@ -68,39 +68,38 @@ void init() {
     /* ===================================================================================
                 Conference
     =====================================================================================*/
-
-#ifdef CONFERENCE
+    /** /
         sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-25.0f, -15.0f, 0.0f));
         glApp->getScene()->addLight(sun);
         sun->prepare(width, height, 15.0f, 0.1f, 10000.0f, glm::vec3(20.0f, 16.f, -3.f), glm::vec3(-5.0f, 1.0f, -3.0f));
-#endif
+    /**/
 
     /* ===================================================================================
                 Sphere and Cube
     =====================================================================================*/
-#ifdef SPHEREANDCUBE
+    if(scene == SPHEREANDCUBE){
         sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(10.0f, -7.5f, -18.0f));
         glApp->getScene()->addLight(sun);
-        sun->prepare(width/2, height/2, 10.0f, 0.1f, 1000.0f, glm::vec3(-7.0f + 6, 10.f, 15.f + 6), glm::vec3(3.0f + 6, 2.5f, -3.0f + 6));
-#endif
+        sun->prepare(width/rsmBufferResolution, height/rsmBufferResolution, 10.0f, 0.1f, 1000.0f, glm::vec3(-7.0f + 6, 10.f, 15.f + 6), glm::vec3(3.0f + 6, 2.5f, -3.0f + 6));
+    }
 
     /* ===================================================================================
                 Lucy
     =====================================================================================*/
-#ifdef LUCY
+    if(scene == LUCY){
         sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
         glApp->getScene()->addLight(sun);
-        sun->prepare(width/2, height/2, 10.0f, 0.1f, 1000.0f, glm::vec3(10.f + 6, 10.f, 10.f + 6), glm::vec3(0.f + 6, 0.f, 0.f + 6));
-#endif
+        sun->prepare(width/rsmBufferResolution, height/rsmBufferResolution, 10.0f, 0.1f, 1000.0f, glm::vec3(10.f + 6, 10.f, 10.f + 6), glm::vec3(0.f + 6, 0.f, 0.f + 6));
+    }
 
     /* ===================================================================================
                 Crytek Sponza
     =====================================================================================*/
-#ifdef SPONZA
+    if(scene == SPONZA){
         sref<DirectionalLight> sun = make_sref<DirectionalLight>(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-89.5f, -85.0f, -15.0f));
         glApp->getScene()->addLight(sun);
-        sun->prepare(width/2, height/2, 100.0f, 0.1f, 100000.0f, glm::vec3(50.f + 150, 85.f, 5.f + 100), glm::vec3(-39.5f + 150, 0.f, -10.f + 100));
-#endif
+        sun->prepare(width/rsmBufferResolution, height/rsmBufferResolution, 100.0f, 0.1f, 100000.0f, glm::vec3(50.f + 150, 85.f, 5.f + 100), glm::vec3(-39.5f + 150, 0.f, -10.f + 100));
+    }
 
     /* ===================================================================================
                 Cornell Box
@@ -159,7 +158,7 @@ void init() {
                std::string("#extension GL_EXT_shader_io_blocks : enable\n") +
                lightDef +
                std::string("precision highp float;\n") +
-               std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
+               std::string("const int NUM_VPL = ") + std::to_string(numVPL) + ";\n");
     vBP.compile();
     fBP.compile();
 
@@ -172,7 +171,7 @@ void init() {
                std::string("#extension GL_EXT_shader_io_blocks : enable\n") +
                lightDef +
                std::string("precision highp float;\n") +
-               std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
+               std::string("const int NUM_VPL = ") + std::to_string(numVPL) + ";\n");
     vBPT.compile();
     fBPT.compile();
 
@@ -184,7 +183,7 @@ void init() {
                std::string("#extension GL_EXT_shader_io_blocks : enable\n") +
                lightDef +
                std::string("precision highp float;\n") +
-               std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
+               std::string("const int NUM_VPL = ") + std::to_string(numVPL) + ";\n");
     vDS.compile();
     fDS.compile();
 
@@ -195,7 +194,7 @@ void init() {
     fII.inject(std::string("#version 320 es\n") +
                std::string("#extension GL_EXT_shader_io_blocks : enable\n") +
                std::string("precision highp float;\n") +
-               std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
+               std::string("const int NUM_VPL = ") + std::to_string(numVPL) + ";\n");
     vII.compile();
     fII.compile();
 
@@ -289,9 +288,10 @@ void init() {
     /* ===================================================================================
                 Sphere and Cube
     =====================================================================================*/
-#ifdef SPHEREANDCUBE
+    if(scene == SPHEREANDCUBE) {
         sref<Model> SphereCube = make_sref<Model>("SphereCube");
-        SphereCube->loadFromMemory(getAssetSource("models/Sphere and Cube/spherecube.obj"), getAssetSource("models/Sphere and Cube/spherecube.mtl"));
+        SphereCube->loadFromMemory(getAssetSource("models/Sphere and Cube/spherecube.obj"),
+                                   getAssetSource("models/Sphere and Cube/spherecube.mtl"));
         RM.addModel("SphereCube", SphereCube);
         SphereCube->prepare();
         SphereCube->setPosition(glm::vec3(6.0f, 0.0f, 6.0f));
@@ -305,14 +305,20 @@ void init() {
 
         glApp->setCamera(camera);
         glApp->getScene()->addCamera(camera);
-#endif
+
+        glApp->setRSMRMax(0.5f);
+        glApp->setRSMIntensity(6.0f);
+        glApp->setGlobalSpecular(0.5f, 0.5f, 0.5f);
+        glApp->setGlobalShininess(225.0f);
+    }
 
     /* ===================================================================================
                 Lucy
     =====================================================================================*/
-#ifdef LUCY
+    if(scene == LUCY) {
         sref<Model> Lucy = make_sref<Model>("Lucy");
-        Lucy->loadFromMemory(getAssetSource("models/Lucy/Lucy.obj"), getAssetSource("models/Lucy/Lucy.mtl"));
+        Lucy->loadFromMemory(getAssetSource("models/Lucy/Lucy.obj"),
+                             getAssetSource("models/Lucy/Lucy.mtl"));
         RM.addModel("Lucy", Lucy);
         Lucy->prepare();
         Lucy->setPosition(glm::vec3(6.0f, 0.0f, 6.0f));
@@ -326,18 +332,24 @@ void init() {
 
         glApp->setCamera(camera);
         glApp->getScene()->addCamera(camera);
-#endif
+
+        glApp->setRSMRMax(0.3f);
+        glApp->setRSMIntensity(3.0f);
+        glApp->setGlobalSpecular(0.5f, 0.5f, 0.5f);
+        glApp->setGlobalShininess(225.0f);
+    }
 
     /* ===================================================================================
                 Crytek Sponza
     =====================================================================================*/
-#ifdef SPONZA
+    if(scene == SPONZA) {
         loadTextures("models/crytek sponza/textures", "astc", "textures\\");
         checkOpenGLError("Error during texture loading!");
         LOG("Textures loaded...\n");
 
         sref<Model> sponza = make_sref<Model>("sponza");
-        sponza->loadFromMemory(getAssetSource("models/crytek sponza/sponza.obj"), getAssetSource("models/crytek sponza/sponza.mtl"));
+        sponza->loadFromMemory(getAssetSource("models/crytek sponza/sponza.obj"),
+                               getAssetSource("models/crytek sponza/sponza.mtl"));
         RM.addModel("sponza", sponza);
         sponza->prepare();
         sponza->setScale(0.05f, 0.05f, 0.05f);
@@ -352,7 +364,12 @@ void init() {
 
         glApp->setCamera(camera);
         glApp->getScene()->addCamera(camera);
-#endif
+
+        glApp->setRSMRMax(0.3f);
+        glApp->setRSMIntensity(400.0f);
+        glApp->setGlobalSpecular(0.0f, 0.0f, 0.0f);
+        glApp->setGlobalShininess(10.2f);
+    }
 
     /* ===================================================================================
                 Cornell Box
@@ -523,15 +540,15 @@ long getCurrentTime(){
 
 extern "C"
 {
-    JNIEXPORT void JNICALL Java_com_rbenjamim_rsm_AndroidApp_init(JNIEnv *env, jclass type, jobject aMgr);
+    JNIEXPORT void JNICALL Java_com_rbenjamim_rsm_AndroidApp_init(JNIEnv *env, jclass type, jobject aMgr, jint scene, jint rsmVersion, jint numVPL, jint indirectWidth, jint indirectHeight, jint gbufferResolution, jint rsmBufferResolution);
     JNIEXPORT void JNICALL Java_com_rbenjamim_rsm_AndroidApp_resize(JNIEnv *env, jclass type, jint width, jint height);
     JNIEXPORT void JNICALL Java_com_rbenjamim_rsm_AndroidApp_render(JNIEnv *env, jclass type);
     JNIEXPORT jint JNICALL Java_com_rbenjamim_rsm_AndroidApp_getInstantFPS(JNIEnv* env, jclass type);
 };
 
-JNIEXPORT void JNICALL Java_com_rbenjamim_rsm_AndroidApp_init(JNIEnv* env, jclass type, jobject aMgr) {
+JNIEXPORT void JNICALL Java_com_rbenjamim_rsm_AndroidApp_init(JNIEnv *env, jclass type, jobject aMgr, jint scene, jint rsmVersion, jint numVPL, jint indirectWidth, jint indirectHeight, jint gbufferResolution, jint rsmBufferResolution) {
     assetManager = AAssetManager_fromJava(env, aMgr);
-    init();
+    init(scene, rsmVersion, numVPL, indirectWidth, indirectHeight, gbufferResolution, rsmBufferResolution);
 }
 
 JNIEXPORT void JNICALL Java_com_rbenjamim_rsm_AndroidApp_resize(JNIEnv* env, jclass type, jint width, jint height) {

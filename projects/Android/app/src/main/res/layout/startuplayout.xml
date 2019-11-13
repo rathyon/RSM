@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:text="Scenes"
             android:textAlignment="center"
-            android:textSize="30sp"
+            android:textSize="24sp"
             android:textStyle="bold" />
 
         <RadioGroup
@@ -28,6 +28,7 @@
                 android:id="@+id/radSNC"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:onClick="onSceneClick"
                 android:text="SNC"
                 android:textAlignment="viewStart" />
 
@@ -35,12 +36,14 @@
                 android:id="@+id/radLucy"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:onClick="onSceneClick"
                 android:text="Lucy" />
 
             <RadioButton
                 android:id="@+id/radSponza"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:onClick="onSceneClick"
                 android:text="Sponza" />
 
         </RadioGroup>
@@ -51,7 +54,7 @@
             android:layout_height="wrap_content"
             android:text="Resolution"
             android:textAlignment="center"
-            android:textSize="30sp"
+            android:textSize="24sp"
             android:textStyle="bold" />
 
         <RadioGroup
@@ -65,6 +68,7 @@
                 android:layout_width="128dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:onClick="onResolutionClick"
                 android:text="1480x720" />
 
             <RadioButton
@@ -72,6 +76,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:onClick="onResolutionClick"
                 android:text="2220x1080" />
         </RadioGroup>
 
@@ -81,7 +86,7 @@
             android:layout_height="wrap_content"
             android:text="RSM Scale"
             android:textAlignment="center"
-            android:textSize="30sp"
+            android:textSize="24sp"
             android:textStyle="bold" />
 
         <RadioGroup
@@ -94,14 +99,63 @@
                 android:id="@+id/radFullRes"
                 android:layout_width="259dp"
                 android:layout_height="wrap_content"
+                android:onClick="onRSMScaleClick"
                 android:text="1x" />
 
             <RadioButton
                 android:id="@+id/radHalfRes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:onClick="onRSMScaleClick"
                 android:text="0.5x" />
 
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/textIndirectResolution"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Indirect Map Resolution"
+            android:textAlignment="center"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rad32i"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:checked="true"
+                android:onClick="onIndirectClick"
+                android:text="32x32" />
+
+            <RadioButton
+                android:id="@+id/rad64i"
+                android:layout_width="113dp"
+                android:layout_height="wrap_content"
+                android:onClick="onIndirectClick"
+                android:text="64x64" />
+
+            <RadioButton
+                android:id="@+id/rad128i"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="onIndirectClick"
+                android:text="128x128" />
+
+            <RadioButton
+                android:id="@+id/rad256i"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="onIndirectClick"
+                android:text="256x256" />
         </RadioGroup>
 
     </LinearLayout>
@@ -129,18 +183,21 @@
                 android:id="@+id/rad32"
                 android:layout_width="120sp"
                 android:layout_height="wrap_content"
+                android:onClick="onSamplesClick"
                 android:text="32" />
 
             <RadioButton
                 android:id="@+id/rad64"
                 android:layout_width="120sp"
                 android:layout_height="wrap_content"
+                android:onClick="onSamplesClick"
                 android:text="64" />
 
             <RadioButton
                 android:id="@+id/rad128"
                 android:layout_width="120sp"
                 android:layout_height="40sp"
+                android:onClick="onSamplesClick"
                 android:text="128"
                 android:textAlignment="viewStart"
                 android:translationX="120sp"
@@ -150,6 +207,7 @@
                 android:id="@+id/rad256"
                 android:layout_width="120sp"
                 android:layout_height="40sp"
+                android:onClick="onSamplesClick"
                 android:text="256"
                 android:translationX="120sp"
                 android:translationY="-84sp" />
@@ -175,18 +233,21 @@
                 android:id="@+id/radForward"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:onClick="onVersionClick"
                 android:text="Forward" />
 
             <RadioButton
                 android:id="@+id/radDeferred"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:onClick="onVersionClick"
                 android:text="Deferred" />
 
             <RadioButton
                 android:id="@+id/radAccelerated"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:onClick="onVersionClick"
                 android:text="Accelerated" />
         </RadioGroup>
 

@@ -27,10 +27,18 @@ const enum TestScenes {
 	SIBENIK_T = 5
 };
 
+const enum RSMVersions {
+	FORWARD = 0,
+	DEFERRED = 1,
+	ACCELERATED = 2
+};
+
 int TestScene = TestScenes::LUCY_T;
+int num_vpl = 64;
+int indirect_res = 128;
 
 void rsm::init(int argc, char* argv[]) {
-	glApp = new OpenGLApplication(WND_W, WND_H);
+	glApp = new OpenGLApplication(WND_W, WND_H, FORWARD, num_vpl, indirect_res, indirect_res);
 
 	width = WND_W;
 	height = WND_H;
@@ -162,7 +170,7 @@ void rsm::init(int argc, char* argv[]) {
 		vBP.inject(std::string("#version 330 core\n"));
 		fBP.inject(std::string("#version 330 core\n") +
 			lightDef +
-			std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
+			std::string("const int NUM_VPL = ") + std::to_string(num_vpl) + ";\n");
 		vBP.compile();
 		fBP.compile();
 
@@ -171,7 +179,7 @@ void rsm::init(int argc, char* argv[]) {
 		vBPT.inject(std::string("#version 330 core\n"));
 		fBPT.inject(std::string("#version 330 core\n") +
 			lightDef +
-			std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
+			std::string("const int NUM_VPL = ") + std::to_string(num_vpl) + ";\n");
 		vBPT.compile();
 		fBPT.compile();
 
@@ -180,7 +188,7 @@ void rsm::init(int argc, char* argv[]) {
 		vDS.inject(std::string("#version 330 core\n"));
 		fDS.inject(std::string("#version 330 core\n") +
 			lightDef +
-			std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
+			std::string("const int NUM_VPL = ") + std::to_string(num_vpl) + ";\n");
 		vDS.compile();
 		fDS.compile();
 
@@ -188,7 +196,7 @@ void rsm::init(int argc, char* argv[]) {
 		ShaderSource fII = ShaderSource(FRAGMENT_SHADER, "../../../src/Shaders/IndirectIllumination.fs");
 		vII.inject(std::string("#version 330 core\n"));
 		fII.inject(std::string("#version 330 core\n") +
-			std::string("const int NUM_VPL = ") + std::to_string(NUM_VPL) + ";\n");
+			std::string("const int NUM_VPL = ") + std::to_string(num_vpl) + ";\n");
 		vII.compile();
 		fII.compile();
 
@@ -292,6 +300,11 @@ void rsm::init(int argc, char* argv[]) {
 
 		glApp->setCamera(camera);
 		glApp->getScene()->addCamera(camera);
+
+		glApp->setRSMRMax(0.5f);
+		glApp->setRSMIntensity(6.0f);
+		glApp->setGlobalSpecular(glm::vec3(0.5f, 0.5f, 0.5f));
+		glApp->setGlobalShininess(225.0f);
 	}
 
 	/* ===================================================================================
@@ -314,6 +327,11 @@ void rsm::init(int argc, char* argv[]) {
 
 		glApp->setCamera(camera);
 		glApp->getScene()->addCamera(camera);
+
+		glApp->setRSMRMax(0.3f);
+		glApp->setRSMIntensity(3.0f);
+		glApp->setGlobalSpecular(glm::vec3(0.5f, 0.5f, 0.5f));
+		glApp->setGlobalShininess(225.0f);
 	}
 
 	/* ===================================================================================
@@ -337,6 +355,11 @@ void rsm::init(int argc, char* argv[]) {
 
 		glApp->setCamera(camera);
 		glApp->getScene()->addCamera(camera);
+
+		glApp->setRSMRMax(0.3f);
+		glApp->setRSMIntensity(400.0f);
+		glApp->setGlobalSpecular(glm::vec3(0.0f, 0.0f, 0.0f));
+		glApp->setGlobalShininess(10.2f);
 	}
 
 	/* ===================================================================================

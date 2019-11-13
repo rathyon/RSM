@@ -6,9 +6,13 @@
 
 using namespace rsm;
 
-OpenGLApplication::OpenGLApplication(int width, int height) {
+OpenGLApplication::OpenGLApplication(int width, int height, int rsm_version, int num_vpl, int indirect_width, int indirect_height) {
 	_width = width;
 	_height = height;
+	_rsm_version = rsm_version;
+	_num_vpl = num_vpl;
+	_indirect_width = indirect_width;
+	_indirect_height = indirect_height;
 
 	_gBufferWidth = width;
 	_gBufferHeight = height;
@@ -89,6 +93,14 @@ void OpenGLApplication::setRSMRMax(float val) {
 
 void OpenGLApplication::setRSMIntensity(float val) {
 	_rsmIntensity = val;
+}
+
+void OpenGLApplication::setGlobalSpecular(float r, float g, float b) {
+	_globalSpecular = glm::vec3(r,g,b);
+}
+
+void OpenGLApplication::setGlobalShininess(float globalShininess) {
+	_globalShininess = globalShininess;
 }
 
 void OpenGLApplication::prepareDeferredShading() {
@@ -174,44 +186,53 @@ void OpenGLApplication::prepareDeferredShading() {
 
 	GLuint prog = RM.getShader("DeferredShading")->id();
 	glUseProgram(prog);
-    glUniform3fv(glGetUniformLocation(prog, "Specular"), 1, glm::value_ptr(SPECULAR));
-    glUniform1f(glGetUniformLocation(prog, "shininess"), SHININESS);
+    glUniform3fv(glGetUniformLocation(prog, "Specular"), 1, glm::value_ptr(_globalSpecular));
+    glUniform1f(glGetUniformLocation(prog, "shininess"), _globalShininess);
     glUseProgram(0);
 }
 
 void OpenGLApplication::prepareRSM() {
-	_rsmRMax = VPL_DIST_MAX;
-	_rsmIntensity = RSM_INTENSITY;
+	//_rsmRMax = VPL_DIST_MAX;
+	//_rsmIntensity = RSM_INTENSITY;
 	// precalculate sampling pattern
 
-	for (int i = 0; i < NUM_VPL; i++) {
-		double* sample = hammersley(i, 2, NUM_VPL);
+	_VPLSamples.resize(_num_vpl);
+	_VPLWeights.resize(_num_vpl);
+	_VPLCoords.resize(_num_vpl);
+
+	for (int i = 0; i < _num_vpl; i++) {
+		double* sample = hammersley(i, 2, _num_vpl);
 		//double sample[2];
 		//sample[0] = randf();
 		//sample[1] = randf();
-		VPLSamples[i][0] = (float)sample[0];
-		VPLSamples[i][1] = (float)sample[1];
-		VPLWeights[i] = VPLSamples[i][0] * VPLSamples[i][0];
-		VPLCoords[i][0] = VPL_DIST_MAX * VPLSamples[i][0] * glm::sin(TWO_PI * VPLSamples[i][1]);
-		VPLCoords[i][1] = VPL_DIST_MAX * VPLSamples[i][0] * glm::cos(TWO_PI * VPLSamples[i][1]);
+
+		_VPLSamples[i].resize(2);
+		_VPLCoords[i].resize(2);
+
+		_VPLSamples[i][0] = (float)sample[0];
+		_VPLSamples[i][1] = (float)sample[1];
+
+		_VPLWeights[i] = _VPLSamples[i][0] * _VPLSamples[i][0];
+		_VPLCoords[i][0] = _rsmRMax * _VPLSamples[i][0] * glm::sin(TWO_PI * _VPLSamples[i][1]);
+		_VPLCoords[i][1] = _rsmRMax * _VPLSamples[i][0] * glm::cos(TWO_PI * _VPLSamples[i][1]);
 	}
 
 	// upload RSM data
 	for (GLuint prog : _programs) {
 		glUseProgram(prog);
-		for (int i = 0; i < NUM_VPL; i++) {
+		for (int i = 0; i < _num_vpl; i++) {
 			std::string name = "VPLSamples[" + std::to_string(i) + "]";
-			glUniform2fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(glm::vec2(VPLSamples[i][0], VPLSamples[i][1])));
+			glUniform2fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(glm::vec2(_VPLSamples[i][0], _VPLSamples[i][1])));
 			name = "VPLWeights[" + std::to_string(i) + "]";
-			glUniform1f(glGetUniformLocation(prog, name.c_str()), VPLWeights[i]);
+			glUniform1f(glGetUniformLocation(prog, name.c_str()), _VPLWeights[i]);
 			name = "VPLCoords[" + std::to_string(i) + "]";
-			glUniform2fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(glm::vec2(VPLCoords[i][0], VPLCoords[i][1])));
+			glUniform2fv(glGetUniformLocation(prog, name.c_str()), 1, glm::value_ptr(glm::vec2(_VPLCoords[i][0], _VPLCoords[i][1])));
 		}
 		glUniform1f(glGetUniformLocation(prog, "rsmRMax"), _rsmRMax);
 		glUniform1f(glGetUniformLocation(prog, "rsmIntensity"), _rsmIntensity);
 
-		glUniform2f(glGetUniformLocation(prog, "lowResIndirectSize"), (float)LOW_RES_INDIRECT_WIDTH, (float)LOW_RES_INDIRECT_HEIGHT);
-		glUniform2f(glGetUniformLocation(prog, "texelSize"), 1.0f / (float)LOW_RES_INDIRECT_WIDTH, 1.0f / (float)LOW_RES_INDIRECT_HEIGHT);
+		glUniform2f(glGetUniformLocation(prog, "lowResIndirectSize"), (float)_indirect_width, (float)_indirect_height);
+		glUniform2f(glGetUniformLocation(prog, "texelSize"), 1.0f / (float)_indirect_width, 1.0f / (float)_indirect_height);
 	}
 	glUseProgram(0);
 
@@ -223,8 +244,8 @@ void OpenGLApplication::prepareRSM() {
 	// e.g max dist = 10 world space units; cos(45deg) 
 	_indirectSampleParams = glm::vec4(4.0f, 1.0f, glm::cos(glm::radians(45.0f)), 1.0f);
 
-	_indirectLowResWidth = LOW_RES_INDIRECT_WIDTH;
-	_indirectLowResHeight = LOW_RES_INDIRECT_HEIGHT;
+	_indirectLowResWidth = _indirect_width;
+	_indirectLowResHeight = _indirect_height;
 	glGenFramebuffers(1, &_indirectLowResFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, _indirectLowResFBO);
 
@@ -250,13 +271,9 @@ void OpenGLApplication::prepare() {
 	// Prepare shared buffers
 	prepareCameraBuffer();
 
-#ifdef RSM_DEFERRED_NAIVE
-	prepareDeferredShading();
-#endif
-
-#ifdef RSM_DEFERRED_INTERPOLATED
-	prepareDeferredShading();
-#endif
+	if (_rsm_version != 0) {
+		prepareDeferredShading();
+	}
 
 	prepareRSM();
 
@@ -349,67 +366,65 @@ void OpenGLApplication::render() {
 	genRSMaps();
 	checkOpenGLError("Error generating depth maps!");
 
-#ifdef RSM_NAIVE
-	// Clear framebuffer...
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	if (_rsm_version == 0) {
+		// Clear framebuffer...
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// Upload shadow mapping data...
-	uploadShadowMappingData();
-	checkOpenGLError("Error uploading shadow mapping data!");
+		// Upload shadow mapping data...
+		uploadShadowMappingData();
+		checkOpenGLError("Error uploading shadow mapping data!");
 
-	// Render scene...
-	_scene.render();
-#endif
+		// Render scene...
+		_scene.render();
+	}
+	else if (_rsm_version == 1) {
+		// Geometry Pass (Deferred Shading) GBuffer...
+		geometryPass();
+		checkOpenGLError("Error in geometry pass!");
 
-#ifdef RSM_DEFERRED_NAIVE
-	// Geometry Pass (Deferred Shading) GBuffer...
-	geometryPass();
-	checkOpenGLError("Error in geometry pass!");
+		// Clear framebuffer...
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// Clear framebuffer...
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		// Upload deferred shading data...
+		uploadDeferredShadingData();
+		checkOpenGLError("Error uploading deferred shading data!");
 
-	// Upload deferred shading data...
-	uploadDeferredShadingData();
-	checkOpenGLError("Error uploading deferred shading data!");
+		// Upload deferred shading data...
+		uploadDeferredShadingData();
+		checkOpenGLError("Error uploading deferred shading data!");
 
-	// Upload deferred shading data...
-	uploadDeferredShadingData();
-	checkOpenGLError("Error uploading deferred shading data!");
+		// Upload shadow mapping data...
+		uploadShadowMappingData();
+		checkOpenGLError("Error uploading shadow mapping data!");
 
-	// Upload shadow mapping data...
-	uploadShadowMappingData();
-	checkOpenGLError("Error uploading shadow mapping data!");
+		renderScreenQuad();
+	}
+	else {
+		// Geometry Pass (Deferred Shading) GBuffer...
+		geometryPass();
+		checkOpenGLError("Error in geometry pass!");
 
-	renderScreenQuad();
-#endif
+		// Clear framebuffer...
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-#ifdef RSM_DEFERRED_INTERPOLATED
-	// Geometry Pass (Deferred Shading) GBuffer...
-	geometryPass();
-	checkOpenGLError("Error in geometry pass!");
+		// Upload deferred shading data...
+		uploadDeferredShadingData();
+		checkOpenGLError("Error uploading deferred shading data!");
 
-	// Clear framebuffer...
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		// Upload deferred shading data...
+		uploadDeferredShadingData();
+		checkOpenGLError("Error uploading deferred shading data!");
 
-	// Upload deferred shading data...
-	uploadDeferredShadingData();
-	checkOpenGLError("Error uploading deferred shading data!");
+		// Upload shadow mapping data...
+		uploadShadowMappingData();
+		checkOpenGLError("Error uploading shadow mapping data!");
 
-	// Upload deferred shading data...
-	uploadDeferredShadingData();
-	checkOpenGLError("Error uploading deferred shading data!");
+		renderLowResIndirect();
 
-	// Upload shadow mapping data...
-	uploadShadowMappingData();
-	checkOpenGLError("Error uploading shadow mapping data!");
+		uploadLowResIndirect();
 
-	renderLowResIndirect();
-
-	uploadLowResIndirect();
-
-	renderScreenQuad();
-#endif
+		renderScreenQuad();
+	}
 
 	checkOpenGLError("Error in render loop!");
 

@@ -24,20 +24,10 @@
 #define IP_ANGLE_CREASE 45.0f
 #define IP_ANGLE_WEIGHT 1.0f
 
-// ive decided I will only have 1 light AT ANY TIME
-#define RSM_NAIVE
-//#define RSM_DEFERRED_NAIVE
-//#define RSM_DEFERRED_INTERPOLATED
-
-#define NUM_VPL 64
-
-#define LOW_RES_INDIRECT_WIDTH 128
-#define LOW_RES_INDIRECT_HEIGHT 128
-
 //#define CONFERENCE
 
 //#define SPHEREANDCUBE
-#define LUCY
+//#define LUCY
 //#define SPONZA
 
 //#define CORNELL

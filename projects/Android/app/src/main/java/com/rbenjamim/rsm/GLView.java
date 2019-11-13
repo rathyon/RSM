@@ -17,10 +17,18 @@ public class GLView extends GLSurfaceView {
     public static AssetManager assetManager;
 
     private MainActivity mainActivity;
+    private int _scene, _rsmVersion, _numVPL, _indirectWidth, _indirectHeight, _gbufferResolution, _rsmResolution;
 
-    public GLView(Context context, AssetManager aMgr){
+    public GLView(Context context, AssetManager aMgr, int scene, int rsmVersion, int numVPL, int indirectWidth, int indirectHeight, int gbufferResolution, int rsmResolution){
         super(context);
         assetManager = aMgr;
+        _scene = scene;
+        _rsmVersion = rsmVersion;
+        _numVPL = numVPL;
+        _indirectWidth = indirectWidth;
+        _indirectHeight = indirectHeight;
+        _gbufferResolution = gbufferResolution;
+        _rsmResolution = rsmResolution;
 
         setEGLConfigChooser(true);
         setEGLConfigChooser(RED_BITS, GREEN_BITS, BLUE_BITS, ALPHA_BITS, DEPTH_BITS, STENCIL_BITS);
@@ -35,7 +43,7 @@ public class GLView extends GLSurfaceView {
 
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-            AndroidApp.init(assetManager);
+            AndroidApp.init(assetManager, _scene, _rsmVersion, _numVPL, _indirectWidth, _indirectHeight, _gbufferResolution, _rsmResolution);
         }
 
         @Override

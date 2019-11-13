@@ -23,8 +23,16 @@ import android.widget.TextView;
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
+        int scene = getIntent().getIntExtra("scene", 0);
+        int rsmVersion = getIntent().getIntExtra("rsmVersion", 0);;
+        int numVPL = getIntent().getIntExtra("numVPL", 32);;
+        int indirectWidth = getIntent().getIntExtra("indirectWidth", 32);;
+        int indirectHeight = getIntent().getIntExtra("indirectHeight", 32);;
+        int gbufferResolution = getIntent().getIntExtra("gbufferResolution", 0);;
+        int rsmResolution = getIntent().getIntExtra("rsmResolution", 1);;
+
         assetManager = getResources().getAssets();
-        glView = new GLView(this, assetManager);
+        glView = new GLView(this, assetManager, scene, rsmVersion, numVPL, indirectWidth, indirectHeight, gbufferResolution, rsmResolution);
 
         int uiOptions = GLView.SYSTEM_UI_FLAG_HIDE_NAVIGATION | GLView.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION  | GLView.SYSTEM_UI_FLAG_FULLSCREEN;
         glView.setSystemUiVisibility(uiOptions);

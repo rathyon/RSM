@@ -21,7 +21,7 @@ namespace rsm {
 
 	class OpenGLApplication {
 	public:
-		OpenGLApplication(int width, int height);
+		OpenGLApplication(int width, int height, int rsm_version, int num_vpl, int indirect_width, int indirect_height);
 
 		void init();
 		void prepare();
@@ -48,6 +48,8 @@ namespace rsm {
 
 		void setRSMRMax(float val);
 		void setRSMIntensity(float val);
+		void setGlobalSpecular(float r, float g, float b);
+		void setGlobalShininess(float globalShininess);
 
 	private:
 		void prepareCameraBuffer();
@@ -63,6 +65,15 @@ namespace rsm {
 
 		Scene _scene;
 		sref<Camera> _camera;
+
+		// State variables (too much effort to actually use State Pattern...)
+		// 0 = Forward; 1 = Deferred; 2 = Accelerated Deferred
+		int _rsm_version;
+		int _num_vpl;
+		int _indirect_width, _indirect_height;
+		glm::vec3 _globalSpecular;
+		float _globalShininess;
+
 
 		// Deferred Shading
 		int _gBufferWidth;
@@ -81,9 +92,12 @@ namespace rsm {
 		// RSM
 		float _rsmRMax;
 		float _rsmIntensity;
-		GLfloat VPLSamples[NUM_VPL][2];
-		GLfloat VPLWeights[NUM_VPL];
-		GLfloat VPLCoords[NUM_VPL][2];
+		//GLfloat VPLSamples[NUM_VPL][2];
+		//GLfloat VPLWeights[NUM_VPL];
+		//GLfloat VPLCoords[NUM_VPL][2];
+		std::vector< std::vector<GLfloat>> _VPLSamples;
+		std::vector<GLfloat> _VPLWeights;
+		std::vector< std::vector<GLfloat>> _VPLCoords;
 
 		int _indirectLowResWidth;
 		int _indirectLowResHeight;
