@@ -303,7 +303,7 @@ void rsm::init(int argc, char* argv[]) {
 
 		glApp->setRSMRMax(0.5f);
 		glApp->setRSMIntensity(6.0f);
-		glApp->setGlobalSpecular(glm::vec3(0.5f, 0.5f, 0.5f));
+		glApp->setGlobalSpecular(0.5f, 0.5f, 0.5f);
 		glApp->setGlobalShininess(225.0f);
 	}
 
@@ -330,7 +330,7 @@ void rsm::init(int argc, char* argv[]) {
 
 		glApp->setRSMRMax(0.3f);
 		glApp->setRSMIntensity(3.0f);
-		glApp->setGlobalSpecular(glm::vec3(0.5f, 0.5f, 0.5f));
+		glApp->setGlobalSpecular(0.5f, 0.5f, 0.5f);
 		glApp->setGlobalShininess(225.0f);
 	}
 
@@ -358,7 +358,7 @@ void rsm::init(int argc, char* argv[]) {
 
 		glApp->setRSMRMax(0.3f);
 		glApp->setRSMIntensity(400.0f);
-		glApp->setGlobalSpecular(glm::vec3(0.0f, 0.0f, 0.0f));
+		glApp->setGlobalSpecular(0.0f, 0.0f, 0.0f);
 		glApp->setGlobalShininess(10.2f);
 	}
 
